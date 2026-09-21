@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AV Chopper & Live Sampler Studio</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-header">
+    <div class="brand">
+      <div class="brand-logo"></div>
+      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio</span></div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot" id="midiDot"></div>
+      <span id="midiStatus">Buscando controlador MIDI...</span>
+    </div>
+    <div class="header-controls">
+      <button id="recBtn" class="btn btn-rec">🔴 Iniciar REC (1080p)</button>
+    </div>
+  </header>
+
+  <!-- Main Workspace -->
+  <main class="app-layout">
+    
+    <!-- Left Area: Canvas & Pads -->
+    <section class="main-workspace">
+      
+      <!-- Output Monitor Canvas (1080p interno) -->
+      <div class="canvas-container">
+        <div class="canvas-overlay-tag">CANVAS OUT: 1920x1080 @ 60FPS</div>
+        <canvas id="mainCanvas" width="1920" height="1080"></canvas>
+      </div>
+
+      <!-- 8 Pads Grid -->
+      <div class="pads-grid" id="padsGrid">
+        <!-- Generado dinámicamente o por plantilla -->
+      </div>
+    </section>
+
+    <!-- Right Sidebar: Settings & Routing -->
+    <aside class="sidebar">
+      
+      <!-- Audio Settings -->
+      <div class="settings-card">
+        <div class="card-title">🔊 Ruteo de Audio</div>
+        <div class="form-group">
+          <label class="form-label" for="audioOutputSelect">Dispositivo de Salida (Sink ID)</label>
+          <select id="audioOutputSelect" class="form-select">
+            <option>Cargando interfaces de audio...</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- MIDI Settings -->
+      <div class="settings-card">
+        <div class="card-title">🎹 Configuración MIDI</div>
+        <div class="form-group">
+          <label class="form-label" for="midiInputSelect">Dispositivo MIDI Detectado</label>
+          <select id="midiInputSelect" class="form-select" disabled>
+            <option>Ningún dispositivo conectado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Control High-Pass Global</label>
+          <input type="text" class="form-input" value="Encoder CC 112 (Pad Activo)" readonly>
+        </div>
+      </div>
+
+      <!-- Export Settings -->
+      <div class="settings-card">
+        <div class="card-title">🎥 Grabación y Exportación</div>
+        <div class="form-group">
+          <label class="form-label">Formato de Salida</label>
+          <input type="text" class="form-input" value="WebM / VP9 + Opus (8 Mbps)" readonly>
+        </div>
+      </div>
+
+      <div class="code-box">
+        💡 Arrastra y suelta archivos .mp4 o .webm directamente sobre cualquiera de los 8 pads.
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- Contenedor oculto para la carga de elementos de video -->
+  <div id="videoBank" style="display: none;"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
