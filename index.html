@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AV Chopper & Live Sampler Studio</title>
+  <title>AV Chopper & Live Sampler Studio Pro</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,13 +12,26 @@
   <header class="app-header">
     <div class="brand">
       <div class="brand-logo"></div>
-      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio</span></div>
+      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio Pro</span></div>
     </div>
+
+    <!-- Master Volume Control -->
+    <div class="master-vol-container">
+      <label for="masterVolRange">🔊 VOL MÁSTER:</label>
+      <input type="range" id="masterVolRange" min="0" max="1" step="0.01" value="0.8">
+      <span id="masterVolLabel">80%</span>
+    </div>
+
     <div class="status-badge">
       <div class="status-dot" id="midiDot"></div>
       <span id="midiStatus">Buscando controlador MIDI...</span>
     </div>
+
+    <!-- Project Save / Load & Rec Controls -->
     <div class="header-controls">
+      <button id="exportProjBtn" class="btn">💾 Exportar Proyecto</button>
+      <button id="importProjBtn" class="btn">📂 Cargar Proyecto</button>
+      <input type="file" id="importProjInput" accept=".json" style="display:none;">
       <button id="recBtn" class="btn btn-rec">🔴 Iniciar REC (1080p)</button>
     </div>
   </header>
@@ -33,17 +46,34 @@
       <div class="canvas-container">
         <div class="canvas-overlay-tag">CANVAS OUT: 1920x1080 @ 60FPS</div>
         <canvas id="mainCanvas" width="1920" height="1080"></canvas>
+        <!-- Contenedor oculto/dinámico para reproductores de YouTube -->
+        <div id="ytPlayersContainer"></div>
       </div>
 
       <!-- 8 Pads Grid -->
       <div class="pads-grid" id="padsGrid">
-        <!-- Generado dinámicamente o por plantilla -->
+        <!-- Generado dinámicamente por JS -->
       </div>
     </section>
 
-    <!-- Right Sidebar: Settings & Routing -->
+    <!-- Right Sidebar: Settings & Controls -->
     <aside class="sidebar">
       
+      <!-- Keyboard Mapping Info -->
+      <div class="settings-card">
+        <div class="card-title">⌨️ Disparo por Teclado QWER/ASDF</div>
+        <div class="keyboard-map-grid">
+          <div><kbd>Q</kbd> Pad 1</div>
+          <div><kbd>W</kbd> Pad 2</div>
+          <div><kbd>E</kbd> Pad 3</div>
+          <div><kbd>R</kbd> Pad 4</div>
+          <div><kbd>A</kbd> Pad 5</div>
+          <div><kbd>S</kbd> Pad 6</div>
+          <div><kbd>D</kbd> Pad 7</div>
+          <div><kbd>F</kbd> Pad 8</div>
+        </div>
+      </div>
+
       <!-- Audio Settings -->
       <div class="settings-card">
         <div class="card-title">🔊 Ruteo de Audio</div>
@@ -70,25 +100,18 @@
         </div>
       </div>
 
-      <!-- Export Settings -->
-      <div class="settings-card">
-        <div class="card-title">🎥 Grabación y Exportación</div>
-        <div class="form-group">
-          <label class="form-label">Formato de Salida</label>
-          <input type="text" class="form-input" value="WebM / VP9 + Opus (8 Mbps)" readonly>
-        </div>
-      </div>
-
       <div class="code-box">
-        💡 Arrastra y suelta archivos .mp4 o .webm directamente sobre cualquiera de los 8 pads.
+        💡 Usa archivos locales (.mp4) o pega un link de YouTube en el Pad. Ajusta el tiempo de inicio Cue y la duración exacta (0.1s a 2.0s) para un chopeo preciso.
       </div>
 
     </aside>
   </main>
 
-  <!-- Contenedor oculto para la carga de elementos de video -->
+  <!-- Contenedor oculto para la carga de elementos de video local -->
   <div id="videoBank" style="display: none;"></div>
 
+  <!-- API de iFrame de YouTube -->
+  <script src="https://www.youtube.com/iframe_api"></script>
   <script src="app.js"></script>
 </body>
 </html>
