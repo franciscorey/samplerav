@@ -5,6 +5,7 @@
   --accent-purple: #a855f7;
   --accent-cyan: #38bdf8;
   --accent-red: #ef4444;
+  --accent-green: #10b981;
   --text-main: #f4f4f5;
   --text-muted: #a1a1aa;
 }
@@ -60,7 +61,7 @@ body {
   color: var(--text-muted);
 }
 
-.master-vol-container {
+.master-vol-container, .global-bpm-container {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -73,7 +74,42 @@ body {
 }
 
 .master-vol-container input[type="range"] {
-  width: 90px;
+  width: 80px;
+}
+
+.bpm-display {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1;
+}
+
+.bpm-display span {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--accent-cyan);
+  font-family: monospace;
+}
+
+.bpm-display small {
+  font-size: 8px;
+  color: var(--text-muted);
+}
+
+.btn-tap {
+  background-color: #27272a;
+  border: 1px solid var(--accent-purple);
+  color: var(--accent-purple);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-tap:active {
+  background-color: var(--accent-purple);
+  color: #fff;
 }
 
 .status-badge {
@@ -96,7 +132,7 @@ body {
 }
 
 .status-dot.active {
-  background-color: #10b981;
+  background-color: var(--accent-green);
 }
 
 .header-controls {
@@ -118,6 +154,22 @@ body {
 
 .btn:hover {
   background-color: #3f3f46;
+}
+
+.btn-sync {
+  background-color: rgba(56, 189, 248, 0.15);
+  border: 1px solid var(--accent-cyan);
+  color: var(--accent-cyan);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-sync:hover {
+  background-color: var(--accent-cyan);
+  color: #000;
 }
 
 .btn-rec {
@@ -212,14 +264,14 @@ canvas {
 
 .pad-card.active {
   background-color: #27272a;
-  border-color: #10b981;
+  border-color: var(--accent-green);
 }
 
 .pad-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .pad-number {
@@ -255,7 +307,7 @@ canvas {
 .yt-input-group {
   display: flex;
   gap: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .yt-input-group input {
@@ -280,9 +332,9 @@ canvas {
 
 .pad-thumb {
   background-color: #000;
-  height: 40px;
+  height: 36px;
   border-radius: 4px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   border: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -314,7 +366,7 @@ canvas {
 }
 
 .num-input-sm {
-  width: 45px;
+  width: 48px;
   background-color: var(--bg-dark);
   border: 1px solid var(--border-color);
   color: var(--text-main);
