@@ -36,10 +36,13 @@ const padBank = Array.from({ length: 8 }, (_, i) => ({
   gainNode: null,
   fileName: "Vacío",
   trimStart: 0.0,    // Cue Start (s)
-  duration: 2.0,     // Duración de CUE (0.1 a 5.0 s)
+  duration: 2.0,     // Duración de LOOP / CUE (0.1 a 10.0 s)
   maxDuration: 60.0, // Límite máximo para el slider de Cue
   playbackRate: 1.0,
   isLooping: true,
+  isPlaying: false,  // Estado Play continuo
+  isMuted: false,
+  isSolo: false,
   hpFrequency: 20,    // HPF (20 Hz - 8000 Hz)
   lpFrequency: 20000, // LPF (200 Hz - 20000 Hz)
   padBPM: 120.0,
@@ -52,6 +55,8 @@ const ctx = canvas.getContext('2d');
 const padsGrid = document.getElementById('padsGrid');
 const videoBank = document.getElementById('videoBank');
 const ytPlayersContainer = document.getElementById('ytPlayersContainer');
+const canvasWrapper = document.getElementById('canvasWrapper');
+const canvasStatusTag = document.getElementById('canvasStatusTag');
 
 // --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,13 +79,20 @@ function renderPadsUI() {
 
   padBank.forEach((pad, index) => {
     const padCard = document.createElement('div');
-    padCard.className = `pad-card ${index === activePadIndex ? 'selected' : ''}`;
+    padCard.className = `pad-card ${index === activePadIndex ? 'selected' : ''} ${pad.isPlaying ? 'playing' : ''}`;
     padCard.dataset.index = index;
 
     padCard.innerHTML = `
       <div class="pad-header">
-        <span class="pad-number">PAD ${pad.id}</span>
-        <span class="pad-key-badge">${pad.keyLabel}</span>
+        <div class="pad-title-group">
+          <span class="pad-number">PAD ${pad.id}</span>
+          <span class="pad-key-badge">${pad.keyLabel}</span>
+        </div>
+        <div>
+          <button class="pad-play-btn ${pad.isPlaying ? 'active' : ''}" onclick="togglePlayPad(event, ${index})">
+            ${pad.isPlaying ? '⏸ PAUSE' : '▶ PLAY'}
+          </button>
+        </div>
       </div>
 
       <select class="pad-source-select" onchange="changeSourceType(${index}, this.value)">
@@ -97,31 +109,46 @@ function renderPadsUI() {
 
       <div class="pad-thumb" id="thumb-${index}">${pad.fileName}</div>
 
+      <!-- Meter Bar -->
+      <div class="pad-meter-bar">
+        <div class="pad-meter-progress" id="meter-${index}"></div>
+      </div>
+
       <div class="pad-controls">
-        <!-- Cue Start: Campo Numérico + Barra Deslizadora -->
+        <!-- Cue Start: Campo Numérico + Slider -->
         <div class="pad-control-row">
-          <span>Cue Start (s)</span>
+          <span>Cue Start</span>
           <input type="number" id="cue-num-${index}" class="num-input-sm" min="0" max="${pad.maxDuration.toFixed(1)}" step="0.1" value="${pad.trimStart}" onchange="updatePadTrimStart(${index}, this.value)">
         </div>
-        <div class="pad-control-row">
+        <div class="pad-control-row slider-cyan">
           <input type="range" id="cue-slider-${index}" min="0" max="${pad.maxDuration}" step="0.1" value="${pad.trimStart}" oninput="updatePadTrimStart(${index}, this.value)">
         </div>
 
-        <!-- Duración (0.1s - 5.0s) -->
+        <!-- Duración / Loop Size (0.1s - 10.0s) -->
         <div class="pad-control-row">
-          <span>Duración (0.1-5s)</span>
-          <input type="number" class="num-input-sm" min="0.1" max="5.0" step="0.1" value="${pad.duration}" onchange="updatePadDuration(${index}, this.value)">
+          <span>Loop Size</span>
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <input type="number" class="num-input-sm" min="0.1" max="10.0" step="0.1" value="${pad.duration}" onchange="updatePadDuration(${index}, this.value)">
+            <span style="font-size: 9px; color: var(--text-muted);">seg</span>
+          </div>
+        </div>
+        <div class="pad-control-row slider-green">
+          <input type="range" min="0.1" max="10.0" step="0.1" value="${pad.duration}" oninput="updatePadDuration(${index}, this.value)">
         </div>
 
-        <!-- Tap BPM del Pad & Sync -->
+        <!-- Mute & Solo + Tap BPM -->
         <div class="pad-control-row">
-          <button class="btn-tap" onclick="handlePadTap(${index})">TAP PAD</button>
-          <span id="pad-bpm-label-${index}" style="font-family: monospace; color: var(--accent-cyan);">${pad.padBPM.toFixed(1)} BPM</span>
+          <div style="display: flex; gap: 3px;">
+            <button class="btn-mute ${pad.isMuted ? 'active' : ''}" onclick="toggleMute(${index})">M</button>
+            <button class="btn-solo ${pad.isSolo ? 'active' : ''}" onclick="toggleSolo(${index})">S</button>
+          </div>
+          <button class="btn-tap" onclick="handlePadTap(${index})">TAP</button>
+          <span id="pad-bpm-label-${index}" style="font-family: monospace; color: var(--accent-cyan); font-size: 9px;">${pad.padBPM.toFixed(1)} BPM</span>
         </div>
 
         <div class="pad-control-row">
-          <label><input type="checkbox" ${pad.isLooping ? 'checked' : ''} onchange="updatePadLoop(${index}, this.checked)"> 🔁 Loop</label>
-          <button class="btn-sync" onclick="syncPadToGlobalBPM(${index})">⚡ SYNC BPM</button>
+          <label style="font-size: 9px;"><input type="checkbox" ${pad.isLooping ? 'checked' : ''} onchange="updatePadLoop(${index}, this.checked)"> 🔁 Loop Continuous</label>
+          <button class="btn-sync" onclick="syncPadToGlobalBPM(${index})">⚡ SYNC</button>
         </div>
 
         <!-- Pitch / Speed Slider -->
@@ -135,25 +162,29 @@ function renderPadsUI() {
 
         <!-- High-Pass Filter Slider -->
         <div class="pad-control-row">
-          <span>High-Pass Filter</span>
-          <span id="hp-label-${index}">${Math.round(pad.hpFrequency)} Hz</span>
+          <span>High-Pass</span>
+          <span id="hp-label-${index}" style="color: var(--accent-orange);">${Math.round(pad.hpFrequency)} Hz</span>
         </div>
-        <div class="pad-control-row">
+        <div class="pad-control-row slider-orange">
           <input type="range" min="20" max="8000" step="10" value="${pad.hpFrequency}" oninput="updatePadHighPassSlider(${index}, this.value)">
         </div>
 
         <!-- Low-Pass Filter Slider -->
         <div class="pad-control-row">
-          <span>Low-Pass Filter</span>
-          <span id="lp-label-${index}">${Math.round(pad.lpFrequency)} Hz</span>
+          <span>Low-Pass</span>
+          <span id="lp-label-${index}" style="color: var(--accent-red);">${Math.round(pad.lpFrequency)} Hz</span>
         </div>
-        <div class="pad-control-row">
+        <div class="pad-control-row slider-red">
           <input type="range" min="200" max="20000" step="100" value="${pad.lpFrequency}" oninput="updatePadLowPassSlider(${index}, this.value)">
         </div>
       </div>
     `;
 
-    padCard.addEventListener('click', () => selectPad(index));
+    padCard.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+        selectPad(index);
+      }
+    });
     padsGrid.appendChild(padCard);
   });
 }
@@ -163,6 +194,110 @@ function selectPad(index) {
   document.querySelectorAll('.pad-card').forEach((card, i) => {
     card.classList.toggle('selected', i === index);
   });
+}
+
+// --- CONTROL PLAY / PAUSE MANTENIDO ---
+function togglePlayPad(e, index) {
+  if (e) e.stopPropagation();
+  const pad = padBank[index];
+
+  if (pad.isPlaying) {
+    stopPadPlayback(index);
+  } else {
+    // Detener otros pads en play si no hay modo multicanal activo
+    padBank.forEach((p, i) => {
+      if (i !== index && p.isPlaying) stopPadPlayback(i);
+    });
+    startPadPlayback(index);
+  }
+}
+
+function startPadPlayback(index) {
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const pad = padBank[index];
+  if (!pad) return;
+
+  pad.isPlaying = true;
+  selectPad(index);
+
+  const calculatedEnd = pad.trimStart + pad.duration;
+
+  if (pad.sourceType === 'local' && pad.videoElem) {
+    const v = pad.videoElem;
+    v.playbackRate = pad.playbackRate;
+    v.preservesPitch = false;
+
+    v.currentTime = pad.trimStart;
+    v.play();
+
+    v.ontimeupdate = () => {
+      if (v.currentTime >= calculatedEnd) {
+        if (pad.isLooping) {
+          v.currentTime = pad.trimStart;
+        } else {
+          stopPadPlayback(index);
+        }
+      }
+      updatePadMeter(index, (v.currentTime - pad.trimStart) / pad.duration);
+    };
+
+    activeVideoElement = v;
+    activeSourceType = 'local';
+
+  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.seekTo) {
+    pad.ytPlayer.seekTo(pad.trimStart, true);
+    pad.ytPlayer.playVideo();
+    
+    activeYtPlayer = pad.ytPlayer;
+    activeSourceType = 'youtube';
+  }
+
+  updateCanvasHeaderStatus(`PAD ${pad.id} | ON AIR (${pad.fileName})`);
+  renderPadsUI();
+  setupDragAndDrop();
+}
+
+function stopPadPlayback(index) {
+  const pad = padBank[index];
+  if (!pad) return;
+
+  pad.isPlaying = false;
+
+  if (pad.sourceType === 'local' && pad.videoElem) {
+    pad.videoElem.pause();
+  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.pauseVideo) {
+    pad.ytPlayer.pauseVideo();
+  }
+
+  updatePadMeter(index, 0);
+
+  // Evaluar si queda otro pad sonando
+  const anyPlaying = padBank.find(p => p.isPlaying);
+  if (!anyPlaying) {
+    activeVideoElement = null;
+    activeYtPlayer = null;
+    activeSourceType = null;
+    updateCanvasHeaderStatus('CANVAS OUT: 1920x1080 @ 60FPS | STANDBY');
+  }
+
+  renderPadsUI();
+  setupDragAndDrop();
+}
+
+function updatePadMeter(index, ratio) {
+  const bar = document.getElementById(`meter-${index}`);
+  if (bar) {
+    const pct = Math.min(Math.max(0, ratio * 100), 100);
+    bar.style.width = `${pct}%`;
+  }
+}
+
+function updateCanvasHeaderStatus(msg) {
+  if (canvasStatusTag) canvasStatusTag.innerText = msg;
+  if (canvasWrapper) {
+    canvasWrapper.classList.toggle('on-air', activeSourceType !== null);
+  }
 }
 
 // --- TAP TEMPO GLOBAL & PAD TEMPO ---
@@ -218,6 +353,37 @@ function syncPadToGlobalBPM(index) {
   setupDragAndDrop();
 }
 
+// --- MUTE & SOLO ---
+function toggleMute(index) {
+  const pad = padBank[index];
+  pad.isMuted = !pad.isMuted;
+  if (pad.gainNode) {
+    pad.gainNode.gain.value = pad.isMuted ? 0 : 1.0;
+  }
+  renderPadsUI();
+  setupDragAndDrop();
+}
+
+function toggleSolo(index) {
+  const pad = padBank[index];
+  pad.isSolo = !pad.isSolo;
+
+  const hasSolo = padBank.some(p => p.isSolo);
+
+  padBank.forEach(p => {
+    if (p.gainNode) {
+      if (hasSolo) {
+        p.gainNode.gain.value = p.isSolo ? 1.0 : 0;
+      } else {
+        p.gainNode.gain.value = p.isMuted ? 0 : 1.0;
+      }
+    }
+  });
+
+  renderPadsUI();
+  setupDragAndDrop();
+}
+
 // --- TECLADO NORMAL (QWER / ASDF) ---
 function setupKeyboardListeners() {
   const activeKeys = new Set();
@@ -227,7 +393,7 @@ function setupKeyboardListeners() {
     const key = e.key.toLowerCase();
     if (keyMap.hasOwnProperty(key) && !activeKeys.has(key)) {
       activeKeys.add(key);
-      triggerPad(keyMap[key]);
+      startPadPlayback(keyMap[key]);
     }
   });
 
@@ -236,7 +402,6 @@ function setupKeyboardListeners() {
     const key = e.key.toLowerCase();
     if (keyMap.hasOwnProperty(key)) {
       activeKeys.delete(key);
-      releasePad(keyMap[key]);
     }
   });
 }
@@ -253,7 +418,7 @@ function setupMasterVolume() {
   });
 }
 
-// --- CAMBIO DE FUENTE (LOCAL VS YOUTUBE) ---
+// --- CAMBIO DE FUENTE ---
 function changeSourceType(index, type) {
   padBank[index].sourceType = type;
   renderPadsUI();
@@ -274,7 +439,6 @@ function loadYouTubeVideo(index) {
 
   if (!val) return;
 
-  // Si se carga en el Pad 1 (index 0), replicar en Pads 2, 3 y 4 (indices 1, 2, 3)
   const targets = (index === 0) ? [0, 1, 2, 3] : [index];
 
   targets.forEach(idx => {
@@ -320,7 +484,7 @@ function loadYouTubeVideo(index) {
   }
 }
 
-// --- CARGA DE ARCHIVOS LOCALES Y CASCADA (PADS 1 -> 2, 3, 4) ---
+// --- CARGA DE ARCHIVOS LOCALES Y CASCADA ---
 function setupDragAndDrop() {
   const padCards = document.querySelectorAll('.pad-card');
 
@@ -342,7 +506,6 @@ function setupDragAndDrop() {
 }
 
 function assignFileToPad(padIndex, file) {
-  // Carga en Cascada si el Pad es el N° 1 (index 0)
   const targetIndices = (padIndex === 0) ? [0, 1, 2, 3] : [padIndex];
 
   targetIndices.forEach(idx => {
@@ -379,18 +542,16 @@ function assignFileToPad(padIndex, file) {
   }
 }
 
-// --- WEBAUDIO API: HPF Y LPF EN SERIE ---
+// --- WEBAUDIO API ---
 function initAudioNodesForPad(pad) {
   if (pad.sourceNode) return;
 
   pad.sourceNode = audioCtx.createMediaElementSource(pad.videoElem);
   
-  // High-Pass Filter
   pad.highpassFilter = audioCtx.createBiquadFilter();
   pad.highpassFilter.type = 'highpass';
   pad.highpassFilter.frequency.value = pad.hpFrequency;
 
-  // Low-Pass Filter
   pad.lowpassFilter = audioCtx.createBiquadFilter();
   pad.lowpassFilter.type = 'lowpass';
   pad.lowpassFilter.frequency.value = pad.lpFrequency;
@@ -398,7 +559,6 @@ function initAudioNodesForPad(pad) {
   pad.gainNode = audioCtx.createGain();
   pad.gainNode.gain.value = 1.0;
 
-  // Cadena Audio: Video -> HPF -> LPF -> GainPad -> MasterGain
   pad.sourceNode.connect(pad.highpassFilter);
   pad.highpassFilter.connect(pad.lowpassFilter);
   pad.lowpassFilter.connect(pad.gainNode);
@@ -412,7 +572,6 @@ function updatePadTrimStart(index, val) {
   numVal = Math.min(Math.max(0, numVal), pad.maxDuration);
   pad.trimStart = numVal;
 
-  // Sincronizar numérico y slider
   const numInput = document.getElementById(`cue-num-${index}`);
   const sliderInput = document.getElementById(`cue-slider-${index}`);
   if (numInput) numInput.value = numVal.toFixed(1);
@@ -420,9 +579,11 @@ function updatePadTrimStart(index, val) {
 }
 
 function updatePadDuration(index, val) {
-  let dur = parseFloat(val) || 1.0;
-  dur = Math.min(Math.max(0.1, dur), 5.0);
+  let dur = parseFloat(val) || 2.0;
+  dur = Math.min(Math.max(0.1, dur), 10.0); // Extendido a 10s
   padBank[index].duration = dur;
+  renderPadsUI();
+  setupDragAndDrop();
 }
 
 function updatePadRate(index, value) {
@@ -472,91 +633,35 @@ function setPadLowPass(index, hz) {
   if (label) label.innerText = `${Math.round(hz)} Hz`;
 }
 
-// --- DISPARO DE PADS (TRIGGER / GATE CUE) ---
-function triggerPad(index) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
-
-  const pad = padBank[index];
-  if (!pad) return;
-
-  selectPad(index);
-  const calculatedEnd = pad.trimStart + pad.duration;
-
-  if (pad.sourceType === 'local' && pad.videoElem) {
-    const v = pad.videoElem;
-    v.playbackRate = pad.playbackRate;
-    v.preservesPitch = false;
-
-    v.currentTime = pad.trimStart;
-    v.play();
-
-    v.ontimeupdate = () => {
-      if (v.currentTime >= calculatedEnd) {
-        if (pad.isLooping) {
-          v.currentTime = pad.trimStart;
-        } else {
-          v.pause();
-        }
-      }
-    };
-
-    activeVideoElement = v;
-    activeSourceType = 'local';
-
-  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.seekTo) {
-    pad.ytPlayer.seekTo(pad.trimStart, true);
-    pad.ytPlayer.playVideo();
-    
-    activeYtPlayer = pad.ytPlayer;
-    activeSourceType = 'youtube';
-  }
-
-  const card = document.querySelectorAll('.pad-card')[index];
-  if (card) card.classList.add('active');
-}
-
-function releasePad(index) {
-  const pad = padBank[index];
-  if (!pad) return;
-
-  if (pad.sourceType === 'local' && pad.videoElem) {
-    pad.videoElem.pause();
-  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.pauseVideo) {
-    pad.ytPlayer.pauseVideo();
-  }
-
-  const card = document.querySelectorAll('.pad-card')[index];
-  if (card) card.classList.remove('active');
-}
-
-// --- RENDERIZADO EN CANVAS (CON SOPORTE DE VIDEO YOUTUBE) ---
+// --- RENDERIZADO EN CANVAS ---
 function renderCanvasFrame() {
   if (activeSourceType === 'local' && activeVideoElement && !activeVideoElement.paused) {
     ctx.drawImage(activeVideoElement, 0, 0, canvas.width, canvas.height);
   } else if (activeSourceType === 'youtube' && activeYtPlayer && activeYtPlayer.getIframe) {
     const iframe = activeYtPlayer.getIframe();
     try {
-      // Captura directa de fotograma del video en reproducción
       ctx.drawImage(iframe, 0, 0, canvas.width, canvas.height);
     } catch (e) {
-      // Si hay restricción CORS en la transmisión de origen, activa el overlay visual HD
-      ctx.fillStyle = '#090a0f';
+      ctx.fillStyle = '#0a0c10';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#a855f7';
+      ctx.fillStyle = '#10b981';
       ctx.font = 'bold 36px sans-serif';
-      ctx.fillText("▶ YOUTUBE VIDEO STREAMING ACTIVE", 80, 120);
+      ctx.fillText("▶ YOUTUBE LIVE LOOP ACTIVE", 80, 120);
       ctx.fillStyle = '#38bdf8';
       ctx.font = '20px monospace';
       ctx.fillText(`Pad Activo: ${padBank[activePadIndex].fileName}`, 80, 170);
     }
-  } else if (!activeVideoElement) {
-    ctx.fillStyle = '#000000';
+  } else {
+    ctx.fillStyle = '#050608';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#232733';
+    ctx.font = '24px monospace';
+    ctx.fillText("STANDBY - SELECCIONA O PULSA PLAY EN UN PAD", 500, 540);
   }
   requestAnimationFrame(renderCanvasFrame);
 }
 
-// --- EXPORTAR / IMPORTAR PROYECTO (JSON) ---
+// --- EXPORTAR / IMPORTAR PROYECTO ---
 function setupProjectExportImport() {
   document.getElementById('exportProjBtn').addEventListener('click', exportProjectJSON);
   
@@ -569,7 +674,7 @@ function setupProjectExportImport() {
 
 function exportProjectJSON() {
   const projectData = {
-    version: "1.2",
+    version: "1.5",
     timestamp: Date.now(),
     globalBPM: globalBPM,
     pads: padBank.map(p => ({
@@ -612,7 +717,7 @@ function importProjectJSON(e) {
             padBank[i].sourceType = savedPad.sourceType;
             padBank[i].ytVideoId = savedPad.ytVideoId || '';
             padBank[i].trimStart = savedPad.trimStart || 0;
-            padBank[i].duration = savedPad.duration || 1.0;
+            padBank[i].duration = savedPad.duration || 2.0;
             padBank[i].playbackRate = savedPad.playbackRate || 1.0;
             padBank[i].isLooping = savedPad.isLooping;
             padBank[i].hpFrequency = savedPad.hpFrequency || 20;
@@ -635,7 +740,7 @@ function importProjectJSON(e) {
   reader.readAsText(file);
 }
 
-// --- WEBMIDI API CON HPF & LPF CONTROLS ---
+// --- WEBMIDI API ---
 function initWebMIDI() {
   if (navigator.requestMIDIAccess) {
     navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFail);
@@ -673,23 +778,16 @@ function onMIDIFail() {
 function handleMIDIMessage(e) {
   const [status, note, velocity] = e.data;
   const isNoteOn = (status & 0xF0) === 0x90 && velocity > 0;
-  const isNoteOff = (status & 0xF0) === 0x80 || ((status & 0xF0) === 0x90 && velocity === 0);
   const isCC = (status & 0xF0) === 0xB0;
 
   if (isNoteOn) {
     const padIndex = padBank.findIndex(p => p.midiNote === note);
-    if (padIndex !== -1) triggerPad(padIndex);
-  } else if (isNoteOff) {
-    const padIndex = padBank.findIndex(p => p.midiNote === note);
-    if (padIndex !== -1) releasePad(padIndex);
+    if (padIndex !== -1) togglePlayPad(null, padIndex);
   } else if (isCC) {
-    // Control CC 112 -> High Pass Filter
     if (note === 112) {
       const hz = 20 * Math.pow(8000 / 20, velocity / 127);
       setPadHighPass(activePadIndex, hz);
-    }
-    // Control CC 113 -> Low Pass Filter
-    else if (note === 113) {
+    } else if (note === 113) {
       const hz = 200 * Math.pow(20000 / 200, velocity / 127);
       setPadLowPass(activePadIndex, hz);
     }
@@ -767,7 +865,7 @@ function stopRecording() {
   mediaRecorder.stop();
   isRecording = false;
   const recBtn = document.getElementById('recBtn');
-  recBtn.innerText = '🔴 Iniciar REC (1080p)';
+  recBtn.innerText = '🔴 REC 1080p';
   recBtn.classList.remove('recording');
 }
 
