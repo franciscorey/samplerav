@@ -8,8 +8,12 @@ masterGainNode.connect(audioCtx.destination);
 
 let activeVideoElement = null;
 let activeYtPlayer = null;
-let activeSourceType = null; // 'local' o 'youtube'
+let activeSourceType = null;
 let activePadIndex = 0;
+
+// BPM Global del Proyecto y Tapping Variable
+let globalBPM = 120.0;
+let globalTapTimes = [];
 
 // Mapeo Teclado Físico (QWER / ASDF) -> Índice de Pad
 const keyMap = {
@@ -21,8 +25,8 @@ const keyMap = {
 const padBank = Array.from({ length: 8 }, (_, i) => ({
   id: i + 1,
   keyLabel: ['Q','W','E','R','A','S','D','F'][i],
-  midiNote: 36 + i, // Pad 1 = C1 (36) a Pad 8 = G1 (43)
-  sourceType: 'local', // 'local' o 'youtube'
+  midiNote: 36 + i,
+  sourceType: 'local',
   videoElem: null,
   ytPlayer: null,
   ytVideoId: '',
@@ -31,10 +35,12 @@ const padBank = Array.from({ length: 8 }, (_, i) => ({
   gainNode: null,
   fileName: "Vacío",
   trimStart: 0.0,    // Inicio de CUE (segundos)
-  duration: 1.0,     // Duración de CUE (0.0 a 2.0 segundos)
+  duration: 1.0,     // Duración de CUE EXTENDIDA (0.1 a 5.0 segundos)
   playbackRate: 1.0,
   isLooping: true,
-  hpFrequency: 20
+  hpFrequency: 20,   // High-Pass Filter Frequency (Hz)
+  padBPM: 120.0,     // Tempo específico del Pad
+  padTapTimes: []
 }));
 
 // Elementos DOM
@@ -44,12 +50,13 @@ const padsGrid = document.getElementById('padsGrid');
 const videoBank = document.getElementById('videoBank');
 const ytPlayersContainer = document.getElementById('ytPlayersContainer');
 
-// --- INICIALIZACIÓN DE LA APLICACIÓN ---
+// --- INICIALIZACIÓN ---
 document.addEventListener('DOMContentLoaded', () => {
   renderPadsUI();
   setupDragAndDrop();
   setupKeyboardListeners();
   setupMasterVolume();
+  setupGlobalTapTempo();
   initWebMIDI();
   setupAudioOutputs();
   setupProjectExportImport();
@@ -59,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   requestAnimationFrame(renderCanvasFrame);
 });
 
-// --- RENDERIZADO INTERFAZ GRAFICA DE PADS ---
+// --- RENDERIZADO INTERFAZ GRÁFICA DE PADS ---
 function renderPadsUI() {
   padsGrid.innerHTML = '';
 
@@ -95,23 +102,36 @@ function renderPadsUI() {
         </div>
 
         <div class="pad-control-row">
-          <span>Duración (0-2s)</span>
-          <input type="number" class="num-input-sm" min="0.1" max="2.0" step="0.05" value="${pad.duration}" onchange="updatePadDuration(${index}, this.value)">
+          <span>Duración (0-5s)</span>
+          <input type="number" class="num-input-sm" min="0.1" max="5.0" step="0.1" value="${pad.duration}" onchange="updatePadDuration(${index}, this.value)">
+        </div>
+
+        <!-- Tap BPM del Pad & Sync -->
+        <div class="pad-control-row">
+          <button class="btn-tap" onclick="handlePadTap(${index})">TAP PAD</button>
+          <span id="pad-bpm-label-${index}" style="font-family: monospace; color: var(--accent-cyan);">${pad.padBPM.toFixed(1)} BPM</span>
         </div>
 
         <div class="pad-control-row">
           <label><input type="checkbox" ${pad.isLooping ? 'checked' : ''} onchange="updatePadLoop(${index}, this.checked)"> 🔁 Loop</label>
+          <button class="btn-sync" onclick="syncPadToGlobalBPM(${index})">⚡ SYNC BPM</button>
+        </div>
+
+        <div class="pad-control-row">
+          <span>Pitch/Speed</span>
           <span id="rate-label-${index}" style="color: #a855f7;">${pad.playbackRate.toFixed(2)}x</span>
         </div>
-
         <div class="pad-control-row">
-          <span>Speed/Pitch</span>
-          <input type="range" min="0.5" max="2.0" step="0.05" value="${pad.playbackRate}" oninput="updatePadRate(${index}, this.value)">
+          <input type="range" min="0.5" max="2.0" step="0.05" value="${pad.playbackRate}" oninput="updatePadRate(${index}, this.value)" style="width: 100%;">
         </div>
 
+        <!-- High-Pass Filter Slider -->
         <div class="pad-control-row">
-          <span>High-Pass</span>
+          <span>High-Pass Filter</span>
           <span id="hp-label-${index}">${Math.round(pad.hpFrequency)} Hz</span>
+        </div>
+        <div class="pad-control-row">
+          <input type="range" min="20" max="8000" step="10" value="${pad.hpFrequency}" oninput="updatePadHighPassSlider(${index}, this.value)" style="width: 100%;">
         </div>
       </div>
     `;
@@ -128,12 +148,68 @@ function selectPad(index) {
   });
 }
 
+// --- TAP TEMPO GLOBAL & PAD TEMPO ---
+function setupGlobalTapTempo() {
+  const tapBtn = document.getElementById('globalTapBtn');
+  tapBtn.addEventListener('click', () => {
+    const now = performance.now();
+    globalTapTimes.push(now);
+
+    if (globalTapTimes.length > 4) globalTapTimes.shift();
+
+    if (globalTapTimes.length > 1) {
+      const intervals = [];
+      for (let i = 1; i < globalTapTimes.length; i++) {
+        intervals.push(globalTapTimes[i] - globalTapTimes[i - 1]);
+      }
+      const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
+      globalBPM = 60000 / avgInterval;
+      document.getElementById('globalBpmLabel').innerText = globalBPM.toFixed(1);
+    }
+  });
+}
+
+function handlePadTap(index) {
+  const now = performance.now();
+  const pad = padBank[index];
+  pad.padTapTimes.push(now);
+
+  if (pad.padTapTimes.length > 4) pad.padTapTimes.shift();
+
+  if (pad.padTapTimes.length > 1) {
+    const intervals = [];
+    for (let i = 1; i < pad.padTapTimes.length; i++) {
+      intervals.push(pad.padTapTimes[i] - pad.padTapTimes[i - 1]);
+    }
+    const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
+    pad.padBPM = 60000 / avgInterval;
+    
+    const label = document.getElementById(`pad-bpm-label-${index}`);
+    if (label) label.innerText = `${pad.padBPM.toFixed(1)} BPM`;
+  }
+}
+
+// Sincronizar velocidad del Pad al BPM del Proyecto
+function syncPadToGlobalBPM(index) {
+  const pad = padBank[index];
+  if (pad.padBPM <= 0) return;
+
+  const targetRate = globalBPM / pad.padBPM;
+  // Limitar entre 0.5x y 2.0x
+  const clampedRate = Math.min(Math.max(0.5, targetRate), 2.0);
+  updatePadRate(index, clampedRate);
+  
+  // Re-renderizar el slider para reflejar el cambio
+  renderPadsUI();
+  setupDragAndDrop();
+}
+
 // --- TECLADO NORMAL (QWER / ASDF) ---
 function setupKeyboardListeners() {
   const activeKeys = new Set();
 
   window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return; // Ignorar si está escribiendo
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
     const key = e.key.toLowerCase();
     if (keyMap.hasOwnProperty(key) && !activeKeys.has(key)) {
       activeKeys.add(key);
@@ -175,7 +251,6 @@ function loadYouTubeVideo(index) {
   if (!input) return;
   
   let val = input.value.trim();
-  // Extraer ID si pegó la URL completa
   if (val.includes('v=')) {
     val = val.split('v=')[1].split('&')[0];
   } else if (val.includes('youtu.be/')) {
@@ -255,7 +330,7 @@ function assignFileToPad(padIndex, file) {
   };
 }
 
-// --- WEBAUDIO API POR PAD ---
+// --- WEBAUDIO API IMPLEMENTACIÓN HIGH-PASS FILTER ---
 function initAudioNodesForPad(pad) {
   if (pad.sourceNode) return;
 
@@ -273,15 +348,15 @@ function initAudioNodesForPad(pad) {
   pad.gainNode.connect(masterGainNode);
 }
 
-// --- CONTROLES DE CUE, DURACION, SPEED Y FILTER ---
+// --- CONTROLES DE PARAMETROS ---
 function updatePadTrimStart(index, val) {
   padBank[index].trimStart = Math.max(0, parseFloat(val) || 0);
 }
 
 function updatePadDuration(index, val) {
-  // Garantizar rango estricto de 0.1 a 2.0 segundos
+  // Extendido hasta 5.0 segundos
   let dur = parseFloat(val) || 1.0;
-  dur = Math.min(Math.max(0.1, dur), 2.0);
+  dur = Math.min(Math.max(0.1, dur), 5.0);
   padBank[index].duration = dur;
 }
 
@@ -300,6 +375,11 @@ function updatePadRate(index, value) {
 
 function updatePadLoop(index, isChecked) {
   padBank[index].isLooping = isChecked;
+}
+
+function updatePadHighPassSlider(index, val) {
+  const hz = parseFloat(val);
+  setPadHighPass(index, hz);
 }
 
 function setPadHighPass(index, hz) {
@@ -378,7 +458,6 @@ function renderCanvasFrame() {
     try {
       ctx.drawImage(iframe, 0, 0, canvas.width, canvas.height);
     } catch(e) {
-      // Dibujar fondo negro si la política de seguridad bloquea el render del iframe de YT
       ctx.fillStyle = '#111';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#fff';
@@ -405,8 +484,9 @@ function setupProjectExportImport() {
 
 function exportProjectJSON() {
   const projectData = {
-    version: "1.0",
+    version: "1.1",
     timestamp: Date.now(),
+    globalBPM: globalBPM,
     pads: padBank.map(p => ({
       id: p.id,
       sourceType: p.sourceType,
@@ -415,7 +495,8 @@ function exportProjectJSON() {
       duration: p.duration,
       playbackRate: p.playbackRate,
       isLooping: p.isLooping,
-      hpFrequency: p.hpFrequency
+      hpFrequency: p.hpFrequency,
+      padBPM: p.padBPM
     }))
   };
 
@@ -435,6 +516,10 @@ function importProjectJSON(e) {
   reader.onload = (event) => {
     try {
       const data = JSON.parse(event.target.result);
+      if (data.globalBPM) {
+        globalBPM = data.globalBPM;
+        document.getElementById('globalBpmLabel').innerText = globalBPM.toFixed(1);
+      }
       if (data.pads && Array.isArray(data.pads)) {
         data.pads.forEach((savedPad, i) => {
           if (padBank[i]) {
@@ -445,6 +530,7 @@ function importProjectJSON(e) {
             padBank[i].playbackRate = savedPad.playbackRate || 1.0;
             padBank[i].isLooping = savedPad.isLooping;
             padBank[i].hpFrequency = savedPad.hpFrequency || 20;
+            padBank[i].padBPM = savedPad.padBPM || 120.0;
 
             if (savedPad.sourceType === 'youtube' && savedPad.ytVideoId) {
               loadYouTubeVideo(i);
@@ -563,7 +649,6 @@ function startRecording() {
   const canvasStream = canvas.captureStream(60);
   const audioDestination = audioCtx.createMediaStreamDestination();
 
-  // Conectar la salida del volumen maestro al canal de grabación
   masterGainNode.connect(audioDestination);
 
   const combinedStream = new MediaStream([
