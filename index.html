@@ -22,6 +22,12 @@
       <span id="masterVolLabel">80%</span>
     </div>
 
+    <!-- Global Tap Tempo Section -->
+    <div class="global-bpm-container">
+      <button id="globalTapBtn" class="btn btn-tap">🥁 TAP BPM</button>
+      <div class="bpm-display"><span id="globalBpmLabel">120.0</span> <small>BPM PROYECTO</small></div>
+    </div>
+
     <div class="status-badge">
       <div class="status-dot" id="midiDot"></div>
       <span id="midiStatus">Buscando controlador MIDI...</span>
@@ -46,7 +52,6 @@
       <div class="canvas-container">
         <div class="canvas-overlay-tag">CANVAS OUT: 1920x1080 @ 60FPS</div>
         <canvas id="mainCanvas" width="1920" height="1080"></canvas>
-        <!-- Contenedor oculto/dinámico para reproductores de YouTube -->
         <div id="ytPlayersContainer"></div>
       </div>
 
@@ -101,16 +106,14 @@
       </div>
 
       <div class="code-box">
-        💡 Usa archivos locales (.mp4) o pega un link de YouTube en el Pad. Ajusta el tiempo de inicio Cue y la duración exacta (0.1s a 2.0s) para un chopeo preciso.
+        💡 Marca el BPM del proyecto arriba. Usa el Tap de cada Pad para detectar el tempo del sample y presiona "SYNC BPM" para acoplar la velocidad automáticamente.
       </div>
 
     </aside>
   </main>
 
-  <!-- Contenedor oculto para la carga de elementos de video local -->
   <div id="videoBank" style="display: none;"></div>
 
-  <!-- API de iFrame de YouTube -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="app.js"></script>
 </body>
