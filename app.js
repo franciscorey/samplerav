@@ -36,7 +36,7 @@ const padBank = Array.from({ length: 8 }, (_, i) => ({
   gainNode: null,
   fileName: "Vacío",
   trimStart: 0.0,    // Cue Start (s)
-  duration: 1.0,     // Duración de CUE (0.1 a 5.0 s)
+  duration: 2.0,     // Duración de CUE (0.1 a 5.0 s)
   maxDuration: 60.0, // Límite máximo para el slider de Cue
   playbackRate: 1.0,
   isLooping: true,
