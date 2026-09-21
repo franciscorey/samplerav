@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AV Chopper & Live Sampler Studio Pro</title>
+  <title>AV Chopper & Live Sampler Studio Pro v1.5</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
   <header class="app-header">
     <div class="brand">
       <div class="brand-logo"></div>
-      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio Pro</span></div>
+      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio Pro v1.5</span></div>
     </div>
 
     <!-- Master Volume Control -->
@@ -38,7 +38,7 @@
       <button id="exportProjBtn" class="btn">💾 Exportar Proyecto</button>
       <button id="importProjBtn" class="btn">📂 Cargar Proyecto</button>
       <input type="file" id="importProjInput" accept=".json" style="display:none;">
-      <button id="recBtn" class="btn btn-rec">🔴 Iniciar REC (1080p)</button>
+      <button id="recBtn" class="btn btn-rec">🔴 REC 1080p</button>
     </div>
   </header>
 
@@ -48,9 +48,9 @@
     <!-- Left Area: Canvas & Pads -->
     <section class="main-workspace">
       
-      <!-- Output Monitor Canvas (1080p interno) -->
-      <div class="canvas-container">
-        <div class="canvas-overlay-tag">CANVAS OUT: 1920x1080 @ 60FPS</div>
+      <!-- Output Monitor Canvas -->
+      <div class="canvas-container" id="canvasWrapper">
+        <div class="canvas-overlay-tag" id="canvasStatusTag">CANVAS OUT: 1920x1080 @ 60FPS | STANDBY</div>
         <canvas id="mainCanvas" width="1920" height="1080"></canvas>
         <div id="ytPlayersContainer"></div>
       </div>
@@ -106,7 +106,7 @@
       </div>
 
       <div class="code-box">
-        💡 **Carga en cascada**: Al cargar un video o URL en el **Pad 1**, se replicará automáticamente en los **Pads 2, 3 y 4**. Los Pads 5 al 8 se mantienen independientes.
+        💡 <strong>Play Automático</strong>: Pulsa ▶ en un Pad para dejar corriendo un loop de hasta 10 segundos. Al no tocar otro pad, la salida de pantalla mantendrá la reproducción de este.
       </div>
 
     </aside>
