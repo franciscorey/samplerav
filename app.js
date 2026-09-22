@@ -1,6 +1,27 @@
 /* ============================================================
    AV SAMPLER & CHOPPER
-   Version 2.0 (Full Architecture Refactor)
+   Version 2.1 (Refactor: fixes de arquitectura + bugs)
+   ============================================================
+
+   CAMBIOS PRINCIPALES RESPECTO A v2.0:
+   - Fix: audio no se reconstruía al recargar un archivo en un pad
+     (destroyPadMedia ahora limpia audioSource/gainNode/filtros).
+   - Fix: MUTE/SOLO ahora funcionan también en pads de YouTube.
+   - Fix: los YouTube players se destruyen correctamente al limpiar
+     el proyecto (ya no quedan iframes huérfanos en el DOM).
+   - Fix: cronómetro de grabación, selects sin <option>, innerHTML
+     con sintaxis Markdown en vez de HTML.
+   - Fix: soltar un archivo local sobre un pad en modo YouTube ahora
+     cambia el sourceType en vez de quedar en un estado inconsistente.
+   - Fix: el estado "sync" y el volumen ahora se guardan/cargan en
+     los archivos de proyecto.
+   - Fix: la selección de dispositivo MIDI ya no se pierde cuando
+     se conecta/desconecta otro dispositivo distinto.
+   - Mejora: se eliminaron los renderPads() (rebuild completo del
+     grid) en cada play/stop/mute/solo/sync; ahora se usan updates
+     ligeros que no rompen el foco de otros controles en uso.
+   - Mejora: playback rate de YouTube ajustado a los valores
+     discretos que la API realmente soporta.
    ============================================================ */
 
 "use strict";
@@ -21,7 +42,9 @@ const CONFIG = {
   MIN_LOOP_DURATION: 0.05,
   MAX_LOOP_DURATION: 60,
   KEY_MAP: ["q", "w", "e", "r", "a", "s", "d", "f"],
-  MIDI_NOTES: [36, 37, 38, 39, 40, 41, 42, 43]
+  MIDI_NOTES: [36, 37, 38, 39, 40, 41, 42, 43],
+  // Valores de velocidad que la YouTube IFrame API realmente acepta.
+  YT_ALLOWED_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
 };
 
 /* ============================================================
@@ -75,8 +98,9 @@ function createPad(index) {
     playing: false,
     muted: false,
     solo: false,
-    bpm: CONFIG.DEFAULT_BPM,
     sync: false,
+    bpm: CONFIG.DEFAULT_BPM,
+    volume: 1,
     highpass: 20,
     lowpass: 20000,
     audioSource: null,
@@ -89,6 +113,10 @@ function createPad(index) {
 }
 
 const pads = Array.from({ length: CONFIG.PAD_COUNT }, (_, index) => createPad(index));
+
+/* Cache de referencias DOM por pad, para poder actualizar la UI
+   sin reconstruir todo el grid en cada acción. */
+const padCardRefs = new Map();
 
 /* ============================================================
    DOM ELEMENTS
@@ -192,7 +220,7 @@ function bindGlobalControls() {
   if (dom.masterVolume) {
     dom.masterVolume.addEventListener("input", event => {
       state.masterVolume = Number(event.target.value);
-      if (masterGainNode) {
+      if (masterGainNode && audioCtx) {
         masterGainNode.gain.setTargetAtTime(state.masterVolume, audioCtx.currentTime, 0.01);
       }
     });
@@ -223,15 +251,17 @@ function bindGlobalControls() {
 }
 
 /* ============================================================
-   PAD RENDERING & UI
+   PAD RENDERING & UI (rebuild completo)
    ============================================================ */
 
 function renderPads() {
   if (!dom.padsGrid) return;
   dom.padsGrid.innerHTML = "";
+  padCardRefs.clear();
 
   pads.forEach(pad => {
-    const card = createPadCard(pad);
+    const { card, refs } = createPadCard(pad);
+    padCardRefs.set(pad.id, refs);
     dom.padsGrid.appendChild(card);
   });
 }
@@ -278,8 +308,8 @@ function createPadCard(pad) {
   const sourceSelect = document.createElement("select");
   sourceSelect.className = "pad-source-select";
   sourceSelect.innerHTML = `
-    LOCAL
-    YOUTUBE
+    <option value="local">LOCAL</option>
+    <option value="youtube">YOUTUBE</option>
   `;
   sourceSelect.value = pad.sourceType;
 
@@ -304,6 +334,14 @@ function createPadCard(pad) {
   youtubeButton.textContent = "LOAD";
 
   youtubeInput.addEventListener("click", event => event.stopPropagation());
+  youtubeInput.addEventListener("keydown", event => {
+    event.stopPropagation();
+    if (event.key === "Enter") {
+      event.preventDefault();
+      loadYouTubeFromInput(pad.id, youtubeInput.value);
+    }
+  });
+
   youtubeButton.addEventListener("click", event => {
     event.stopPropagation();
     loadYouTubeFromInput(pad.id, youtubeInput.value);
@@ -322,8 +360,7 @@ function createPadCard(pad) {
 
   localButton.addEventListener("click", event => {
     event.stopPropagation();
-    state.selectedPad = pad.id;
-    updateSelectedPadUI();
+    selectPad(pad.id);
     if (dom.mediaFileInput) dom.mediaFileInput.click();
   });
 
@@ -346,41 +383,33 @@ function createPadCard(pad) {
   const controls = document.createElement("div");
   controls.className = "pad-controls";
 
-  controls.appendChild(
-    createRangeRow("CUE", pad.trimStart, 0, Math.max(pad.maxDuration, 1), 0.01, value => {
-      pad.trimStart = Number(value);
-      clampPadTrim(pad);
-    })
+  const cue = createRangeRow("CUE", pad.trimStart, 0, Math.max(pad.maxDuration, 1), 0.01, value => {
+    pad.trimStart = Number(value);
+    clampPadTrim(pad);
+  });
+
+  const loopRow = createRangeRow("LOOP", pad.duration, CONFIG.MIN_LOOP_DURATION, Math.max(pad.maxDuration, 1), 0.01, value => {
+    pad.duration = Number(value);
+    clampPadDuration(pad);
+  });
+
+  const rate = createRangeRow(
+    "RATE",
+    pad.playbackRate,
+    CONFIG.MIN_PLAYBACK_RATE,
+    CONFIG.MAX_PLAYBACK_RATE,
+    0.01,
+    value => setPadRate(pad.id, Number(value)),
+    val => `${Number(val).toFixed(2)}x`
   );
 
-  controls.appendChild(
-    createRangeRow("LOOP", pad.duration, CONFIG.MIN_LOOP_DURATION, Math.max(pad.maxDuration, 1), 0.01, value => {
-      pad.duration = Number(value);
-      clampPadDuration(pad);
-    })
-  );
+  const bpmRow = createNumberRow("BPM", pad.bpm, value => {
+    const bpm = Number(value);
+    if (!Number.isFinite(bpm) || bpm <= 0) return;
+    pad.bpm = Math.min(400, Math.max(20, bpm));
+  });
 
-  controls.appendChild(
-    createRangeRow(
-      "RATE",
-      pad.playbackRate,
-      CONFIG.MIN_PLAYBACK_RATE,
-      CONFIG.MAX_PLAYBACK_RATE,
-      0.01,
-      value => {
-        setPadRate(pad.id, Number(value));
-      },
-      val => `${Number(val).toFixed(2)}x`
-    )
-  );
-
-  controls.appendChild(
-    createNumberRow("BPM", pad.bpm, value => {
-      const bpm = Number(value);
-      if (!Number.isFinite(bpm) || bpm <= 0) return;
-      pad.bpm = Math.min(400, Math.max(20, bpm));
-    })
-  );
+  controls.append(cue.row, loopRow.row, rate.row, bpmRow.row);
 
   /* BUTTON ROW */
   const buttonRow = document.createElement("div");
@@ -437,15 +466,37 @@ function createPadCard(pad) {
     if (!file) return;
 
     if (!file.type.startsWith("video/") && !file.type.startsWith("audio/")) {
-      setStatus("INVALID FILE", false);
+      setStatus("ARCHIVO NO VÁLIDO", false);
       return;
     }
 
     state.selectedPad = pad.id;
+
+    // Si el pad estaba en modo YouTube, hay que pasarlo a local
+    // (antes el archivo se cargaba pero nunca se reproducía).
+    if (pad.sourceType !== "local") {
+      setPadSourceType(pad.id, "local");
+    }
+
     loadLocalFile(pad.id, file);
   });
 
-  return card;
+  const refs = {
+    card,
+    playButton,
+    muteButton,
+    soloButton,
+    syncButton,
+    visualButton,
+    thumb,
+    meterProgress,
+    cueInput: cue.input,
+    cueOutput: cue.output,
+    loopInput: loopRow.input,
+    loopOutput: loopRow.output
+  };
+
+  return { card, refs };
 }
 
 /* ============================================================
@@ -483,7 +534,8 @@ function createRangeRow(label, value, min, max, step, onInput, formatter = null)
 
   wrapper.append(input, output);
   row.append(labelElement, wrapper);
-  return row;
+
+  return { row, input, output };
 }
 
 function createNumberRow(label, value, onChange) {
@@ -505,7 +557,8 @@ function createNumberRow(label, value, onChange) {
   input.addEventListener("change", event => onChange(event.target.value));
 
   row.append(labelElement, input);
-  return row;
+
+  return { row, input };
 }
 
 function createSmallButton(text, active, className) {
@@ -517,11 +570,58 @@ function createSmallButton(text, active, className) {
   return button;
 }
 
+/* ============================================================
+   PAD UI: UPDATES LIGEROS (sin reconstruir el DOM)
+   ============================================================ */
+
+function updatePadCardState(index) {
+  const pad = pads[index];
+  const refs = padCardRefs.get(index);
+  if (!pad || !refs) return;
+
+  refs.card.classList.toggle("selected", index === state.selectedPad);
+  refs.card.classList.toggle("playing", pad.playing);
+
+  refs.playButton.textContent = pad.playing ? "STOP" : "PLAY";
+  refs.playButton.classList.toggle("active", pad.playing);
+
+  refs.muteButton.classList.toggle("active", pad.muted);
+  refs.soloButton.classList.toggle("active", pad.solo);
+  refs.syncButton.classList.toggle("active", pad.sync);
+  refs.visualButton.classList.toggle("active", index === state.visualPad);
+
+  refs.thumb.textContent = pad.fileName;
+
+  if (!pad.playing) {
+    refs.meterProgress.style.width = "0%";
+  }
+}
+
+function updateAllPadCardStates() {
+  pads.forEach((_, idx) => updatePadCardState(idx));
+}
+
+function refreshPadRanges(index) {
+  const pad = pads[index];
+  const refs = padCardRefs.get(index);
+  if (!pad || !refs) return;
+
+  const maxBound = Math.max(pad.maxDuration, 1);
+
+  refs.cueInput.max = maxBound;
+  refs.cueInput.value = pad.trimStart;
+  refs.cueOutput.textContent = pad.trimStart.toFixed(2);
+
+  refs.loopInput.max = maxBound;
+  refs.loopInput.value = pad.duration;
+  refs.loopOutput.textContent = pad.duration.toFixed(2);
+}
+
 function selectPad(index) {
   if (index < 0 || index >= pads.length) return;
   state.selectedPad = index;
   updateSelectedPadUI();
-  renderPads();
+  updateAllPadCardStates();
 }
 
 function updateSelectedPadUI() {
@@ -529,10 +629,7 @@ function updateSelectedPadUI() {
   if (!pad) return;
 
   if (dom.selectedPadInfo) {
-    dom.selectedPadInfo.innerHTML = `
-      **PAD ${pad.id + 1}**
-      ${pad.key.toUpperCase()}
-    `;
+    dom.selectedPadInfo.innerHTML = `<strong>PAD ${pad.id + 1}</strong> · ${pad.key.toUpperCase()}`;
   }
 
   if (dom.visualMasterButton) {
@@ -544,7 +641,7 @@ function setVisualPad(index) {
   if (!pads[index]) return;
   state.visualPad = index;
   updateSelectedPadUI();
-  renderPads();
+  updateAllPadCardStates();
   updateCanvasStatus();
 }
 
@@ -556,12 +653,10 @@ async function togglePadPlayback(index) {
   const pad = pads[index];
   if (!pad) return;
 
-  await resumeAudio();
-
   if (pad.playing) {
     stopPadPlayback(index);
   } else {
-    startPadPlayback(index);
+    await startPadPlayback(index);
   }
 }
 
@@ -600,8 +695,6 @@ async function startPadPlayback(index) {
 
     pad.playing = true;
     pad.lastPlayedAt = performance.now();
-    setVisualPad(index);
-    setStatus(`PLAY PAD ${index + 1}`, true);
   } else if (pad.sourceType === "youtube") {
     if (!pad.youtubePlayer) {
       setStatus(`PAD ${index + 1}: YT NO CARGADO`, false);
@@ -610,20 +703,24 @@ async function startPadPlayback(index) {
 
     try {
       pad.youtubePlayer.seekTo(pad.trimStart, true);
-      pad.youtubePlayer.setPlaybackRate(getEffectivePlaybackRate(pad));
+      pad.youtubePlayer.setPlaybackRate(snapToAllowedYouTubeRate(getEffectivePlaybackRate(pad)));
       pad.youtubePlayer.playVideo();
-
-      pad.playing = true;
-      pad.lastPlayedAt = performance.now();
-      setVisualPad(index);
-      setStatus(`PLAY PAD ${index + 1}`, true);
     } catch (error) {
       console.error("Error al reproducir YouTube:", error);
       setStatus("YOUTUBE ERROR", false);
+      return;
     }
+
+    pad.playing = true;
+    pad.lastPlayedAt = performance.now();
+  } else {
+    return;
   }
 
-  updatePadVisualState();
+  setVisualPad(index);
+  updatePadCardState(index);
+  updateCanvasStatus();
+  setStatus(`PLAY PAD ${index + 1}`, true);
 }
 
 function stopPadPlayback(index) {
@@ -637,13 +734,15 @@ function stopPadPlayback(index) {
   if (pad.sourceType === "youtube" && pad.youtubePlayer) {
     try {
       pad.youtubePlayer.pauseVideo();
-    } catch {}
+    } catch (e) {
+      /* player ya destruido o no listo */
+    }
   }
 
   pad.playing = false;
   pad.meterValue = 0;
 
-  updatePadVisualState();
+  updatePadCardState(index);
   updateCanvasStatus();
 }
 
@@ -674,21 +773,57 @@ function attachMediaEvents(pad) {
   media.addEventListener("ended", () => {
     if (pad.loop && pad.playing) {
       media.currentTime = pad.trimStart;
-      media.play().catch(console.warn);
+      media.play().catch(err => console.warn("Error al reiniciar loop:", err));
     } else {
       pad.playing = false;
-      updatePadVisualState();
+      updatePadCardState(pad.id);
+      updateCanvasStatus();
     }
   });
 
   media.addEventListener("error", () => {
     pad.playing = false;
     setStatus(`ERROR PAD ${pad.id + 1}`, false);
-    updatePadVisualState();
+    updatePadCardState(pad.id);
+    updateCanvasStatus();
   });
 }
 
+/* ============================================================
+   LIMPIEZA DE RECURSOS (audio, video, YouTube)
+   ============================================================ */
+
 function destroyPadMedia(pad) {
+  if (pad.audioSource) {
+    try {
+      pad.audioSource.disconnect();
+    } catch (e) {
+      /* ya desconectado */
+    }
+  }
+  if (pad.highpassNode) {
+    try {
+      pad.highpassNode.disconnect();
+    } catch (e) {}
+  }
+  if (pad.lowpassNode) {
+    try {
+      pad.lowpassNode.disconnect();
+    } catch (e) {}
+  }
+  if (pad.gainNode) {
+    try {
+      pad.gainNode.disconnect();
+    } catch (e) {}
+  }
+
+  // Crítico: sin este reset, initializePadAudio() nunca reconstruye
+  // el grafo de audio para un archivo nuevo cargado en el mismo pad.
+  pad.audioSource = null;
+  pad.highpassNode = null;
+  pad.lowpassNode = null;
+  pad.gainNode = null;
+
   if (pad.video) {
     try {
       pad.video.pause();
@@ -707,8 +842,29 @@ function destroyPadMedia(pad) {
 
   pad.file = null;
   pad.fileUrl = null;
+}
+
+function destroyPadYouTube(pad) {
+  if (pad.youtubePlayer) {
+    try {
+      pad.youtubePlayer.destroy();
+    } catch (e) {
+      console.warn("Error destruyendo YouTube player:", e);
+    }
+    pad.youtubePlayer = null;
+  }
+
+  const container = document.getElementById(`yt-player-${pad.id}`);
+  if (container) container.remove();
+
+  pad.youtubeId = "";
+}
+
+function destroyPad(pad) {
+  stopPadPlayback(pad.id);
+  destroyPadMedia(pad);
+  destroyPadYouTube(pad);
   pad.fileName = "Vacío";
-  pad.playing = false;
 }
 
 /* ============================================================
@@ -758,7 +914,8 @@ function loadLocalFile(index, file) {
 
     initializePadAudio(pad);
     setStatus(`CARGADO PAD ${index + 1}`, false);
-    renderPads();
+    refreshPadRanges(index);
+    updatePadCardState(index);
   });
 
   attachMediaEvents(pad);
@@ -772,7 +929,7 @@ function setPadSourceType(index, type) {
   const pad = pads[index];
   if (!pad) return;
 
-  stopPadPlayback(index);
+  destroyPad(pad);
   pad.sourceType = type;
   renderPads();
 }
@@ -798,29 +955,45 @@ function initializePadAudio(pad) {
     pad.lowpassNode.connect(pad.gainNode);
     pad.gainNode.connect(masterGainNode);
 
-    updatePadAudioGain(pad);
+    updatePadGain(pad);
   } catch (e) {
     console.error("Error al inicializar nodos de audio:", e);
   }
 }
 
-function updatePadAudioGain(pad) {
-  if (!pad.gainNode || !audioCtx) return;
-
+// Reemplaza a la vieja updatePadAudioGain: ahora controla tanto el
+// GainNode de Web Audio (pads locales) como el volumen nativo del
+// reproductor de YouTube, respetando mute/solo/volume en ambos casos.
+function updatePadGain(pad) {
   const anySolo = pads.some(p => p.solo);
-  let targetGain = 1.0;
+  let multiplier = 1;
 
   if (pad.muted) {
-    targetGain = 0;
+    multiplier = 0;
   } else if (anySolo) {
-    targetGain = pad.solo ? 1.0 : 0;
+    multiplier = pad.solo ? 1 : 0;
   }
 
-  pad.gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.01);
+  const targetGain = clamp(pad.volume, 0, 1) * multiplier;
+
+  if (pad.sourceType === "local" && pad.gainNode && audioCtx) {
+    pad.gainNode.gain.setTargetAtTime(targetGain, audioCtx.currentTime, 0.01);
+  } else if (pad.sourceType === "youtube" && pad.youtubePlayer) {
+    try {
+      pad.youtubePlayer.setVolume(Math.round(targetGain * 100));
+      if (targetGain <= 0) {
+        pad.youtubePlayer.mute();
+      } else {
+        pad.youtubePlayer.unMute();
+      }
+    } catch (e) {
+      /* player no listo aún */
+    }
+  }
 }
 
 function updateAllAudioGains() {
-  pads.forEach(updatePadAudioGain);
+  pads.forEach(updatePadGain);
 }
 
 /* ============================================================
@@ -887,7 +1060,7 @@ function createYouTubePlayer(pad) {
   if (pad.youtubePlayer) {
     try {
       pad.youtubePlayer.destroy();
-    } catch {}
+    } catch (e) {}
   }
 
   pad.youtubePlayer = new window.YT.Player(container.id, {
@@ -905,8 +1078,11 @@ function createYouTubePlayer(pad) {
     events: {
       onReady: () => {
         pad.maxDuration = pad.youtubePlayer.getDuration() || CONFIG.DEFAULT_MAX_DURATION;
+        // Aplica el estado de mute/solo/volumen vigente al player recién creado.
+        updatePadGain(pad);
         setStatus(`YT PAD ${pad.id + 1} LISTO`, false);
-        renderPads();
+        refreshPadRanges(pad.id);
+        updatePadCardState(pad.id);
       },
       onStateChange: event => {
         if (event.data === window.YT.PlayerState.ENDED && pad.playing) {
@@ -920,6 +1096,13 @@ function createYouTubePlayer(pad) {
       }
     }
   });
+}
+
+function snapToAllowedYouTubeRate(rate) {
+  return CONFIG.YT_ALLOWED_RATES.reduce(
+    (closest, allowed) => (Math.abs(allowed - rate) < Math.abs(closest - rate) ? allowed : closest),
+    CONFIG.YT_ALLOWED_RATES[0]
+  );
 }
 
 /* ============================================================
@@ -1044,14 +1227,29 @@ function initializeMIDI() {
     .requestMIDIAccess()
     .then(midiAccess => {
       const inputs = Array.from(midiAccess.inputs.values());
+
       if (dom.midiInputSelect) {
-        dom.midiInputSelect.innerHTML = 'SELECCIONAR MIDI';
+        dom.midiInputSelect.innerHTML = '<option value="">SELECCIONAR MIDI</option>';
         inputs.forEach(input => {
           const option = document.createElement("option");
           option.value = input.id;
           option.textContent = input.name || `Dispositivo ${input.id}`;
           dom.midiInputSelect.appendChild(option);
         });
+
+        // No perder la selección del usuario si se conecta/desconecta
+        // OTRO dispositivo distinto al elegido.
+        const stillConnected = inputs.some(input => input.id === state.midiInputId);
+        dom.midiInputSelect.value = stillConnected ? state.midiInputId : "";
+      }
+
+      midiAccess.inputs.forEach(input => {
+        input.onmidimessage = input.id === state.midiInputId ? handleMIDIMessage : null;
+      });
+
+      if (dom.midiStatus) {
+        const connected = inputs.some(i => i.id === state.midiInputId);
+        dom.midiStatus.textContent = state.midiInputId ? (connected ? "CONECTADO" : "DESCONECTADO") : "DESCONECTADO";
       }
 
       midiAccess.onstatechange = () => initializeMIDI();
@@ -1090,15 +1288,17 @@ function handleMIDIMessage(event) {
     const pad = pads[state.selectedPad];
     if (!pad) return;
 
-    if (note === 112 && pad.highpassNode) {
+    if (note === 112 && pad.sourceType === "local" && pad.highpassNode) {
       pad.highpass = (velocity / 127) * 1000;
       pad.highpassNode.frequency.value = pad.highpass;
-    } else if (note === 113 && pad.lowpassNode) {
+    } else if (note === 113 && pad.sourceType === "local" && pad.lowpassNode) {
       pad.lowpass = (velocity / 127) * 19800 + 20;
       pad.lowpassNode.frequency.value = pad.lowpass;
-    } else if (note === 7 && pad.gainNode) {
-      const vol = velocity / 127;
-      pad.gainNode.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.01);
+    } else if (note === 7) {
+      // Ahora funciona también para pads de YouTube, ya que
+      // updatePadGain() controla ambos motores de audio.
+      pad.volume = velocity / 127;
+      updatePadGain(pad);
     }
   }
 }
@@ -1118,61 +1318,92 @@ async function toggleRecording() {
 async function startRecording() {
   await resumeAudio();
 
-  const canvasStream = dom.canvas.captureStream(30);
-  recordingDestination = audioCtx.createMediaStreamDestination();
-  masterGainNode.connect(recordingDestination);
-
-  const combinedStream = new MediaStream([
-    ...canvasStream.getVideoTracks(),
-    ...recordingDestination.stream.getAudioTracks()
-  ]);
-
-  const mimeTypes = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"];
-  const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
-
-  if (!mimeType) {
+  if (!dom.canvas || typeof dom.canvas.captureStream !== "function") {
     setStatus("REC UNSUPPORTED", false);
     return;
   }
 
-  state.recordingChunks = [];
-  state.recorder = new MediaRecorder(combinedStream, { mimeType });
+  try {
+    const canvasStream = dom.canvas.captureStream(30);
+    recordingDestination = audioCtx.createMediaStreamDestination();
+    masterGainNode.connect(recordingDestination);
 
-  state.recorder.ondataavailable = e => {
-    if (e.data.size > 0) state.recordingChunks.push(e.data);
-  };
+    const combinedStream = new MediaStream([
+      ...canvasStream.getVideoTracks(),
+      ...recordingDestination.stream.getAudioTracks()
+    ]);
 
-  state.recorder.onstop = exportRecording;
+    const mimeTypes = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"];
+    const mimeType = mimeTypes.find(type => MediaRecorder.isTypeSupported(type)) || "";
 
-  state.recorder.start();
-  state.isRecording = true;
-  state.recordingStartedAt = Date.now();
+    if (!mimeType) {
+      setStatus("REC UNSUPPORTED", false);
+      masterGainNode.disconnect(recordingDestination);
+      recordingDestination = null;
+      return;
+    }
 
-  if (dom.recordButton) dom.recordButton.classList.add("recording");
-  setStatus("GRABANDO...", true);
+    state.recordingChunks = [];
+    state.recorder = new MediaRecorder(combinedStream, { mimeType });
 
-  state.recordingTimer = setInterval(() => {
-    const elapsed = Math.floor((Date.now() - state.recordingStartedAt) / 1000);
-    const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
-    const s = String(elapsed % 60).padStart(2, "0");
-    if (dom.recordingTimer) dom.recordingTimer.textContent = `\({m}:\){s}`;
-  }, 1000);
+    state.recorder.ondataavailable = e => {
+      if (e.data.size > 0) state.recordingChunks.push(e.data);
+    };
+
+    state.recorder.onstop = exportRecording;
+
+    state.recorder.onerror = event => {
+      console.error("Error de MediaRecorder:", event.error);
+      setStatus("REC ERROR", false);
+      stopRecording();
+    };
+
+    state.recorder.start();
+    state.isRecording = true;
+    state.recordingStartedAt = Date.now();
+
+    if (dom.recordButton) dom.recordButton.classList.add("recording");
+    setStatus("GRABANDO...", true);
+
+    state.recordingTimer = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - state.recordingStartedAt) / 1000);
+      const m = String(Math.floor(elapsed / 60)).padStart(2, "0");
+      const s = String(elapsed % 60).padStart(2, "0");
+      if (dom.recordingTimer) dom.recordingTimer.textContent = `${m}:${s}`;
+    }, 1000);
+  } catch (error) {
+    console.error("Error al iniciar grabación:", error);
+    setStatus("REC ERROR", false);
+    if (recordingDestination) {
+      try {
+        masterGainNode.disconnect(recordingDestination);
+      } catch (e) {}
+      recordingDestination = null;
+    }
+  }
 }
 
 function stopRecording() {
   if (!state.recorder || !state.isRecording) return;
 
-  state.recorder.stop();
+  try {
+    state.recorder.stop();
+  } catch (e) {
+    console.warn("Error al detener grabación:", e);
+  }
   state.isRecording = false;
 
   clearInterval(state.recordingTimer);
+  state.recordingTimer = null;
+
   if (dom.recordButton) dom.recordButton.classList.remove("recording");
   if (dom.recordingTimer) dom.recordingTimer.textContent = "00:00";
 
   if (recordingDestination) {
     try {
       masterGainNode.disconnect(recordingDestination);
-    } catch {}
+    } catch (e) {}
+    recordingDestination = null;
   }
 
   setStatus("GRABACIÓN FINALIZADA", false);
@@ -1214,7 +1445,9 @@ function exportProject() {
       loop: p.loop,
       muted: p.muted,
       solo: p.solo,
+      sync: p.sync,
       bpm: p.bpm,
+      volume: p.volume,
       highpass: p.highpass,
       lowpass: p.lowpass
     }))
@@ -1274,7 +1507,9 @@ function loadProjectData(data) {
       pad.loop = pData.loop !== undefined ? pData.loop : true;
       pad.muted = !!pData.muted;
       pad.solo = !!pData.solo;
+      pad.sync = !!pData.sync;
       pad.bpm = pData.bpm || CONFIG.DEFAULT_BPM;
+      pad.volume = pData.volume !== undefined ? clamp(Number(pData.volume), 0, 1) : 1;
       pad.highpass = pData.highpass || 20;
       pad.lowpass = pData.lowpass || 20000;
 
@@ -1288,16 +1523,21 @@ function loadProjectData(data) {
   }
 
   renderPads();
+  updateAllAudioGains();
   setStatus("PROYECTO CARGADO", false);
 }
 
 function clearProject() {
-  stopAllPads();
-  pads.forEach((pad, idx) => {
-    destroyPadMedia(pad);
+  pads.forEach(pad => destroyPad(pad));
+  pads.forEach((_, idx) => {
     pads[idx] = createPad(idx);
   });
+
+  state.selectedPad = 0;
+  state.visualPad = 0;
+
   renderPads();
+  updateSelectedPadUI();
   setStatus("PROYECTO REINICIADO", false);
 }
 
@@ -1331,8 +1571,8 @@ function setPadRate(index, rate) {
     pad.video.playbackRate = getEffectivePlaybackRate(pad);
   } else if (pad.sourceType === "youtube" && pad.youtubePlayer) {
     try {
-      pad.youtubePlayer.setPlaybackRate(getEffectivePlaybackRate(pad));
-    } catch {}
+      pad.youtubePlayer.setPlaybackRate(snapToAllowedYouTubeRate(getEffectivePlaybackRate(pad)));
+    } catch (e) {}
   }
 }
 
@@ -1349,7 +1589,7 @@ function toggleMute(index) {
 
   pad.muted = !pad.muted;
   updateAllAudioGains();
-  renderPads();
+  updatePadCardState(index);
 }
 
 function toggleSolo(index) {
@@ -1358,7 +1598,7 @@ function toggleSolo(index) {
 
   pad.solo = !pad.solo;
   updateAllAudioGains();
-  renderPads();
+  updatePadCardState(index);
 }
 
 function toggleSync(index) {
@@ -1367,7 +1607,7 @@ function toggleSync(index) {
 
   pad.sync = !pad.sync;
   setPadRate(index, pad.playbackRate);
-  renderPads();
+  updatePadCardState(index);
 }
 
 let tapTimes = [];
@@ -1401,10 +1641,6 @@ function updateGlobalBpmUI() {
   }
 }
 
-function updatePadVisualState() {
-  renderPads();
-}
-
 function updatePadMeter(pad) {
   if (!pad.playing || !pad.video || !pad.duration) return;
 
@@ -1412,12 +1648,9 @@ function updatePadMeter(pad) {
   const progress = clamp((current / pad.duration) * 100, 0, 100);
   pad.meterValue = progress;
 
-  if (dom.padsGrid) {
-    const card = dom.padsGrid.querySelector(`[data-pad="${pad.id}"]`);
-    if (card) {
-      const bar = card.querySelector(".pad-meter-progress");
-      if (bar) bar.style.width = `${progress}%`;
-    }
+  const refs = padCardRefs.get(pad.id);
+  if (refs && refs.meterProgress) {
+    refs.meterProgress.style.width = `${progress}%`;
   }
 }
 
@@ -1427,7 +1660,7 @@ function refreshAudioOutputs() {
   navigator.mediaDevices.enumerateDevices().then(devices => {
     const outputs = devices.filter(d => d.kind === "audiooutput");
     if (dom.audioOutputSelect) {
-      dom.audioOutputSelect.innerHTML = 'SALIDA DEFAULT';
+      dom.audioOutputSelect.innerHTML = '<option value="">SALIDA DEFAULT</option>';
       outputs.forEach(device => {
         const opt = document.createElement("option");
         opt.value = device.deviceId;
