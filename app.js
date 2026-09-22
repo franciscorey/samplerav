@@ -1,849 +1,4807 @@
-// --- ESTADO GLOBAL Y AUDIO CONTEXT ---
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+/* ============================================================
+   AV SAMPLER
+   Version 2
+   ============================================================ */
 
-// Nodos de Audio Globales
-const masterGainNode = audioCtx.createGain();
-masterGainNode.gain.value = 0.8;
-masterGainNode.connect(audioCtx.destination);
+"use strict";
 
-let activeVideoElement = null;
-let activeYtPlayer = null;
-let activeSourceType = null;
-let activePadIndex = 0;
 
-// BPM Global del Proyecto y Tapping
-let globalBPM = 120.0;
-let globalTapTimes = [];
+/* ============================================================
+   CONFIGURATION
+   ============================================================ */
 
-// Mapeo Teclado Físico (QWER / ASDF) -> Índice de Pad
-const keyMap = {
-  'q': 0, 'w': 1, 'e': 2, 'r': 3,
-  'a': 4, 's': 5, 'd': 6, 'f': 7
+const CONFIG = {
+
+  PAD_COUNT: 8,
+
+  DEFAULT_BPM: 120,
+
+  DEFAULT_MASTER_VOLUME: 0.8,
+
+  DEFAULT_PAD_DURATION: 2,
+
+  DEFAULT_MAX_DURATION: 60,
+
+  DEFAULT_PLAYBACK_RATE: 1,
+
+  MIN_PLAYBACK_RATE: 0.25,
+
+  MAX_PLAYBACK_RATE: 4,
+
+  MIN_LOOP_DURATION: 0.05,
+
+  MAX_LOOP_DURATION: 60,
+
+  KEY_MAP: [
+    "q",
+    "w",
+    "e",
+    "r",
+    "a",
+    "s",
+    "d",
+    "f"
+  ],
+
+  MIDI_NOTES: [
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43
+  ]
+
 };
 
-// Banco de 8 Pads (Todos en STOP por defecto)
-const padBank = Array.from({ length: 8 }, (_, i) => ({
-  id: i + 1,
-  keyLabel: ['Q','W','E','R','A','S','D','F'][i],
-  midiNote: 36 + i,
-  sourceType: 'local',
-  videoElem: null,
-  ytPlayer: null,
-  ytVideoId: '',
-  sourceNode: null,
-  highpassFilter: null,
-  lowpassFilter: null,
-  gainNode: null,
-  fileName: "Vacío",
-  trimStart: 0.0,
-  duration: 2.0,
-  maxDuration: 60.0,
-  playbackRate: 1.0,
-  isLooping: true,
-  isPlaying: false, // ESTADO STOP POR DEFECTO
-  isMuted: false,
-  isSolo: false,
-  hpFrequency: 20,
-  lpFrequency: 20000,
-  padBPM: 120.0,
-  padTapTimes: []
-}));
 
-// Elementos DOM
-const canvas = document.getElementById('mainCanvas');
-const ctx = canvas.getContext('2d');
-const padsGrid = document.getElementById('padsGrid');
-const videoBank = document.getElementById('videoBank');
-const ytPlayersContainer = document.getElementById('ytPlayersContainer');
-const canvasWrapper = document.getElementById('canvasWrapper');
-const canvasStatusTag = document.getElementById('canvasStatusTag');
+/* ============================================================
+   AUDIO CONTEXT
+   ============================================================ */
 
-// --- INICIALIZACIÓN ---
-document.addEventListener('DOMContentLoaded', () => {
-  renderPadsUI();
-  setupDragAndDrop();
-  setupKeyboardListeners();
-  setupMasterVolume();
-  setupGlobalTapTempo();
-  initWebMIDI();
-  setupAudioOutputs();
-  setupProjectExportImport();
-  setupRecorder();
+let audioCtx = null;
 
-  // Primer frame de pantalla de espera (fondo activo)
-  ctx.fillStyle = '#0a0c10';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+let masterGainNode = null;
 
-  requestAnimationFrame(renderCanvasFrame);
-});
+let recordingDestination = null;
 
-// --- RENDERIZADO INTERFAZ GRÁFICA DE PADS ---
-function renderPadsUI() {
-  padsGrid.innerHTML = '';
 
-  padBank.forEach((pad, index) => {
-    const padCard = document.createElement('div');
-    padCard.className = `pad-card ${index === activePadIndex ? 'selected' : ''} ${pad.isPlaying ? 'playing' : ''}`;
-    padCard.dataset.index = index;
+/* ============================================================
+   APP STATE
+   ============================================================ */
 
-    padCard.innerHTML = `
-      <div class="pad-header">
-        <div class="pad-title-group">
-          <span class="pad-number">PAD ${pad.id}</span>
-          <span class="pad-key-badge">${pad.keyLabel}</span>
-        </div>
-        <div>
-          <button class="pad-play-btn ${pad.isPlaying ? 'active' : ''}" onclick="togglePlayPad(event, ${index})">
-            ${pad.isPlaying ? '⏸ PAUSE' : '▶ PLAY'}
-          </button>
-        </div>
-      </div>
+const state = {
 
-      <select class="pad-source-select" onchange="changeSourceType(${index}, this.value)">
-        <option value="local" ${pad.sourceType === 'local' ? 'selected' : ''}>Local (.mp4)</option>
-        <option value="youtube" ${pad.sourceType === 'youtube' ? 'selected' : ''}>YouTube URL</option>
-      </select>
+  selectedPad: 0,
 
-      ${pad.sourceType === 'youtube' ? `
-        <div class="yt-input-group">
-          <input type="text" id="yt-url-${index}" placeholder="ID/URL YouTube" value="${pad.ytVideoId}">
-          <button onclick="loadYouTubeVideo(${index})">Cargar</button>
-        </div>
-      ` : ''}
+  visualPad: 0,
 
-      <div class="pad-thumb" id="thumb-${index}">${pad.fileName}</div>
+  globalBpm: CONFIG.DEFAULT_BPM,
 
-      <!-- Meter Bar -->
-      <div class="pad-meter-bar">
-        <div class="pad-meter-progress" id="meter-${index}"></div>
-      </div>
+  masterVolume: CONFIG.DEFAULT_MASTER_VOLUME,
 
-      <div class="pad-controls">
-        <div class="pad-control-row">
-          <span>Cue Start</span>
-          <input type="number" id="cue-num-${index}" class="num-input-sm" min="0" max="${pad.maxDuration.toFixed(1)}" step="0.1" value="${pad.trimStart}" onchange="updatePadTrimStart(${index}, this.value)">
-        </div>
-        <div class="pad-control-row slider-cyan">
-          <input type="range" id="cue-slider-${index}" min="0" max="${pad.maxDuration}" step="0.1" value="${pad.trimStart}" oninput="updatePadTrimStart(${index}, this.value)">
-        </div>
+  midiInputId: "",
 
-        <div class="pad-control-row">
-          <span>Loop Size</span>
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <input type="number" class="num-input-sm" min="0.1" max="10.0" step="0.1" value="${pad.duration}" onchange="updatePadDuration(${index}, this.value)">
-            <span style="font-size: 9px; color: var(--text-muted);">seg</span>
-          </div>
-        </div>
-        <div class="pad-control-row slider-green">
-          <input type="range" min="0.1" max="10.0" step="0.1" value="${pad.duration}" oninput="updatePadDuration(${index}, this.value)">
-        </div>
+  audioOutputId: "",
 
-        <div class="pad-control-row">
-          <div style="display: flex; gap: 3px;">
-            <button class="btn-mute ${pad.isMuted ? 'active' : ''}" onclick="toggleMute(${index})">M</button>
-            <button class="btn-solo ${pad.isSolo ? 'active' : ''}" onclick="toggleSolo(${index})">S</button>
-          </div>
-          <button class="btn-tap" onclick="handlePadTap(${index})">TAP</button>
-          <span id="pad-bpm-label-${index}" style="font-family: monospace; color: var(--accent-cyan); font-size: 9px;">${pad.padBPM.toFixed(1)} BPM</span>
-        </div>
+  isRecording: false,
 
-        <div class="pad-control-row">
-          <label style="font-size: 9px;"><input type="checkbox" ${pad.isLooping ? 'checked' : ''} onchange="updatePadLoop(${index}, this.checked)"> 🔁 Continuous Loop</label>
-          <button class="btn-sync" onclick="syncPadToGlobalBPM(${index})">⚡ SYNC</button>
-        </div>
+  recordingStartedAt: 0,
 
-        <div class="pad-control-row">
-          <span>Pitch / Speed</span>
-          <span id="rate-label-${index}" style="color: #a855f7;">${pad.playbackRate.toFixed(2)}x</span>
-        </div>
-        <div class="pad-control-row">
-          <input type="range" min="0.5" max="2.0" step="0.05" value="${pad.playbackRate}" oninput="updatePadRate(${index}, this.value)">
-        </div>
+  recordingTimer: null,
 
-        <div class="pad-control-row">
-          <span>High-Pass</span>
-          <span id="hp-label-${index}" style="color: var(--accent-orange);">${Math.round(pad.hpFrequency)} Hz</span>
-        </div>
-        <div class="pad-control-row slider-orange">
-          <input type="range" min="20" max="8000" step="10" value="${pad.hpFrequency}" oninput="updatePadHighPassSlider(${index}, this.value)">
-        </div>
+  recorder: null,
 
-        <div class="pad-control-row">
-          <span>Low-Pass</span>
-          <span id="lp-label-${index}" style="color: var(--accent-red);">${Math.round(pad.lpFrequency)} Hz</span>
-        </div>
-        <div class="pad-control-row slider-red">
-          <input type="range" min="200" max="20000" step="100" value="${pad.lpFrequency}" oninput="updatePadLowPassSlider(${index}, this.value)">
-        </div>
-      </div>
-    `;
+  recordingChunks: [],
 
-    padCard.addEventListener('click', (e) => {
-      if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
-        selectPad(index);
-      }
-    });
-    padsGrid.appendChild(padCard);
-  });
+  recordingStream: null,
+
+  activeProjectName: "Proyecto nuevo"
+
+};
+
+
+/* ============================================================
+   PAD FACTORY
+   ============================================================ */
+
+function createPad(index) {
+
+  return {
+
+    id: index,
+
+    key: CONFIG.KEY_MAP[index],
+
+    midiNote: CONFIG.MIDI_NOTES[index],
+
+    sourceType: "local",
+
+    file: null,
+
+    fileUrl: null,
+
+    fileName: "Vacío",
+
+    video: null,
+
+    youtubeId: "",
+
+    youtubePlayer: null,
+
+    duration: CONFIG.DEFAULT_PAD_DURATION,
+
+    maxDuration: CONFIG.DEFAULT_MAX_DURATION,
+
+    trimStart: 0,
+
+    playbackRate: CONFIG.DEFAULT_PLAYBACK_RATE,
+
+    loop: true,
+
+    playing: false,
+
+    muted: false,
+
+    solo: false,
+
+    bpm: CONFIG.DEFAULT_BPM,
+
+    sync: false,
+
+    highpass: 20,
+
+    lowpass: 20000,
+
+    audioSource: null,
+
+    highpassNode: null,
+
+    lowpassNode: null,
+
+    gainNode: null,
+
+    meterValue: 0,
+
+    lastPlayedAt: 0
+
+  };
+
 }
+
+
+const pads = Array.from(
+  { length: CONFIG.PAD_COUNT },
+  (_, index) => createPad(index)
+);
+
+
+/* ============================================================
+   DOM
+   ============================================================ */
+
+const dom = {
+
+  padsGrid:
+    document.getElementById("padsGrid"),
+
+  canvas:
+    document.getElementById("outputCanvas"),
+
+  canvasContainer:
+    document.getElementById("canvasContainer"),
+
+  canvasOverlayTag:
+    document.getElementById("canvasOverlayTag"),
+
+  videoBank:
+    document.getElementById("videoBank"),
+
+  ytPlayersContainer:
+    document.getElementById("ytPlayersContainer"),
+
+  masterVolume:
+    document.getElementById("masterVolume"),
+
+  globalBpmValue:
+    document.getElementById("globalBpmValue"),
+
+  globalTapButton:
+    document.getElementById("globalTapButton"),
+
+  statusBadge:
+    document.getElementById("statusBadge"),
+
+  statusDot:
+    document.getElementById("statusDot"),
+
+  statusText:
+    document.getElementById("statusText"),
+
+  audioStartButton:
+    document.getElementById("audioStartButton"),
+
+  loadProjectButton:
+    document.getElementById("loadProjectButton"),
+
+  saveProjectButton:
+    document.getElementById("saveProjectButton"),
+
+  recordButton:
+    document.getElementById("recordButton"),
+
+  mediaFileInput:
+    document.getElementById("mediaFileInput"),
+
+  projectFileInput:
+    document.getElementById("projectFileInput"),
+
+  selectedPadInfo:
+    document.getElementById("selectedPadInfo"),
+
+  visualMasterButton:
+    document.getElementById("visualMasterButton"),
+
+  midiInputSelect:
+    document.getElementById("midiInputSelect"),
+
+  midiStatus:
+    document.getElementById("midiStatus"),
+
+  audioOutputSelect:
+    document.getElementById("audioOutputSelect"),
+
+  audioOutputRefresh:
+    document.getElementById("audioOutputRefresh"),
+
+  projectInfo:
+    document.getElementById("projectInfo"),
+
+  clearProjectButton:
+    document.getElementById("clearProjectButton"),
+
+  recordingStatus:
+    document.getElementById("recordingStatus"),
+
+  recordingTimer:
+    document.getElementById("recordingTimer")
+
+};
+
+
+/* ============================================================
+   INITIALIZATION
+   ============================================================ */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  initialize
+);
+
+
+function initialize() {
+
+  initializeAudio();
+
+  renderPads();
+
+  updateSelectedPadUI();
+
+  updateGlobalBpmUI();
+
+  bindGlobalControls();
+
+  bindKeyboard();
+
+  initializeMIDI();
+
+  refreshAudioOutputs();
+
+  drawStandby();
+
+  requestAnimationFrame(renderCanvas);
+
+  setStatus(
+    "READY",
+    false
+  );
+
+}
+
+
+/* ============================================================
+   AUDIO INITIALIZATION
+   ============================================================ */
+
+function initializeAudio() {
+
+  if (audioCtx) {
+    return;
+  }
+
+  const AudioContextClass =
+    window.AudioContext ||
+    window.webkitAudioContext;
+
+  if (!AudioContextClass) {
+
+    setStatus(
+      "AUDIO UNSUPPORTED",
+      false
+    );
+
+    return;
+
+  }
+
+  audioCtx = new AudioContextClass();
+
+  masterGainNode =
+    audioCtx.createGain();
+
+  masterGainNode.gain.value =
+    state.masterVolume;
+
+  masterGainNode.connect(
+    audioCtx.destination
+  );
+
+}
+
+
+/* ============================================================
+   RESUME AUDIO
+   ============================================================ */
+
+async function resumeAudio() {
+
+  initializeAudio();
+
+  if (
+    audioCtx &&
+    audioCtx.state === "suspended"
+  ) {
+
+    try {
+
+      await audioCtx.resume();
+
+    } catch (error) {
+
+      console.error(
+        "No se pudo activar AudioContext:",
+        error
+      );
+
+      setStatus(
+        "AUDIO ERROR",
+        false
+      );
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   GLOBAL CONTROLS
+   ============================================================ */
+
+function bindGlobalControls() {
+
+  dom.audioStartButton.addEventListener(
+    "click",
+    async () => {
+
+      await resumeAudio();
+
+      setStatus(
+        "AUDIO READY",
+        false
+      );
+
+      dom.audioStartButton.textContent =
+        "AUDIO ✓";
+
+    }
+  );
+
+
+  dom.masterVolume.addEventListener(
+    "input",
+    event => {
+
+      state.masterVolume =
+        Number(event.target.value);
+
+      if (masterGainNode) {
+
+        masterGainNode.gain.setTargetAtTime(
+          state.masterVolume,
+          audioCtx.currentTime,
+          0.01
+        );
+
+      }
+
+    }
+  );
+
+
+  dom.globalTapButton.addEventListener(
+    "click",
+    handleGlobalTap
+  );
+
+
+  dom.saveProjectButton.addEventListener(
+    "click",
+    exportProject
+  );
+
+
+  dom.loadProjectButton.addEventListener(
+    "click",
+    () => dom.projectFileInput.click()
+  );
+
+
+  dom.projectFileInput.addEventListener(
+    "change",
+    handleProjectFile
+  );
+
+
+  dom.clearProjectButton.addEventListener(
+    "click",
+    clearProject
+  );
+
+
+  dom.recordButton.addEventListener(
+    "click",
+    toggleRecording
+  );
+
+
+  dom.mediaFileInput.addEventListener(
+    "change",
+    handleMediaFile
+  );
+
+
+  dom.visualMasterButton.addEventListener(
+    "click",
+    () => {
+
+      setVisualPad(
+        state.selectedPad
+      );
+
+    }
+  );
+
+
+  dom.audioOutputRefresh.addEventListener(
+    "click",
+    refreshAudioOutputs
+  );
+
+
+  dom.audioOutputSelect.addEventListener(
+    "change",
+    handleAudioOutputChange
+  );
+
+
+  dom.midiInputSelect.addEventListener(
+    "change",
+    event => {
+
+      selectMIDIInput(
+        event.target.value
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   PAD RENDERING
+   ============================================================ */
+
+function renderPads() {
+
+  dom.padsGrid.innerHTML = "";
+
+  pads.forEach(
+    pad => {
+
+      const card =
+        createPadCard(pad);
+
+      dom.padsGrid.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+function createPadCard(pad) {
+
+  const card =
+    document.createElement("article");
+
+  card.className =
+    "pad-card";
+
+  card.dataset.pad =
+    pad.id;
+
+  if (
+    pad.id === state.selectedPad
+  ) {
+
+    card.classList.add(
+      "selected"
+    );
+
+  }
+
+  if (pad.playing) {
+
+    card.classList.add(
+      "playing"
+    );
+
+  }
+
+
+  /* HEADER */
+
+  const header =
+    document.createElement("div");
+
+  header.className =
+    "pad-header";
+
+
+  const titleGroup =
+    document.createElement("div");
+
+  titleGroup.className =
+    "pad-title-group";
+
+
+  const number =
+    document.createElement("span");
+
+  number.className =
+    "pad-number";
+
+  number.textContent =
+    `PAD ${pad.id + 1}`;
+
+
+  const key =
+    document.createElement("span");
+
+  key.className =
+    "pad-key-badge";
+
+  key.textContent =
+    pad.key.toUpperCase();
+
+
+  titleGroup.append(
+    number,
+    key
+  );
+
+
+  const playButton =
+    document.createElement("button");
+
+  playButton.className =
+    "pad-play-btn";
+
+  playButton.type =
+    "button";
+
+  playButton.textContent =
+    pad.playing
+      ? "STOP"
+      : "PLAY";
+
+  if (pad.playing) {
+
+    playButton.classList.add(
+      "active"
+    );
+
+  }
+
+
+  playButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      togglePadPlayback(
+        pad.id
+      );
+
+    }
+  );
+
+
+  header.append(
+    titleGroup,
+    playButton
+  );
+
+
+  /* SOURCE */
+
+  const sourceSelect =
+    document.createElement("select");
+
+  sourceSelect.className =
+    "pad-source-select";
+
+  sourceSelect.innerHTML = `
+    <option value="local">LOCAL</option>
+    <option value="youtube">YOUTUBE</option>
+  `;
+
+  sourceSelect.value =
+    pad.sourceType;
+
+
+  sourceSelect.addEventListener(
+    "click",
+    event => event.stopPropagation()
+  );
+
+
+  sourceSelect.addEventListener(
+    "change",
+    event => {
+
+      event.stopPropagation();
+
+      setPadSourceType(
+        pad.id,
+        event.target.value
+      );
+
+    }
+  );
+
+
+  /* YOUTUBE */
+
+  const youtubeGroup =
+    document.createElement("div");
+
+  youtubeGroup.className =
+    "yt-input-group";
+
+  youtubeGroup.style.display =
+    pad.sourceType === "youtube"
+      ? "flex"
+      : "none";
+
+
+  const youtubeInput =
+    document.createElement("input");
+
+  youtubeInput.type =
+    "text";
+
+  youtubeInput.placeholder =
+    "YouTube URL";
+
+  youtubeInput.value =
+    pad.youtubeId
+      ? `https://youtu.be/${pad.youtubeId}`
+      : "";
+
+
+  const youtubeButton =
+    document.createElement("button");
+
+  youtubeButton.type =
+    "button";
+
+  youtubeButton.textContent =
+    "LOAD";
+
+
+  youtubeInput.addEventListener(
+    "click",
+    event => event.stopPropagation()
+  );
+
+  youtubeButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      loadYouTubeFromInput(
+        pad.id,
+        youtubeInput.value
+      );
+
+    }
+  );
+
+
+  youtubeGroup.append(
+    youtubeInput,
+    youtubeButton
+  );
+
+
+  /* LOCAL LOAD */
+
+  const localButton =
+    document.createElement("button");
+
+  localButton.type =
+    "button";
+
+  localButton.className =
+    "btn";
+
+  localButton.textContent =
+    "CARGAR VIDEO";
+
+
+  localButton.style.width =
+    "100%";
+
+  localButton.style.marginBottom =
+    "6px";
+
+
+  localButton.style.display =
+    pad.sourceType === "local"
+      ? "block"
+      : "none";
+
+
+  localButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      state.selectedPad =
+        pad.id;
+
+      updateSelectedPadUI();
+
+      dom.mediaFileInput.click();
+
+    }
+  );
+
+
+  /* THUMB */
+
+  const thumb =
+    document.createElement("div");
+
+  thumb.className =
+    "pad-thumb";
+
+  thumb.textContent =
+    pad.fileName;
+
+
+  /* METER */
+
+  const meter =
+    document.createElement("div");
+
+  meter.className =
+    "pad-meter-bar";
+
+
+  const meterProgress =
+    document.createElement("div");
+
+  meterProgress.className =
+    "pad-meter-progress";
+
+  meterProgress.style.width =
+    `${pad.meterValue}%`;
+
+
+  meter.appendChild(
+    meterProgress
+  );
+
+
+  /* CONTROLS */
+
+  const controls =
+    document.createElement("div");
+
+  controls.className =
+    "pad-controls";
+
+
+  /* CUE */
+
+  controls.appendChild(
+    createRangeRow(
+      "CUE",
+      pad.trimStart,
+      0,
+      Math.max(
+        pad.maxDuration,
+        1
+      ),
+      0.01,
+      value => {
+
+        pad.trimStart =
+          Number(value);
+
+        clampPadTrim(
+          pad
+        );
+
+      }
+    )
+  );
+
+
+  /* LOOP */
+
+  controls.appendChild(
+    createRangeRow(
+      "LOOP",
+      pad.duration,
+      CONFIG.MIN_LOOP_DURATION,
+      Math.max(
+        pad.maxDuration,
+        1
+      ),
+      0.01,
+      value => {
+
+        pad.duration =
+          Number(value);
+
+        clampPadDuration(
+          pad
+        );
+
+      }
+    )
+  );
+
+
+  /* RATE */
+
+  controls.appendChild(
+    createRangeRow(
+      "RATE",
+      pad.playbackRate,
+      CONFIG.MIN_PLAYBACK_RATE,
+      CONFIG.MAX_PLAYBACK_RATE,
+      0.01,
+      value => {
+
+        setPadRate(
+          pad.id,
+          Number(value)
+        );
+
+      },
+      value => `${Number(value).toFixed(2)}x`
+    )
+  );
+
+
+  /* BPM */
+
+  controls.appendChild(
+    createNumberRow(
+      "BPM",
+      pad.bpm,
+      value => {
+
+        const bpm =
+          Number(value);
+
+        if (
+          !Number.isFinite(bpm) ||
+          bpm <= 0
+        ) {
+
+          return;
+
+        }
+
+        pad.bpm =
+          Math.min(
+            400,
+            Math.max(
+              20,
+              bpm
+            )
+          );
+
+      }
+    )
+  );
+
+
+  /* BUTTONS */
+
+  const buttonRow =
+    document.createElement("div");
+
+  buttonRow.className =
+    "pad-control-row";
+
+
+  const muteButton =
+    createSmallButton(
+      "MUTE",
+      pad.muted,
+      "btn-mute"
+    );
+
+
+  muteButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      toggleMute(
+        pad.id
+      );
+
+    }
+  );
+
+
+  const soloButton =
+    createSmallButton(
+      "SOLO",
+      pad.solo,
+      "btn-solo"
+    );
+
+
+  soloButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      toggleSolo(
+        pad.id
+      );
+
+    }
+  );
+
+
+  const syncButton =
+    createSmallButton(
+      "SYNC",
+      pad.sync,
+      "btn-sync"
+    );
+
+
+  syncButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      toggleSync(
+        pad.id
+      );
+
+    }
+  );
+
+
+  const visualButton =
+    createSmallButton(
+      "VIDEO",
+      pad.id === state.visualPad,
+      "btn-sync"
+    );
+
+
+  visualButton.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      setVisualPad(
+        pad.id
+      );
+
+    }
+  );
+
+
+  buttonRow.append(
+    muteButton,
+    soloButton,
+    syncButton,
+    visualButton
+  );
+
+
+  controls.appendChild(
+    buttonRow
+  );
+
+
+  /* CARD CONTENT */
+
+  card.append(
+    header,
+    sourceSelect,
+    youtubeGroup,
+    localButton,
+    thumb,
+    meter,
+    controls
+  );
+
+
+  /* CARD SELECTION */
+
+  card.addEventListener(
+    "click",
+    () => {
+
+      selectPad(
+        pad.id
+      );
+
+    }
+  );
+
+
+  /* DRAG & DROP */
+
+  card.addEventListener(
+    "dragover",
+    event => {
+
+      event.preventDefault();
+
+      card.classList.add(
+        "drag-highlight"
+      );
+
+    }
+  );
+
+
+  card.addEventListener(
+    "dragleave",
+    () => {
+
+      card.classList.remove(
+        "drag-highlight"
+      );
+
+    }
+  );
+
+
+  card.addEventListener(
+    "drop",
+    event => {
+
+      event.preventDefault();
+
+      card.classList.remove(
+        "drag-highlight"
+      );
+
+      const file =
+        event.dataTransfer.files?.[0];
+
+      if (!file) {
+        return;
+      }
+
+      if (
+        !file.type.startsWith(
+          "video/"
+        ) &&
+        !file.type.startsWith(
+          "audio/"
+        )
+      ) {
+
+        setStatus(
+          "INVALID FILE",
+          false
+        );
+
+        return;
+
+      }
+
+      state.selectedPad =
+        pad.id;
+
+      loadLocalFile(
+        pad.id,
+        file
+      );
+
+    }
+  );
+
+
+  return card;
+
+}
+
+
+/* ============================================================
+   UI HELPERS
+   ============================================================ */
+
+function createRangeRow(
+  label,
+  value,
+  min,
+  max,
+  step,
+  onInput,
+  formatter = null
+) {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "pad-control-row";
+
+
+  const labelElement =
+    document.createElement("span");
+
+  labelElement.textContent =
+    label;
+
+
+  const wrapper =
+    document.createElement("div");
+
+
+  wrapper.style.display =
+    "flex";
+
+  wrapper.style.alignItems =
+    "center";
+
+  wrapper.style.gap =
+    "4px";
+
+
+  const input =
+    document.createElement("input");
+
+  input.type =
+    "range";
+
+  input.min =
+    min;
+
+  input.max =
+    max;
+
+  input.step =
+    step;
+
+  input.value =
+    value;
+
+
+  const output =
+    document.createElement("output");
+
+  output.textContent =
+    formatter
+      ? formatter(value)
+      : Number(value).toFixed(
+          2
+        );
+
+
+  input.addEventListener(
+    "click",
+    event => event.stopPropagation()
+  );
+
+
+  input.addEventListener(
+    "input",
+    event => {
+
+      const current =
+        Number(event.target.value);
+
+      output.textContent =
+        formatter
+          ? formatter(current)
+          : current.toFixed(2);
+
+      onInput(
+        current
+      );
+
+    }
+  );
+
+
+  wrapper.append(
+    input,
+    output
+  );
+
+
+  row.append(
+    labelElement,
+    wrapper
+  );
+
+
+  return row;
+
+}
+
+
+function createNumberRow(
+  label,
+  value,
+  onChange
+) {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "pad-control-row";
+
+
+  const labelElement =
+    document.createElement("span");
+
+  labelElement.textContent =
+    label;
+
+
+  const input =
+    document.createElement("input");
+
+  input.type =
+    "number";
+
+  input.className =
+    "num-input-sm";
+
+  input.value =
+    value;
+
+  input.min =
+    "20";
+
+  input.max =
+    "400";
+
+  input.step =
+    "1";
+
+
+  input.addEventListener(
+    "click",
+    event => event.stopPropagation()
+  );
+
+
+  input.addEventListener(
+    "change",
+    event => {
+
+      onChange(
+        event.target.value
+      );
+
+    }
+  );
+
+
+  row.append(
+    labelElement,
+    input
+  );
+
+
+  return row;
+
+}
+
+
+function createSmallButton(
+  text,
+  active,
+  className
+) {
+
+  const button =
+    document.createElement("button");
+
+  button.type =
+    "button";
+
+  button.textContent =
+    text;
+
+  button.className =
+    className;
+
+  if (active) {
+
+    button.classList.add(
+      "active"
+    );
+
+  }
+
+  return button;
+
+}
+
+
+/* ============================================================
+   PAD SELECTION
+   ============================================================ */
 
 function selectPad(index) {
-  activePadIndex = index;
-  document.querySelectorAll('.pad-card').forEach((card, i) => {
-    card.classList.toggle('selected', i === index);
-  });
+
+  if (
+    index < 0 ||
+    index >= pads.length
+  ) {
+
+    return;
+
+  }
+
+  state.selectedPad =
+    index;
+
+  updateSelectedPadUI();
+
+  renderPads();
+
 }
 
-// --- CONTROL PLAY / PAUSE MANUAL ---
-function togglePlayPad(e, index) {
-  if (e) e.stopPropagation();
-  const pad = padBank[index];
 
-  if (pad.isPlaying) {
-    stopPadPlayback(index);
+function updateSelectedPadUI() {
+
+  const pad =
+    pads[state.selectedPad];
+
+  if (!pad) {
+    return;
+  }
+
+  dom.selectedPadInfo.innerHTML = `
+    <strong>PAD ${pad.id + 1}</strong>
+    <span>${pad.key.toUpperCase()}</span>
+  `;
+
+
+  dom.visualMasterButton.textContent =
+    state.visualPad === pad.id
+      ? "VIDEO ACTIVO ✓"
+      : "USAR COMO VIDEO";
+
+}
+
+
+/* ============================================================
+   VISUAL PAD
+   ============================================================ */
+
+function setVisualPad(index) {
+
+  const pad =
+    pads[index];
+
+  if (!pad) {
+    return;
+  }
+
+  state.visualPad =
+    index;
+
+  updateSelectedPadUI();
+
+  renderPads();
+
+  updateCanvasStatus();
+
+}
+
+
+/* ============================================================
+   PAD PLAYBACK
+   ============================================================ */
+
+async function togglePadPlayback(index) {
+
+  const pad =
+    pads[index];
+
+  if (!pad) {
+    return;
+  }
+
+  await resumeAudio();
+
+  if (pad.playing) {
+
+    stopPadPlayback(
+      index
+    );
+
   } else {
-    // Detener cualquier otro pad que se esté ejecutando en ese momento
-    padBank.forEach((p, i) => {
-      if (i !== index && p.isPlaying) stopPadPlayback(i);
-    });
-    startPadPlayback(index);
-  }
-}
 
-function startPadPlayback(index) {
-  if (audioCtx.state === 'suspended') audioCtx.resume();
+    startPadPlayback(
+      index
+    );
 
-  const pad = padBank[index];
-  if (!pad) return;
-
-  pad.isPlaying = true;
-  selectPad(index);
-
-  const calculatedEnd = pad.trimStart + pad.duration;
-
-  if (pad.sourceType === 'local' && pad.videoElem) {
-    const v = pad.videoElem;
-    v.playbackRate = pad.playbackRate;
-    v.preservesPitch = false;
-
-    v.currentTime = pad.trimStart;
-    v.play();
-
-    v.ontimeupdate = () => {
-      if (v.currentTime >= calculatedEnd) {
-        if (pad.isLooping) {
-          v.currentTime = pad.trimStart;
-        } else {
-          stopPadPlayback(index);
-        }
-      }
-      updatePadMeter(index, (v.currentTime - pad.trimStart) / pad.duration);
-    };
-
-    activeVideoElement = v;
-    activeSourceType = 'local';
-
-  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.seekTo) {
-    pad.ytPlayer.seekTo(pad.trimStart, true);
-    pad.ytPlayer.playVideo();
-    
-    activeYtPlayer = pad.ytPlayer;
-    activeSourceType = 'youtube';
   }
 
-  updateCanvasHeaderStatus(`CANVAS OUT: PAD ${pad.id} (${pad.fileName})`);
-  renderPadsUI();
-  setupDragAndDrop();
 }
+
+
+async function startPadPlayback(index) {
+
+  const pad =
+    pads[index];
+
+  if (!pad) {
+    return;
+  }
+
+  await resumeAudio();
+
+  if (
+    pad.sourceType === "local"
+  ) {
+
+    if (!pad.video) {
+
+      setStatus(
+        `PAD ${index + 1}: SIN FUENTE`,
+        false
+      );
+
+      selectPad(index);
+
+      return;
+
+    }
+
+    const media =
+      pad.video;
+
+    const start =
+      clamp(
+        pad.trimStart,
+        0,
+        Math.max(
+          media.duration || 0,
+          0
+        )
+      );
+
+
+    try {
+
+      media.currentTime =
+        start;
+
+    } catch (error) {
+
+      console.warn(
+        "No se pudo establecer cue:",
+        error
+      );
+
+    }
+
+
+    media.playbackRate =
+      getEffectivePlaybackRate(
+        pad
+      );
+
+    media.preservesPitch =
+      false;
+
+
+    try {
+
+      await media.play();
+
+    } catch (error) {
+
+      console.error(
+        "Error reproduciendo media:",
+        error
+      );
+
+      setStatus(
+        "PLAY ERROR",
+        false
+      );
+
+      return;
+
+    }
+
+
+    pad.playing =
+      true;
+
+    pad.lastPlayedAt =
+      performance.now();
+
+    setVisualPad(index);
+
+    setStatus(
+      `PLAY PAD ${index + 1}`,
+      true
+    );
+
+  }
+
+
+  else if (
+    pad.sourceType === "youtube"
+  ) {
+
+    if (!pad.youtubePlayer) {
+
+      setStatus(
+        `PAD ${index + 1}: YOUTUBE NO CARGADO`,
+        false
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      pad.youtubePlayer.seekTo(
+        pad.trimStart,
+        true
+      );
+
+      pad.youtubePlayer.setPlaybackRate(
+        getEffectivePlaybackRate(
+          pad
+        )
+      );
+
+      pad.youtubePlayer.playVideo();
+
+      pad.playing =
+        true;
+
+      pad.lastPlayedAt =
+        performance.now();
+
+      setVisualPad(index);
+
+      setStatus(
+        `PLAY PAD ${index + 1}`,
+        true
+      );
+
+    } catch (error) {
+
+      console.error(
+        "YouTube playback error:",
+        error
+      );
+
+      setStatus(
+        "YOUTUBE ERROR",
+        false
+      );
+
+    }
+
+  }
+
+
+  updatePadVisualState();
+
+}
+
 
 function stopPadPlayback(index) {
-  const pad = padBank[index];
-  if (!pad) return;
 
-  pad.isPlaying = false;
+  const pad =
+    pads[index];
 
-  if (pad.sourceType === 'local' && pad.videoElem) {
-    pad.videoElem.pause();
-  } else if (pad.sourceType === 'youtube' && pad.ytPlayer && pad.ytPlayer.pauseVideo) {
-    pad.ytPlayer.pauseVideo();
+  if (!pad) {
+    return;
   }
 
-  updatePadMeter(index, 0);
 
-  // NOTA CLAVE: No borramos activeVideoElement ni activeSourceType.
-  // El último frame renderizado en el canvas permanecerá fijo y visible.
-  updateCanvasHeaderStatus(`CANVAS OUT: PAD ${pad.id} (PAUSADO / FRAME FIJO)`);
+  if (
+    pad.sourceType === "local" &&
+    pad.video
+  ) {
 
-  renderPadsUI();
-  setupDragAndDrop();
-}
+    pad.video.pause();
 
-function updatePadMeter(index, ratio) {
-  const bar = document.getElementById(`meter-${index}`);
-  if (bar) {
-    const pct = Math.min(Math.max(0, ratio * 100), 100);
-    bar.style.width = `${pct}%`;
   }
-}
 
-function updateCanvasHeaderStatus(msg) {
-  if (canvasStatusTag) canvasStatusTag.innerText = msg;
-  if (canvasWrapper) canvasWrapper.classList.add('on-air');
-}
 
-// --- RENDERIZADO EN CANVAS (SIN STANDBY BLACKOUT) ---
-function renderCanvasFrame() {
-  // Renderiza el video local si está disponible (esté sonando o en pausa mantiene el frame)
-  if (activeSourceType === 'local' && activeVideoElement) {
-    ctx.drawImage(activeVideoElement, 0, 0, canvas.width, canvas.height);
-  } else if (activeSourceType === 'youtube' && activeYtPlayer && activeYtPlayer.getIframe) {
-    const iframe = activeYtPlayer.getIframe();
+  if (
+    pad.sourceType === "youtube" &&
+    pad.youtubePlayer
+  ) {
+
     try {
-      ctx.drawImage(iframe, 0, 0, canvas.width, canvas.height);
-    } catch (e) {
-      // Fallback para YouTube iframe sin borrar la imagen previa del buffer
-    }
+
+      pad.youtubePlayer.pauseVideo();
+
+    } catch {}
+
   }
 
-  requestAnimationFrame(renderCanvasFrame);
+
+  pad.playing =
+    false;
+
+  pad.meterValue =
+    0;
+
+
+  updatePadVisualState();
+
+  updateCanvasStatus();
+
 }
 
-// --- RESTO DE FUNCIONALIDADES (Midi, Audio, File/YT Loaders, Rec, Export) ---
-function setupGlobalTapTempo() {
-  const tapBtn = document.getElementById('globalTapBtn');
-  tapBtn.addEventListener('click', () => {
-    const now = performance.now();
-    globalTapTimes.push(now);
 
-    if (globalTapTimes.length > 4) globalTapTimes.shift();
+function stopAllPads() {
 
-    if (globalTapTimes.length > 1) {
-      const intervals = [];
-      for (let i = 1; i < globalTapTimes.length; i++) {
-        intervals.push(globalTapTimes[i] - globalTapTimes[i - 1]);
+  pads.forEach(
+    (_, index) => {
+
+      stopPadPlayback(
+        index
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   MEDIA TIME / LOOP ENGINE
+   ============================================================ */
+
+function attachMediaEvents(pad) {
+
+  if (!pad.video) {
+    return;
+  }
+
+  const media =
+    pad.video;
+
+
+  media.addEventListener(
+    "timeupdate",
+    () => {
+
+      if (!pad.playing) {
+        return;
       }
-      const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
-      globalBPM = 60000 / avgInterval;
-      document.getElementById('globalBpmLabel').innerText = globalBPM.toFixed(1);
+
+      const current =
+        media.currentTime;
+
+      const end =
+        pad.trimStart +
+        pad.duration;
+
+
+      if (
+        current >= end ||
+        current >= media.duration
+      ) {
+
+        if (pad.loop) {
+
+          media.currentTime =
+            pad.trimStart;
+
+        } else {
+
+          stopPadPlayback(
+            pad.id
+          );
+
+        }
+
+      }
+
+      updatePadMeter(
+        pad
+      );
+
     }
-  });
+  );
+
+
+  media.addEventListener(
+    "ended",
+    () => {
+
+      if (
+        pad.loop &&
+        pad.playing
+      ) {
+
+        media.currentTime =
+          pad.trimStart;
+
+        media.play().catch(
+          console.warn
+        );
+
+      } else {
+
+        pad.playing =
+          false;
+
+        updatePadVisualState();
+
+      }
+
+    }
+  );
+
+
+  media.addEventListener(
+    "error",
+    () => {
+
+      pad.playing =
+        false;
+
+      setStatus(
+        `ERROR PAD ${pad.id + 1}`,
+        false
+      );
+
+      updatePadVisualState();
+
+    }
+  );
+
 }
 
-function handlePadTap(index) {
-  const now = performance.now();
-  const pad = padBank[index];
-  pad.padTapTimes.push(now);
 
-  if (pad.padTapTimes.length > 4) pad.padTapTimes.shift();
+/* ============================================================
+   LOCAL MEDIA
+   ============================================================ */
 
-  if (pad.padTapTimes.length > 1) {
-    const intervals = [];
-    for (let i = 1; i < pad.padTapTimes.length; i++) {
-      intervals.push(pad.padTapTimes[i] - pad.padTapTimes[i - 1]);
-    }
-    const avgInterval = intervals.reduce((a, b) => a + b) / intervals.length;
-    pad.padBPM = 60000 / avgInterval;
-    
-    const label = document.getElementById(`pad-bpm-label-${index}`);
-    if (label) label.innerText = `${pad.padBPM.toFixed(1)} BPM`;
+function handleMediaFile(event) {
+
+  const file =
+    event.target.files?.[0];
+
+  event.target.value =
+    "";
+
+  if (!file) {
+    return;
   }
+
+  loadLocalFile(
+    state.selectedPad,
+    file
+  );
+
 }
 
-function syncPadToGlobalBPM(index) {
-  const pad = padBank[index];
-  if (pad.padBPM <= 0) return;
 
-  const targetRate = globalBPM / pad.padBPM;
-  const clampedRate = Math.min(Math.max(0.5, targetRate), 2.0);
-  updatePadRate(index, clampedRate);
-  
-  renderPadsUI();
-  setupDragAndDrop();
+function loadLocalFile(
+  index,
+  file
+) {
+
+  const pad =
+    pads[index];
+
+  if (!pad) {
+    return;
+  }
+
+
+  if (
+    !file.type.startsWith("video/") &&
+    !file.type.startsWith("audio/")
+  ) {
+
+    setStatus(
+      "FORMATO NO SOPORTADO",
+      false
+    );
+
+    return;
+
+  }
+
+
+  stopPadPlayback(
+    index
+  );
+
+
+  destroyPadMedia(
+    pad
+  );
+
+
+  const url =
+    URL.createObjectURL(
+      file
+    );
+
+
+  const media =
+    document.createElement(
+      file.type.startsWith("video/")
+        ? "video"
+        : "audio"
+    );
+
+
+  media.src =
+    url;
+
+  media.preload =
+    "metadata";
+
+  media.playsInline =
+    true;
+
+  media.crossOrigin =
+    "anonymous";
+
+
+  media.dataset.pad =
+    index;
+
+
+  dom.videoBank.appendChild(
+    media
+  );
+
+
+  pad.file =
+    file;
+
+  pad.fileUrl =
+    url;
+
+  pad.fileName =
+    file.name;
+
+  pad.video =
+    media;
+
+
+  media.addEventListener(
+    "loadedmetadata",
+    () => {
+
+      pad.maxDuration =
+        Number.isFinite(
+          media.duration
+        )
+          ? media.duration
+          : CONFIG.DEFAULT_MAX_DURATION;
+
+
+      pad.trimStart =
+        clamp(
+          pad.trimStart,
+          0,
+          Math.max(
+            0,
+            pad.maxDuration - 0.01
+          )
+        );
+
+
+      pad.duration =
+        clamp(
+          pad.duration,
+          CONFIG.MIN_LOOP_DURATION,
+          Math.max(
+            CONFIG.MIN_LOOP_DURATION,
+            pad.maxDuration - pad.trimStart
+          )
+        );
+
+
+      initializePadAudio(
+        pad
+      );
+
+
+      setStatus(
+        `CARGADO PAD ${index + 1}`,
+        false
+      );
+
+
+      renderPads();
+
+    }
+  );
+
+
+  attachMediaEvents(
+    pad
+  );
+
+
+  selectPad(index);
+
 }
+
+
+/* ============================================================
+   DESTROY LOCAL MEDIA
+   ============================================================ */
+
+function destroyPadMedia(pad) {
+
+  if (pad.video) {
+
+    try {
+
+      pad.video.pause();
+
+    } catch {}
+
+    try {
+
+      pad.video.remove();
+
+    } catch {}
+
+  }
+
+
+  if (pad.fileUrl) {
+
+    try {
+
+      URL.revokeObjectURL(
+        pad.fileUrl
+      );
+
+    } catch {}
+
+  }
+
+
+  if (pad.audioSource) {
+
+    try {
+
+      pad.audioSource.disconnect();
+
+    } catch {}
+
+  }
+
+
+  pad.video =
+    null;
+
+  pad.file =
+    null;
+
+  pad.fileUrl =
+    null;
+
+  pad.audioSource =
+    null;
+
+}
+
+
+/* ============================================================
+   AUDIO GRAPH
+   ============================================================ */
+
+function initializePadAudio(pad) {
+
+  if (
+    !audioCtx ||
+    !pad.video
+  ) {
+
+    return;
+
+  }
+
+
+  if (pad.audioSource) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const source =
+      audioCtx.createMediaElementSource(
+        pad.video
+      );
+
+    const highpass =
+      audioCtx.createBiquadFilter();
+
+    const lowpass =
+      audioCtx.createBiquadFilter();
+
+    const gain =
+      audioCtx.createGain();
+
+
+    highpass.type =
+      "highpass";
+
+    lowpass.type =
+      "lowpass";
+
+
+    highpass.frequency.value =
+      pad.highpass;
+
+    lowpass.frequency.value =
+      pad.lowpass;
+
+
+    source.connect(
+      highpass
+    );
+
+    highpass.connect(
+      lowpass
+    );
+
+    lowpass.connect(
+      gain
+    );
+
+    gain.connect(
+      masterGainNode
+    );
+
+
+    pad.audioSource =
+      source;
+
+    pad.highpassNode =
+      highpass;
+
+    pad.lowpassNode =
+      lowpass;
+
+    pad.gainNode =
+      gain;
+
+
+    updatePadGain(
+      pad
+    );
+
+  } catch (error) {
+
+    console.error(
+      "No se pudo crear AudioNode:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   GAIN / MUTE / SOLO
+   ============================================================ */
+
+function updatePadGain(pad) {
+
+  if (!pad.gainNode) {
+    return;
+  }
+
+
+  const hasSolo =
+    pads.some(
+      item => item.solo
+    );
+
+
+  let gain =
+    1;
+
+
+  if (pad.muted) {
+
+    gain = 0;
+
+  }
+
+
+  if (
+    hasSolo &&
+    !pad.solo
+  ) {
+
+    gain = 0;
+
+  }
+
+
+  pad.gainNode.gain.setTargetAtTime(
+    gain,
+    audioCtx.currentTime,
+    0.01
+  );
+
+}
+
 
 function toggleMute(index) {
-  const pad = padBank[index];
-  pad.isMuted = !pad.isMuted;
-  if (pad.gainNode) {
-    pad.gainNode.gain.value = pad.isMuted ? 0 : 1.0;
-  }
-  renderPadsUI();
-  setupDragAndDrop();
+
+  const pad =
+    pads[index];
+
+  pad.muted =
+    !pad.muted;
+
+  updateAllPadGains();
+
+  renderPads();
+
 }
+
 
 function toggleSolo(index) {
-  const pad = padBank[index];
-  pad.isSolo = !pad.isSolo;
 
-  const hasSolo = padBank.some(p => p.isSolo);
+  const pad =
+    pads[index];
 
-  padBank.forEach(p => {
-    if (p.gainNode) {
-      if (hasSolo) {
-        p.gainNode.gain.value = p.isSolo ? 1.0 : 0;
-      } else {
-        p.gainNode.gain.value = p.isMuted ? 0 : 1.0;
-      }
-    }
-  });
+  pad.solo =
+    !pad.solo;
 
-  renderPadsUI();
-  setupDragAndDrop();
+  updateAllPadGains();
+
+  renderPads();
+
 }
 
-function setupKeyboardListeners() {
-  const activeKeys = new Set();
 
-  window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-    const key = e.key.toLowerCase();
-    if (keyMap.hasOwnProperty(key) && !activeKeys.has(key)) {
-      activeKeys.add(key);
-      togglePlayPad(null, keyMap[key]);
-    }
-  });
+function updateAllPadGains() {
 
-  window.addEventListener('keyup', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-    const key = e.key.toLowerCase();
-    if (keyMap.hasOwnProperty(key)) {
-      activeKeys.delete(key);
-    }
-  });
+  pads.forEach(
+    updatePadGain
+  );
+
 }
 
-function setupMasterVolume() {
-  const range = document.getElementById('masterVolRange');
-  const label = document.getElementById('masterVolLabel');
 
-  range.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value);
-    masterGainNode.gain.setTargetAtTime(val, audioCtx.currentTime, 0.01);
-    label.innerText = `${Math.round(val * 100)}%`;
-  });
-}
+/* ============================================================
+   RATE / BPM
+   ============================================================ */
 
-function changeSourceType(index, type) {
-  padBank[index].sourceType = type;
-  renderPadsUI();
-  setupDragAndDrop();
-}
+function getEffectivePlaybackRate(pad) {
 
-function loadYouTubeVideo(index) {
-  const input = document.getElementById(`yt-url-${index}`);
-  if (!input) return;
-  
-  let val = input.value.trim();
-  if (val.includes('v=')) {
-    val = val.split('v=')[1].split('&')[0];
-  } else if (val.includes('youtu.be/')) {
-    val = val.split('youtu.be/')[1].split('?')[0];
+  if (!pad.sync) {
+
+    return pad.playbackRate;
+
   }
 
-  if (!val) return;
 
-  const targets = (index === 0) ? [0, 1, 2, 3] : [index];
+  if (
+    !pad.bpm ||
+    pad.bpm <= 0
+  ) {
 
-  targets.forEach(idx => {
-    const pad = padBank[idx];
-    pad.sourceType = 'youtube';
-    pad.ytVideoId = val;
-    pad.fileName = `YT: ${val}`;
+    return pad.playbackRate;
 
-    let playerDiv = document.getElementById(`yt-player-${idx}`);
-    if (!playerDiv) {
-      playerDiv = document.createElement('div');
-      playerDiv.id = `yt-player-${idx}`;
-      ytPlayersContainer.appendChild(playerDiv);
-    } else {
-      playerDiv.innerHTML = '';
-    }
-
-    pad.ytPlayer = new YT.Player(`yt-player-${idx}`, {
-      height: '1080',
-      width: '1920',
-      videoId: val,
-      playerVars: { 'controls': 0, 'disablekb': 1, 'modestbranding': 1, 'rel': 0, 'autoplay': 0 },
-      events: {
-        'onReady': (evt) => {
-          const dur = evt.target.getDuration();
-          if (dur > 0) pad.maxDuration = dur;
-          const thumb = document.getElementById(`thumb-${idx}`);
-          if (thumb) thumb.innerText = `YouTube: ${val}`;
-        }
-      }
-    });
-  });
-
-  if (index === 0) {
-    renderPadsUI();
-    setupDragAndDrop();
   }
+
+
+  const syncedRate =
+    state.globalBpm /
+    pad.bpm;
+
+
+  return clamp(
+    pad.playbackRate *
+    syncedRate,
+    CONFIG.MIN_PLAYBACK_RATE,
+    CONFIG.MAX_PLAYBACK_RATE
+  );
+
 }
 
-function setupDragAndDrop() {
-  const padCards = document.querySelectorAll('.pad-card');
 
-  padCards.forEach((card, index) => {
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-      card.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); });
-    });
+function setPadRate(
+  index,
+  rate
+) {
 
-    ['dragenter', 'dragover'].forEach(() => card.classList.add('drag-highlight'));
-    ['dragleave', 'drop'].forEach(() => card.classList.remove('drag-highlight'));
+  const pad =
+    pads[index];
 
-    card.addEventListener('drop', (e) => {
-      const files = e.dataTransfer.files;
-      if (files.length > 0 && files[0].type.startsWith('video/')) {
-        assignFileToPad(index, files[0]);
-      }
-    });
-  });
+  pad.playbackRate =
+    clamp(
+      Number(rate),
+      CONFIG.MIN_PLAYBACK_RATE,
+      CONFIG.MAX_PLAYBACK_RATE
+    );
+
+
+  applyPadRate(
+    pad
+  );
+
 }
 
-function assignFileToPad(padIndex, file) {
-  const targetIndices = (padIndex === 0) ? [0, 1, 2, 3] : [padIndex];
 
-  targetIndices.forEach(idx => {
-    const pad = padBank[idx];
-    pad.sourceType = 'local';
+function applyPadRate(pad) {
 
-    if (pad.videoElem) {
-      URL.revokeObjectURL(pad.videoElem.src);
-      pad.videoElem.remove();
-    }
+  const rate =
+    getEffectivePlaybackRate(
+      pad
+    );
 
-    const videoUrl = URL.createObjectURL(file);
-    const video = document.createElement('video');
-    video.src = videoUrl;
-    video.preload = 'auto';
-    video.playsInline = true;
 
-    videoBank.appendChild(video);
+  if (pad.video) {
 
-    pad.videoElem = video;
-    pad.fileName = file.name;
+    pad.video.playbackRate =
+      rate;
 
-    video.onloadedmetadata = () => {
-      pad.maxDuration = video.duration || 60.0;
-      initAudioNodesForPad(pad);
-      const thumb = document.getElementById(`thumb-${idx}`);
-      if (thumb) thumb.innerText = file.name;
-      
-      // Si no hay video activo actualmente en el canvas, mostrar el primer frame
-      if (!activeVideoElement) {
-        activeVideoElement = video;
-        activeSourceType = 'local';
-        video.currentTime = pad.trimStart;
-      }
-    };
-  });
+    pad.video.preservesPitch =
+      false;
 
-  if (padIndex === 0) {
-    renderPadsUI();
-    setupDragAndDrop();
   }
-}
 
-function initAudioNodesForPad(pad) {
-  if (pad.sourceNode) return;
 
-  pad.sourceNode = audioCtx.createMediaElementSource(pad.videoElem);
-  
-  pad.highpassFilter = audioCtx.createBiquadFilter();
-  pad.highpassFilter.type = 'highpass';
-  pad.highpassFilter.frequency.value = pad.hpFrequency;
+  if (pad.youtubePlayer) {
 
-  pad.lowpassFilter = audioCtx.createBiquadFilter();
-  pad.lowpassFilter.type = 'lowpass';
-  pad.lowpassFilter.frequency.value = pad.lpFrequency;
-
-  pad.gainNode = audioCtx.createGain();
-  pad.gainNode.gain.value = 1.0;
-
-  pad.sourceNode.connect(pad.highpassFilter);
-  pad.highpassFilter.connect(pad.lowpassFilter);
-  pad.lowpassFilter.connect(pad.gainNode);
-  pad.gainNode.connect(masterGainNode);
-}
-
-function updatePadTrimStart(index, val) {
-  const pad = padBank[index];
-  let numVal = parseFloat(val) || 0;
-  numVal = Math.min(Math.max(0, numVal), pad.maxDuration);
-  pad.trimStart = numVal;
-
-  const numInput = document.getElementById(`cue-num-${index}`);
-  const sliderInput = document.getElementById(`cue-slider-${index}`);
-  if (numInput) numInput.value = numVal.toFixed(1);
-  if (sliderInput) sliderInput.value = numVal;
-}
-
-function updatePadDuration(index, val) {
-  let dur = parseFloat(val) || 2.0;
-  dur = Math.min(Math.max(0.1, dur), 10.0);
-  padBank[index].duration = dur;
-  renderPadsUI();
-  setupDragAndDrop();
-}
-
-function updatePadRate(index, value) {
-  const pad = padBank[index];
-  pad.playbackRate = parseFloat(value);
-  
-  if (pad.videoElem) {
-    pad.videoElem.playbackRate = pad.playbackRate;
-    pad.videoElem.preservesPitch = false;
-  }
-  
-  const label = document.getElementById(`rate-label-${index}`);
-  if (label) label.innerText = `${pad.playbackRate.toFixed(2)}x`;
-}
-
-function updatePadLoop(index, isChecked) {
-  padBank[index].isLooping = isChecked;
-}
-
-function updatePadHighPassSlider(index, val) {
-  const hz = parseFloat(val);
-  setPadHighPass(index, hz);
-}
-
-function setPadHighPass(index, hz) {
-  const pad = padBank[index];
-  pad.hpFrequency = hz;
-  if (pad.highpassFilter) {
-    pad.highpassFilter.frequency.setTargetAtTime(hz, audioCtx.currentTime, 0.01);
-  }
-  const label = document.getElementById(`hp-label-${index}`);
-  if (label) label.innerText = `${Math.round(hz)} Hz`;
-}
-
-function updatePadLowPassSlider(index, val) {
-  const hz = parseFloat(val);
-  setPadLowPass(index, hz);
-}
-
-function setPadLowPass(index, hz) {
-  const pad = padBank[index];
-  pad.lpFrequency = hz;
-  if (pad.lowpassFilter) {
-    pad.lowpassFilter.frequency.setTargetAtTime(hz, audioCtx.currentTime, 0.01);
-  }
-  const label = document.getElementById(`lp-label-${index}`);
-  if (label) label.innerText = `${Math.round(hz)} Hz`;
-}
-
-function setupProjectExportImport() {
-  document.getElementById('exportProjBtn').addEventListener('click', exportProjectJSON);
-  
-  const importBtn = document.getElementById('importProjBtn');
-  const importInput = document.getElementById('importProjInput');
-
-  importBtn.addEventListener('click', () => importInput.click());
-  importInput.addEventListener('change', importProjectJSON);
-}
-
-function exportProjectJSON() {
-  const projectData = {
-    version: "1.5",
-    timestamp: Date.now(),
-    globalBPM: globalBPM,
-    pads: padBank.map(p => ({
-      id: p.id,
-      sourceType: p.sourceType,
-      ytVideoId: p.ytVideoId,
-      trimStart: p.trimStart,
-      duration: p.duration,
-      playbackRate: p.playbackRate,
-      isLooping: p.isLooping,
-      hpFrequency: p.hpFrequency,
-      lpFrequency: p.lpFrequency,
-      padBPM: p.padBPM
-    }))
-  };
-
-  const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `AV_Project_${Date.now()}.json`;
-  a.click();
-}
-
-function importProjectJSON(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = (event) => {
     try {
-      const data = JSON.parse(event.target.result);
-      if (data.globalBPM) {
-        globalBPM = data.globalBPM;
-        document.getElementById('globalBpmLabel').innerText = globalBPM.toFixed(1);
-      }
-      if (data.pads && Array.isArray(data.pads)) {
-        data.pads.forEach((savedPad, i) => {
-          if (padBank[i]) {
-            padBank[i].sourceType = savedPad.sourceType;
-            padBank[i].ytVideoId = savedPad.ytVideoId || '';
-            padBank[i].trimStart = savedPad.trimStart || 0;
-            padBank[i].duration = savedPad.duration || 2.0;
-            padBank[i].playbackRate = savedPad.playbackRate || 1.0;
-            padBank[i].isLooping = savedPad.isLooping;
-            padBank[i].hpFrequency = savedPad.hpFrequency || 20;
-            padBank[i].lpFrequency = savedPad.lpFrequency || 20000;
-            padBank[i].padBPM = savedPad.padBPM || 120.0;
-            padBank[i].isPlaying = false; // Mantiene el estado en STOP al importar
 
-            if (savedPad.sourceType === 'youtube' && savedPad.ytVideoId) {
-              loadYouTubeVideo(i);
-            }
-          }
-        });
-        renderPadsUI();
-        setupDragAndDrop();
-        alert('¡Proyecto cargado con éxito!');
-      }
-    } catch(err) {
-      alert('Error al leer el archivo JSON.');
+      pad.youtubePlayer.setPlaybackRate(
+        rate
+      );
+
+    } catch {}
+
+  }
+
+}
+
+
+function toggleSync(index) {
+
+  const pad =
+    pads[index];
+
+  pad.sync =
+    !pad.sync;
+
+  applyPadRate(
+    pad
+  );
+
+  renderPads();
+
+}
+
+
+/* ============================================================
+   BPM TAP
+   ============================================================ */
+
+let globalTapTimes = [];
+
+let padTapTimes =
+  Array.from(
+    { length: CONFIG.PAD_COUNT },
+    () => []
+  );
+
+
+function handleGlobalTap() {
+
+  const now =
+    performance.now();
+
+  globalTapTimes.push(
+    now
+  );
+
+
+  if (
+    globalTapTimes.length > 4
+  ) {
+
+    globalTapTimes.shift();
+
+  }
+
+
+  if (
+    globalTapTimes.length >= 2
+  ) {
+
+    const intervals = [];
+
+    for (
+      let i = 1;
+      i < globalTapTimes.length;
+      i++
+    ) {
+
+      intervals.push(
+        globalTapTimes[i] -
+        globalTapTimes[i - 1]
+      );
+
     }
-  };
-  reader.readAsText(file);
-}
 
-function initWebMIDI() {
-  if (navigator.requestMIDIAccess) {
-    navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFail);
-  } else {
-    document.getElementById('midiStatus').innerText = 'WebMIDI no soportado';
+
+    const average =
+      intervals.reduce(
+        (sum, value) =>
+          sum + value,
+        0
+      ) /
+      intervals.length;
+
+
+    const bpm =
+      60000 /
+      average;
+
+
+    state.globalBpm =
+      clamp(
+        bpm,
+        20,
+        400
+      );
+
+
+    updateGlobalBpmUI();
+
+    pads.forEach(
+      applyPadRate
+    );
+
   }
+
 }
 
-function onMIDISuccess(midiAccess) {
-  const inputs = Array.from(midiAccess.inputs.values());
-  const statusDot = document.getElementById('midiDot');
-  const statusText = document.getElementById('midiStatus');
-  const select = document.getElementById('midiInputSelect');
 
-  if (inputs.length > 0) {
-    statusDot.classList.add('active');
-    statusText.innerText = inputs[0].name;
+function updateGlobalBpmUI() {
 
-    select.innerHTML = '';
-    inputs.forEach(input => {
-      const opt = document.createElement('option');
-      opt.text = input.name;
-      select.appendChild(opt);
-      input.onmidimessage = handleMIDIMessage;
-    });
-  } else {
-    statusText.innerText = 'Conecta tu MiniLab / Teclado MIDI';
-  }
+  dom.globalBpmValue.textContent =
+    Math.round(
+      state.globalBpm
+    );
+
 }
 
-function onMIDIFail() {
-  document.getElementById('midiStatus').innerText = 'Error al acceder a MIDI';
-}
 
-function handleMIDIMessage(e) {
-  const [status, note, velocity] = e.data;
-  const isNoteOn = (status & 0xF0) === 0x90 && velocity > 0;
-  const isCC = (status & 0xF0) === 0xB0;
+/* ============================================================
+   KEYBOARD
+   ============================================================ */
 
-  if (isNoteOn) {
-    const padIndex = padBank.findIndex(p => p.midiNote === note);
-    if (padIndex !== -1) togglePlayPad(null, padIndex);
-  } else if (isCC) {
-    if (note === 112) {
-      const hz = 20 * Math.pow(8000 / 20, velocity / 127);
-      setPadHighPass(activePadIndex, hz);
-    } else if (note === 113) {
-      const hz = 200 * Math.pow(20000 / 200, velocity / 127);
-      setPadLowPass(activePadIndex, hz);
+const pressedKeys =
+  new Set();
+
+
+function bindKeyboard() {
+
+  window.addEventListener(
+    "keydown",
+    event => {
+
+      if (
+        isTypingTarget(
+          event.target
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      const key =
+        event.key.toLowerCase();
+
+
+      const index =
+        CONFIG.KEY_MAP.indexOf(
+          key
+        );
+
+
+      if (
+        index === -1 ||
+        pressedKeys.has(key)
+      ) {
+
+        return;
+
+      }
+
+
+      pressedKeys.add(
+        key
+      );
+
+
+      event.preventDefault();
+
+      togglePadPlayback(
+        index
+      );
+
     }
-  }
+  );
+
+
+  window.addEventListener(
+    "keyup",
+    event => {
+
+      pressedKeys.delete(
+        event.key.toLowerCase()
+      );
+
+    }
+  );
+
+
+  window.addEventListener(
+    "blur",
+    () => {
+
+      pressedKeys.clear();
+
+    }
+  );
+
 }
 
-async function setupAudioOutputs() {
-  const select = document.getElementById('audioOutputSelect');
+
+/* ============================================================
+   MIDI
+   ============================================================ */
+
+let midiAccess =
+  null;
+
+let midiInputs =
+  new Map();
+
+
+async function initializeMIDI() {
+
+  if (
+    !navigator.requestMIDIAccess
+  ) {
+
+    dom.midiStatus.textContent =
+      "Web MIDI no disponible";
+
+    return;
+
+  }
+
+
   try {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const outputs = devices.filter(d => d.kind === 'audiooutput');
 
-    select.innerHTML = '';
-    outputs.forEach(device => {
-      const opt = document.createElement('option');
-      opt.value = device.deviceId;
-      opt.text = device.label || `Salida ${select.length + 1}`;
-      select.appendChild(opt);
-    });
+    midiAccess =
+      await navigator.requestMIDIAccess();
 
-    select.addEventListener('change', async (e) => {
-      if (typeof audioCtx.setSinkId === 'function') {
-        await audioCtx.setSinkId(e.target.value);
-      }
-    });
-  } catch (err) {
-    console.warn('No se pudieron listar las salidas de audio:', err);
+
+    updateMIDIInputs();
+
+    midiAccess.onstatechange =
+      updateMIDIInputs;
+
+  } catch (error) {
+
+    console.error(
+      "MIDI error:",
+      error
+    );
+
+    dom.midiStatus.textContent =
+      "MIDI no disponible";
+
   }
+
 }
 
-let mediaRecorder;
-let recordedChunks = [];
-let isRecording = false;
 
-function setupRecorder() {
-  const recBtn = document.getElementById('recBtn');
-  recBtn.addEventListener('click', () => {
-    if (!isRecording) startRecording();
-    else stopRecording();
-  });
+function updateMIDIInputs() {
+
+  if (!midiAccess) {
+    return;
+  }
+
+
+  midiInputs =
+    new Map(
+      midiAccess.inputs
+    );
+
+
+  const current =
+    state.midiInputId;
+
+
+  dom.midiInputSelect.innerHTML =
+    "";
+
+
+  if (
+    midiInputs.size === 0
+  ) {
+
+    dom.midiInputSelect.innerHTML =
+      `<option value="">Sin dispositivos</option>`;
+
+    dom.midiStatus.textContent =
+      "Sin entrada MIDI";
+
+    return;
+
+  }
+
+
+  midiInputs.forEach(
+    input => {
+
+      const option =
+        document.createElement(
+          "option"
+        );
+
+      option.value =
+        input.id;
+
+      option.textContent =
+        input.name ||
+        "MIDI Input";
+
+      dom.midiInputSelect.appendChild(
+        option
+      );
+
+    }
+  );
+
+
+  if (
+    current &&
+    midiInputs.has(current)
+  ) {
+
+    dom.midiInputSelect.value =
+      current;
+
+  } else {
+
+    const first =
+      midiInputs.keys().next().value;
+
+    selectMIDIInput(
+      first
+    );
+
+  }
+
 }
 
-function startRecording() {
-  recordedChunks = [];
 
-  const canvasStream = canvas.captureStream(60);
-  const audioDestination = audioCtx.createMediaStreamDestination();
+function selectMIDIInput(id) {
 
-  masterGainNode.connect(audioDestination);
+  midiInputs.forEach(
+    input => {
 
-  const combinedStream = new MediaStream([
-    ...canvasStream.getVideoTracks(),
-    ...audioDestination.stream.getAudioTracks()
-  ]);
+      input.onmidimessage =
+        null;
 
-  const options = { mimeType: 'video/webm;codecs=vp9,opus', videoBitsPerSecond: 8000000 };
-  mediaRecorder = new MediaRecorder(combinedStream, options);
+    }
+  );
 
-  mediaRecorder.ondataavailable = (e) => {
-    if (e.data.size > 0) recordedChunks.push(e.data);
+
+  state.midiInputId =
+    id || "";
+
+
+  if (!id) {
+
+    dom.midiStatus.textContent =
+      "Sin MIDI";
+
+    return;
+
+  }
+
+
+  const input =
+    midiInputs.get(id);
+
+
+  if (!input) {
+    return;
+  }
+
+
+  input.onmidimessage =
+    handleMIDIMessage;
+
+
+  dom.midiStatus.textContent =
+    input.name ||
+    "MIDI conectado";
+
+}
+
+
+function handleMIDIMessage(event) {
+
+  const data =
+    event.data;
+
+
+  if (!data || data.length < 2) {
+    return;
+  }
+
+
+  const status =
+    data[0];
+
+  const command =
+    status & 0xf0;
+
+  const note =
+    data[1];
+
+  const velocity =
+    data[2] || 0;
+
+
+  /* NOTE ON */
+
+  if (
+    command === 0x90 &&
+    velocity > 0
+  ) {
+
+    const index =
+      CONFIG.MIDI_NOTES.indexOf(
+        note
+      );
+
+
+    if (index !== -1) {
+
+      togglePadPlayback(
+        index
+      );
+
+    }
+
+  }
+
+
+  /* NOTE OFF */
+
+  if (
+    command === 0x80 ||
+    (
+      command === 0x90 &&
+      velocity === 0
+    )
+  ) {
+
+    // Reservado para modo gate futuro.
+
+  }
+
+
+  /* CC */
+
+  if (
+    command === 0xb0
+  ) {
+
+    const controller =
+      data[1];
+
+    const value =
+      data[2];
+
+
+    const pad =
+      pads[state.selectedPad];
+
+
+    if (
+      controller === 112
+    ) {
+
+      pad.highpass =
+        scaleMIDI(
+          value,
+          20,
+          8000
+        );
+
+      updatePadFilters(
+        pad
+      );
+
+      renderPads();
+
+    }
+
+
+    if (
+      controller === 113
+    ) {
+
+      pad.lowpass =
+        scaleMIDI(
+          value,
+          200,
+          20000
+        );
+
+      updatePadFilters(
+        pad
+      );
+
+      renderPads();
+
+    }
+
+  }
+
+}
+
+
+/* ============================================================
+   FILTERS
+   ============================================================ */
+
+function updatePadFilters(pad) {
+
+  if (!audioCtx) {
+    return;
+  }
+
+
+  if (pad.highpassNode) {
+
+    pad.highpassNode.frequency.setTargetAtTime(
+      clamp(
+        pad.highpass,
+        20,
+        8000
+      ),
+      audioCtx.currentTime,
+      0.01
+    );
+
+  }
+
+
+  if (pad.lowpassNode) {
+
+    pad.lowpassNode.frequency.setTargetAtTime(
+      clamp(
+        pad.lowpass,
+        200,
+        20000
+      ),
+      audioCtx.currentTime,
+      0.01
+    );
+
+  }
+
+}
+
+
+function scaleMIDI(
+  value,
+  min,
+  max
+) {
+
+  const normalized =
+    value / 127;
+
+  return (
+    min +
+    (
+      max - min
+    ) *
+    normalized
+  );
+
+}
+
+
+/* ============================================================
+   YOUTUBE
+   ============================================================ */
+
+function parseYouTubeId(input) {
+
+  if (!input) {
+    return null;
+  }
+
+
+  const value =
+    input.trim();
+
+
+  if (
+    /^[a-zA-Z0-9_-]{11}$/.test(
+      value
+    )
+  ) {
+
+    return value;
+
+  }
+
+
+  try {
+
+    const url =
+      new URL(
+        value
+      );
+
+
+    if (
+      url.hostname.includes(
+        "youtu.be"
+      )
+    ) {
+
+      return url.pathname
+        .replace(
+          "/",
+          ""
+        )
+        .substring(
+          0,
+          11
+        );
+
+    }
+
+
+    if (
+      url.hostname.includes(
+        "youtube.com"
+      )
+    ) {
+
+      return url.searchParams.get(
+        "v"
+      );
+
+    }
+
+  } catch {}
+
+  return null;
+
+}
+
+
+function loadYouTubeFromInput(
+  index,
+  input
+) {
+
+  const id =
+    parseYouTubeId(
+      input
+    );
+
+
+  if (!id) {
+
+    setStatus(
+      "URL YOUTUBE INVÁLIDA",
+      false
+    );
+
+    return;
+
+  }
+
+
+  const pad =
+    pads[index];
+
+
+  pad.youtubeId =
+    id;
+
+  pad.sourceType =
+    "youtube";
+
+
+  createYouTubePlayer(
+    pad
+  );
+
+}
+
+
+function createYouTubePlayer(pad) {
+
+  if (
+    typeof YT === "undefined" ||
+    !YT.Player
+  ) {
+
+    setStatus(
+      "YOUTUBE API NO LISTA",
+      false
+    );
+
+    return;
+
+  }
+
+
+  destroyYouTubePlayer(
+    pad
+  );
+
+
+  const playerElement =
+    document.createElement(
+      "div"
+    );
+
+
+  playerElement.id =
+    `yt-pad-${pad.id}`;
+
+
+  dom.ytPlayersContainer.appendChild(
+    playerElement
+  );
+
+
+  pad.youtubePlayer =
+    new YT.Player(
+      playerElement,
+      {
+
+        width: "1280",
+
+        height: "720",
+
+        videoId:
+          pad.youtubeId,
+
+        playerVars: {
+
+          controls: 0,
+
+          disablekb: 1,
+
+          rel: 0,
+
+          modestbranding: 1,
+
+          playsinline: 1,
+
+          autoplay: 0
+
+        },
+
+        events: {
+
+          onReady: event => {
+
+            const duration =
+              event.target.getDuration();
+
+
+            if (
+              Number.isFinite(
+                duration
+              ) &&
+              duration > 0
+            ) {
+
+              pad.maxDuration =
+                duration;
+
+              pad.duration =
+                Math.min(
+                  pad.duration,
+                  duration
+                );
+
+            }
+
+
+            setStatus(
+              `YOUTUBE PAD ${pad.id + 1} READY`,
+              false
+            );
+
+            renderPads();
+
+          },
+
+
+          onStateChange:
+            event => {
+
+              if (
+                event.data ===
+                YT.PlayerState.PLAYING
+              ) {
+
+                pad.playing =
+                  true;
+
+              }
+
+
+              if (
+                event.data ===
+                YT.PlayerState.PAUSED ||
+                event.data ===
+                YT.PlayerState.ENDED
+              ) {
+
+                pad.playing =
+                  false;
+
+              }
+
+
+              updatePadVisualState();
+
+            }
+
+        }
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   YOUTUBE DESTROY
+   ============================================================ */
+
+function destroyYouTubePlayer(pad) {
+
+  if (
+    pad.youtubePlayer
+  ) {
+
+    try {
+
+      pad.youtubePlayer.destroy();
+
+    } catch {}
+
+  }
+
+
+  pad.youtubePlayer =
+    null;
+
+}
+
+
+/* ============================================================
+   CANVAS
+   ============================================================ */
+
+function drawStandby() {
+
+  const ctx =
+    dom.canvas.getContext(
+      "2d"
+    );
+
+
+  ctx.fillStyle =
+    "#050505";
+
+  ctx.fillRect(
+    0,
+    0,
+    dom.canvas.width,
+    dom.canvas.height
+  );
+
+
+  ctx.fillStyle =
+    "#8b92a2";
+
+  ctx.font =
+    "20px monospace";
+
+  ctx.textAlign =
+    "center";
+
+  ctx.fillText(
+    "AV SAMPLER — STANDBY",
+    dom.canvas.width / 2,
+    dom.canvas.height / 2
+  );
+
+}
+
+
+function renderCanvas() {
+
+  const pad =
+    pads[state.visualPad];
+
+
+  if (
+    pad &&
+    pad.sourceType === "local" &&
+    pad.video &&
+    pad.video.readyState >= 2
+  ) {
+
+    const ctx =
+      dom.canvas.getContext(
+        "2d"
+      );
+
+
+    drawVideoContain(
+      ctx,
+      pad.video,
+      dom.canvas
+    );
+
+  }
+
+
+  updateMeters();
+
+  requestAnimationFrame(
+    renderCanvas
+  );
+
+}
+
+
+function drawVideoContain(
+  ctx,
+  media,
+  canvas
+) {
+
+  const sourceWidth =
+    media.videoWidth ||
+    canvas.width;
+
+  const sourceHeight =
+    media.videoHeight ||
+    canvas.height;
+
+
+  if (
+    !sourceWidth ||
+    !sourceHeight
+  ) {
+
+    return;
+
+  }
+
+
+  const canvasRatio =
+    canvas.width /
+    canvas.height;
+
+  const sourceRatio =
+    sourceWidth /
+    sourceHeight;
+
+
+  let width =
+    canvas.width;
+
+  let height =
+    canvas.height;
+
+  let x = 0;
+
+  let y = 0;
+
+
+  if (
+    sourceRatio >
+    canvasRatio
+  ) {
+
+    height =
+      canvas.width /
+      sourceRatio;
+
+    y =
+      (
+        canvas.height -
+        height
+      ) / 2;
+
+  } else {
+
+    width =
+      canvas.height *
+      sourceRatio;
+
+    x =
+      (
+        canvas.width -
+        width
+      ) / 2;
+
+  }
+
+
+  ctx.fillStyle =
+    "#000";
+
+  ctx.fillRect(
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  ctx.drawImage(
+    media,
+    x,
+    y,
+    width,
+    height
+  );
+
+}
+
+
+/* ============================================================
+   METERS
+   ============================================================ */
+
+function updateMeters() {
+
+  pads.forEach(
+    pad => {
+
+      if (
+        pad.playing
+      ) {
+
+        pad.meterValue =
+          35 +
+          Math.random() * 65;
+
+      } else {
+
+        pad.meterValue *=
+          0.75;
+
+      }
+
+    }
+  );
+
+
+  const cards =
+    dom.padsGrid.children;
+
+
+  pads.forEach(
+    (pad, index) => {
+
+      const card =
+        cards[index];
+
+      if (!card) {
+        return;
+      }
+
+
+      const meter =
+        card.querySelector(
+          ".pad-meter-progress"
+        );
+
+
+      if (meter) {
+
+        meter.style.width =
+          `${pad.meterValue}%`;
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   PAD VISUAL STATE
+   ============================================================ */
+
+function updatePadVisualState() {
+
+  const cards =
+    dom.padsGrid.children;
+
+
+  pads.forEach(
+    (pad, index) => {
+
+      const card =
+        cards[index];
+
+      if (!card) {
+        return;
+      }
+
+
+      card.classList.toggle(
+        "selected",
+        index === state.selectedPad
+      );
+
+
+      card.classList.toggle(
+        "playing",
+        pad.playing
+      );
+
+
+      const button =
+        card.querySelector(
+          ".pad-play-btn"
+        );
+
+
+      if (button) {
+
+        button.textContent =
+          pad.playing
+            ? "STOP"
+            : "PLAY";
+
+        button.classList.toggle(
+          "active",
+          pad.playing
+        );
+
+      }
+
+    }
+  );
+
+
+  updateCanvasStatus();
+
+}
+
+
+/* ============================================================
+   CANVAS STATUS
+   ============================================================ */
+
+function updateCanvasStatus() {
+
+  const pad =
+    pads[state.visualPad];
+
+
+  if (!pad) {
+    return;
+  }
+
+
+  const source =
+    pad.sourceType === "youtube"
+      ? "YOUTUBE"
+      : "LOCAL";
+
+
+  dom.canvasOverlayTag.textContent =
+    `VIDEO ${pad.id + 1} · ${source}`;
+
+
+  dom.canvasContainer.classList.toggle(
+    "on-air",
+    pad.playing
+  );
+
+}
+
+
+/* ============================================================
+   STATUS
+   ============================================================ */
+
+function setStatus(
+  text,
+  active
+) {
+
+  dom.statusText.textContent =
+    text;
+
+  dom.statusDot.classList.toggle(
+    "active",
+    Boolean(active)
+  );
+
+}
+
+
+/* ============================================================
+   PROJECT EXPORT
+   ============================================================ */
+
+function exportProject() {
+
+  const project = {
+
+    version: 2,
+
+    app: "AV Sampler",
+
+    createdAt:
+      new Date().toISOString(),
+
+    globalBpm:
+      state.globalBpm,
+
+    masterVolume:
+      state.masterVolume,
+
+    selectedPad:
+      state.selectedPad,
+
+    visualPad:
+      state.visualPad,
+
+    pads:
+      pads.map(
+        pad => ({
+
+          id:
+            pad.id,
+
+          key:
+            pad.key,
+
+          midiNote:
+            pad.midiNote,
+
+          sourceType:
+            pad.sourceType,
+
+          fileName:
+            pad.fileName,
+
+          youtubeId:
+            pad.youtubeId,
+
+          trimStart:
+            pad.trimStart,
+
+          duration:
+            pad.duration,
+
+          playbackRate:
+            pad.playbackRate,
+
+          loop:
+            pad.loop,
+
+          muted:
+            pad.muted,
+
+          solo:
+            pad.solo,
+
+          bpm:
+            pad.bpm,
+
+          sync:
+            pad.sync,
+
+          highpass:
+            pad.highpass,
+
+          lowpass:
+            pad.lowpass
+
+        })
+      )
+
   };
 
-  mediaRecorder.onstop = exportVideo;
-  mediaRecorder.start();
 
-  isRecording = true;
-  const recBtn = document.getElementById('recBtn');
-  recBtn.innerText = '⏹ Detener y Exportar';
-  recBtn.classList.add('recording');
+  const blob =
+    new Blob(
+      [
+        JSON.stringify(
+          project,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
+    );
+
+
+  downloadBlob(
+    blob,
+    `AV_Project_${timestamp()}.json`
+  );
+
+
+  setStatus(
+    "PROJECT SAVED",
+    false
+  );
+
 }
+
+
+/* ============================================================
+   PROJECT IMPORT
+   ============================================================ */
+
+async function handleProjectFile(
+  event
+) {
+
+  const file =
+    event.target.files?.[0];
+
+  event.target.value =
+    "";
+
+  if (!file) {
+    return;
+  }
+
+
+  try {
+
+    const text =
+      await file.text();
+
+
+    const project =
+      JSON.parse(
+        text
+      );
+
+
+    importProject(
+      project,
+      file.name
+    );
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    setStatus(
+      "PROJECT ERROR",
+      false
+    );
+
+  }
+
+}
+
+
+function importProject(
+  project,
+  filename
+) {
+
+  if (
+    !project ||
+    !Array.isArray(
+      project.pads
+    )
+  ) {
+
+    throw new Error(
+      "Proyecto inválido"
+    );
+
+  }
+
+
+  stopAllPads();
+
+
+  state.globalBpm =
+    clamp(
+      Number(
+        project.globalBpm
+      ) || CONFIG.DEFAULT_BPM,
+      20,
+      400
+    );
+
+
+  state.masterVolume =
+    clamp(
+      Number(
+        project.masterVolume
+      ) || CONFIG.DEFAULT_MASTER_VOLUME,
+      0,
+      1
+    );
+
+
+  state.selectedPad =
+    clampIndex(
+      Number(
+        project.selectedPad
+      )
+    );
+
+
+  state.visualPad =
+    clampIndex(
+      Number(
+        project.visualPad
+      )
+    );
+
+
+  dom.masterVolume.value =
+    state.masterVolume;
+
+
+  if (masterGainNode) {
+
+    masterGainNode.gain.value =
+      state.masterVolume;
+
+  }
+
+
+  project.pads.forEach(
+    saved => {
+
+      const pad =
+        pads[saved.id];
+
+      if (!pad) {
+        return;
+      }
+
+
+      pad.sourceType =
+        saved.sourceType === "youtube"
+          ? "youtube"
+          : "local";
+
+
+      pad.fileName =
+        saved.fileName ||
+        "Vacío";
+
+
+      pad.youtubeId =
+        saved.youtubeId ||
+        "";
+
+
+      pad.trimStart =
+        Number(
+          saved.trimStart
+        ) || 0;
+
+
+      pad.duration =
+        Number(
+          saved.duration
+        ) || CONFIG.DEFAULT_PAD_DURATION;
+
+
+      pad.playbackRate =
+        Number(
+          saved.playbackRate
+        ) || 1;
+
+
+      pad.loop =
+        saved.loop !== false;
+
+
+      pad.muted =
+        Boolean(
+          saved.muted
+        );
+
+
+      pad.solo =
+        Boolean(
+          saved.solo
+        );
+
+
+      pad.bpm =
+        Number(
+          saved.bpm
+        ) || CONFIG.DEFAULT_BPM;
+
+
+      pad.sync =
+        Boolean(
+          saved.sync
+        );
+
+
+      pad.highpass =
+        Number(
+          saved.highpass
+        ) || 20;
+
+
+      pad.lowpass =
+        Number(
+          saved.lowpass
+        ) || 20000;
+
+
+      if (
+        pad.sourceType === "youtube" &&
+        pad.youtubeId
+      ) {
+
+        createYouTubePlayer(
+          pad
+        );
+
+      }
+
+    }
+  );
+
+
+  state.activeProjectName =
+    filename;
+
+
+  dom.projectInfo.textContent =
+    filename;
+
+
+  updateGlobalBpmUI();
+
+  updateSelectedPadUI();
+
+  updateAllPadGains();
+
+  renderPads();
+
+  setStatus(
+    "PROJECT LOADED",
+    false
+  );
+
+}
+
+
+/* ============================================================
+   CLEAR PROJECT
+   ============================================================ */
+
+function clearProject() {
+
+  if (
+    !confirm(
+      "¿Limpiar todos los pads?"
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  stopAllPads();
+
+
+  pads.forEach(
+    pad => {
+
+      destroyPadMedia(
+        pad
+      );
+
+      destroyYouTubePlayer(
+        pad
+      );
+
+      Object.assign(
+        pad,
+        createPad(
+          pad.id
+        )
+      );
+
+    }
+  );
+
+
+  state.selectedPad =
+    0;
+
+  state.visualPad =
+    0;
+
+  state.globalBpm =
+    CONFIG.DEFAULT_BPM;
+
+
+  updateGlobalBpmUI();
+
+  updateSelectedPadUI();
+
+  renderPads();
+
+  drawStandby();
+
+  setStatus(
+    "PROJECT CLEARED",
+    false
+  );
+
+}
+
+
+/* ============================================================
+   AUDIO OUTPUT
+   ============================================================ */
+
+async function refreshAudioOutputs() {
+
+  if (
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.enumerateDevices
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    const devices =
+      await navigator.mediaDevices.enumerateDevices();
+
+
+    const outputs =
+      devices.filter(
+        device =>
+          device.kind ===
+          "audiooutput"
+      );
+
+
+    dom.audioOutputSelect.innerHTML =
+      `<option value="">
+        Predeterminada
+      </option>`;
+
+
+    outputs.forEach(
+      device => {
+
+        const option =
+          document.createElement(
+            "option"
+          );
+
+        option.value =
+          device.deviceId;
+
+        option.textContent =
+          device.label ||
+          `Salida ${device.deviceId.substring(0, 6)}`;
+
+        dom.audioOutputSelect.appendChild(
+          option
+        );
+
+      }
+    );
+
+  } catch (error) {
+
+    console.error(
+      "No se pudieron enumerar salidas:",
+      error
+    );
+
+  }
+
+}
+
+
+async function handleAudioOutputChange(
+  event
+) {
+
+  const deviceId =
+    event.target.value;
+
+
+  state.audioOutputId =
+    deviceId;
+
+
+  if (
+    !audioCtx ||
+    typeof audioCtx.setSinkId !==
+      "function"
+  ) {
+
+    setStatus(
+      "SINK ID NO SOPORTADO",
+      false
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    await audioCtx.setSinkId(
+      deviceId
+    );
+
+    setStatus(
+      "AUDIO OUTPUT OK",
+      false
+    );
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    setStatus(
+      "AUDIO OUTPUT ERROR",
+      false
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   RECORDING
+   ============================================================ */
+
+async function toggleRecording() {
+
+  if (
+    state.isRecording
+  ) {
+
+    stopRecording();
+
+  } else {
+
+    await startRecording();
+
+  }
+
+}
+
+
+async function startRecording() {
+
+  await resumeAudio();
+
+
+  if (
+    typeof MediaRecorder ===
+      "undefined"
+  ) {
+
+    setStatus(
+      "REC NO SOPORTADO",
+      false
+    );
+
+    return;
+
+  }
+
+
+  if (
+    !dom.canvas.captureStream
+  ) {
+
+    setStatus(
+      "CANVAS REC NO SOPORTADO",
+      false
+    );
+
+    return;
+
+  }
+
+
+  if (
+    recordingDestination
+  ) {
+
+    try {
+
+      masterGainNode.disconnect(
+        recordingDestination
+      );
+
+    } catch {}
+
+  }
+
+
+  recordingDestination =
+    audioCtx.createMediaStreamDestination();
+
+
+  masterGainNode.connect(
+    recordingDestination
+  );
+
+
+  const canvasStream =
+    dom.canvas.captureStream(
+      60
+    );
+
+
+  const audioTracks =
+    recordingDestination
+      .stream
+      .getAudioTracks();
+
+
+  const tracks = [
+    ...canvasStream.getVideoTracks(),
+    ...audioTracks
+  ];
+
+
+  state.recordingStream =
+    new MediaStream(
+      tracks
+    );
+
+
+  const mimeType =
+    getSupportedRecordingMime();
+
+
+  try {
+
+    state.recorder =
+      new MediaRecorder(
+        state.recordingStream,
+        {
+
+          mimeType,
+
+          videoBitsPerSecond:
+            8000000
+
+        }
+      );
+
+  } catch (error) {
+
+    console.error(
+      error
+    );
+
+    cleanupRecording();
+
+    setStatus(
+      "REC FORMAT ERROR",
+      false
+    );
+
+    return;
+
+  }
+
+
+  state.recordingChunks =
+    [];
+
+
+  state.recorder.ondataavailable =
+    event => {
+
+      if (
+        event.data &&
+        event.data.size > 0
+      ) {
+
+        state.recordingChunks.push(
+          event.data
+        );
+
+      }
+
+    };
+
+
+  state.recorder.onstop =
+    finalizeRecording;
+
+
+  state.recorder.onerror =
+    event => {
+
+      console.error(
+        "MediaRecorder:",
+        event.error
+      );
+
+      cleanupRecording();
+
+      setStatus(
+        "REC ERROR",
+        false
+      );
+
+    };
+
+
+  state.recorder.start(
+    250
+  );
+
+
+  state.isRecording =
+    true;
+
+  state.recordingStartedAt =
+    Date.now();
+
+
+  dom.recordButton.textContent =
+    "STOP REC";
+
+  dom.recordButton.classList.add(
+    "recording"
+  );
+
+
+  dom.recordingStatus.textContent =
+    "Grabando";
+
+  dom.recordingTimer.textContent =
+    "00:00";
+
+
+  state.recordingTimer =
+    setInterval(
+      updateRecordingTimer,
+      250
+    );
+
+
+  setStatus(
+    "RECORDING",
+    true
+  );
+
+}
+
+
+function getSupportedRecordingMime() {
+
+  const formats = [
+
+    "video/webm;codecs=vp9,opus",
+
+    "video/webm;codecs=vp8,opus",
+
+    "video/webm"
+
+  ];
+
+
+  return (
+    formats.find(
+      format =>
+        MediaRecorder.isTypeSupported(
+          format
+        )
+    ) ||
+    ""
+  );
+
+}
+
 
 function stopRecording() {
-  mediaRecorder.stop();
-  isRecording = false;
-  const recBtn = document.getElementById('recBtn');
-  recBtn.innerText = '🔴 REC 1080p';
-  recBtn.classList.remove('recording');
+
+  if (
+    !state.recorder ||
+    state.recorder.state ===
+      "inactive"
+  ) {
+
+    cleanupRecording();
+
+    return;
+
+  }
+
+
+  state.recorder.stop();
+
 }
 
-function exportVideo() {
-  const blob = new Blob(recordedChunks, { type: 'video/webm' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `AV_Session_${Date.now()}.webm`;
-  a.click();
+
+function finalizeRecording() {
+
+  const blob =
+    new Blob(
+      state.recordingChunks,
+      {
+        type:
+          state.recorder.mimeType ||
+          "video/webm"
+      }
+    );
+
+
+  if (
+    blob.size > 0
+  ) {
+
+    downloadBlob(
+      blob,
+      `AV_Session_${timestamp()}.webm`
+    );
+
+  }
+
+
+  cleanupRecording();
+
+
+  setStatus(
+    "RECORDING SAVED",
+    false
+  );
+
 }
+
+
+function cleanupRecording() {
+
+  if (
+    state.recordingTimer
+  ) {
+
+    clearInterval(
+      state.recordingTimer
+    );
+
+    state.recordingTimer =
+      null;
+
+  }
+
+
+  if (
+    recordingDestination &&
+    masterGainNode
+  ) {
+
+    try {
+
+      masterGainNode.disconnect(
+        recordingDestination
+      );
+
+    } catch {}
+
+  }
+
+
+  if (
+    state.recordingStream
+  ) {
+
+    state.recordingStream
+      .getTracks()
+      .forEach(
+        track =>
+          track.stop()
+      );
+
+  }
+
+
+  state.recordingStream =
+    null;
+
+  recordingDestination =
+    null;
+
+  state.recorder =
+    null;
+
+  state.recordingChunks =
+    [];
+
+  state.isRecording =
+    false;
+
+
+  dom.recordButton.textContent =
+    "REC";
+
+  dom.recordButton.classList.remove(
+    "recording"
+  );
+
+
+  dom.recordingStatus.textContent =
+    "No grabando";
+
+  dom.recordingTimer.textContent =
+    "00:00";
+
+}
+
+
+function updateRecordingTimer() {
+
+  if (
+    !state.recordingStartedAt
+  ) {
+    return;
+  }
+
+
+  const elapsed =
+    Math.floor(
+      (
+        Date.now() -
+        state.recordingStartedAt
+      ) / 1000
+    );
+
+
+  const minutes =
+    Math.floor(
+      elapsed / 60
+    );
+
+
+  const seconds =
+    elapsed % 60;
+
+
+  dom.recordingTimer.textContent =
+    `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+}
+
+
+/* ============================================================
+   PROJECT / MEDIA UTILITIES
+   ============================================================ */
+
+function downloadBlob(
+  blob,
+  filename
+) {
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const anchor =
+    document.createElement(
+      "a"
+    );
+
+  anchor.href =
+    url;
+
+  anchor.download =
+    filename;
+
+
+  document.body.appendChild(
+    anchor
+  );
+
+  anchor.click();
+
+  anchor.remove();
+
+
+  setTimeout(
+    () => {
+
+      URL.revokeObjectURL(
+        url
+      );
+
+    },
+    1000
+  );
+
+}
+
+
+function timestamp() {
+
+  const now =
+    new Date();
+
+
+  const pad =
+    value =>
+      String(
+        value
+      ).padStart(
+        2,
+        "0"
+      );
+
+
+  return [
+    now.getFullYear(),
+    pad(now.getMonth() + 1),
+    pad(now.getDate())
+  ].join("") +
+  "_" +
+  [
+    pad(now.getHours()),
+    pad(now.getMinutes()),
+    pad(now.getSeconds())
+  ].join("");
+
+}
+
+
+/* ============================================================
+   PAD UTILITIES
+   ============================================================ */
+
+function clamp(
+  value,
+  min,
+  max
+) {
+
+  return Math.min(
+    max,
+    Math.max(
+      min,
+      value
+    )
+  );
+
+}
+
+
+function clampIndex(
+  index
+) {
+
+  return clamp(
+    Number(index) || 0,
+    0,
+    CONFIG.PAD_COUNT - 1
+  );
+
+}
+
+
+function clampPadTrim(pad) {
+
+  pad.trimStart =
+    clamp(
+      pad.trimStart,
+      0,
+      Math.max(
+        0,
+        pad.maxDuration - 0.01
+      )
+    );
+
+
+  const maxLoop =
+    Math.max(
+      CONFIG.MIN_LOOP_DURATION,
+      pad.maxDuration -
+      pad.trimStart
+    );
+
+
+  pad.duration =
+    clamp(
+      pad.duration,
+      CONFIG.MIN_LOOP_DURATION,
+      maxLoop
+    );
+
+}
+
+
+function clampPadDuration(pad) {
+
+  const max =
+    Math.max(
+      CONFIG.MIN_LOOP_DURATION,
+      pad.maxDuration -
+      pad.trimStart
+    );
+
+
+  pad.duration =
+    clamp(
+      pad.duration,
+      CONFIG.MIN_LOOP_DURATION,
+      max
+    );
+
+}
+
+
+function updatePadMeter(pad) {
+
+  if (
+    !pad.video ||
+    !pad.playing
+  ) {
+
+    pad.meterValue *=
+      0.8;
+
+    return;
+
+  }
+
+
+  const length =
+    pad.duration || 1;
+
+
+  const position =
+    pad.video.currentTime -
+    pad.trimStart;
+
+
+  const normalized =
+    clamp(
+      position / length,
+      0,
+      1
+    );
+
+
+  pad.meterValue =
+    Math.max(
+      10,
+      100 *
+      (
+        1 -
+        normalized
+      )
+    );
+
+}
+
+
+/* ============================================================
+   MEDIA CLEANUP
+   ============================================================ */
+
+window.addEventListener(
+  "beforeunload",
+  () => {
+
+    pads.forEach(
+      pad => {
+
+        destroyPadMedia(
+          pad
+        );
+
+        destroyYouTubePlayer(
+          pad
+        );
+
+      }
+    );
+
+
+    if (
+      state.recordingStream
+    ) {
+
+      state.recordingStream
+        .getTracks()
+        .forEach(
+          track =>
+            track.stop()
+        );
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   GENERAL HELPERS
+   ============================================================ */
+
+function isTypingTarget(
+  element
+) {
+
+  if (!element) {
+    return false;
+  }
+
+
+  const tag =
+    element.tagName;
+
+
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    element.isContentEditable
+  );
+
+}
+
+
+/* ============================================================
+   LOOP TOGGLE
+   ============================================================ */
+
+/*
+   Event delegation opcional para futuras extensiones.
+   El estado loop se puede modificar directamente desde
+   una futura UI avanzada.
+*/
+
+
+/* ============================================================
+   INITIAL VISUAL STATE
+   ============================================================ */
+
+updateCanvasStatus();
