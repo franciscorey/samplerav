@@ -2,119 +2,530 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AV Chopper & Live Sampler Studio Pro v1.5</title>
-  <link rel="stylesheet" href="styles.css">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="description"
+    content="Sampler audiovisual de 8 pads con vídeo, MIDI, BPM y grabación."
+  >
+
+  <title>AV Sampler</title>
+
+  <!--
+    Tu CSS actual.
+    Lo dejamos separado para trabajarlo después.
+  -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
+
 <body>
 
-  <!-- Top Navigation Bar -->
+  <!-- =========================================================
+       APP HEADER
+       ========================================================= -->
+
   <header class="app-header">
+
     <div class="brand">
-      <div class="brand-logo"></div>
-      <div class="brand-title">AV CHOPPER <span class="brand-subtitle">| Live Sampler Studio Pro v1.5</span></div>
+
+      <div
+        class="brand-logo"
+        aria-hidden="true"
+      ></div>
+
+      <div>
+        <div class="brand-title">
+          AV SAMPLER
+        </div>
+
+        <div class="brand-subtitle">
+          audiovisual performance
+        </div>
+      </div>
+
     </div>
 
-    <!-- Master Volume Control -->
+
+    <!-- MASTER / BPM -->
+
     <div class="master-vol-container">
-      <label for="masterVolRange">🔊 VOL MÁSTER:</label>
-      <input type="range" id="masterVolRange" min="0" max="1" step="0.01" value="0.8">
-      <span id="masterVolLabel">80%</span>
+
+      <label for="masterVolume">
+        MASTER
+      </label>
+
+      <input
+        id="masterVolume"
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value="0.8"
+        aria-label="Volumen master"
+      >
+
     </div>
 
-    <!-- Global Tap Tempo Section -->
+
     <div class="global-bpm-container">
-      <button id="globalTapBtn" class="btn btn-tap">🥁 TAP BPM</button>
-      <div class="bpm-display"><span id="globalBpmLabel">120.0</span> <small>BPM PROYECTO</small></div>
+
+      <div class="bpm-display">
+
+        <span id="globalBpmValue">
+          120
+        </span>
+
+        <small>BPM</small>
+
+      </div>
+
+      <button
+        id="globalTapButton"
+        class="btn-tap"
+        type="button"
+      >
+        TAP
+      </button>
+
     </div>
 
-    <div class="status-badge">
-      <div class="status-dot" id="midiDot"></div>
-      <span id="midiStatus">Buscando controlador MIDI...</span>
+
+    <!-- STATUS -->
+
+    <div
+      id="statusBadge"
+      class="status-badge"
+      role="status"
+      aria-live="polite"
+    >
+
+      <span
+        id="statusDot"
+        class="status-dot"
+      ></span>
+
+      <span id="statusText">
+        READY
+      </span>
+
     </div>
 
-    <!-- Project Save / Load & Rec Controls -->
+
+    <!-- HEADER ACTIONS -->
+
     <div class="header-controls">
-      <button id="exportProjBtn" class="btn">💾 Exportar Proyecto</button>
-      <button id="importProjBtn" class="btn">📂 Cargar Proyecto</button>
-      <input type="file" id="importProjInput" accept=".json" style="display:none;">
-      <button id="recBtn" class="btn btn-rec">🔴 REC 1080p</button>
+
+      <button
+        id="audioStartButton"
+        class="btn"
+        type="button"
+      >
+        AUDIO
+      </button>
+
+      <button
+        id="loadProjectButton"
+        class="btn"
+        type="button"
+      >
+        LOAD
+      </button>
+
+      <button
+        id="saveProjectButton"
+        class="btn"
+        type="button"
+      >
+        SAVE
+      </button>
+
+      <button
+        id="recordButton"
+        class="btn btn-rec"
+        type="button"
+      >
+        REC
+      </button>
+
     </div>
+
   </header>
 
-  <!-- Main Workspace -->
+
+  <!-- =========================================================
+       MAIN LAYOUT
+       ========================================================= -->
+
   <main class="app-layout">
-    
-    <!-- Left Area: Canvas & Pads -->
-    <section class="main-workspace">
-      
-      <!-- Output Monitor Canvas -->
-      <div class="canvas-container" id="canvasWrapper">
-        <div class="canvas-overlay-tag" id="canvasStatusTag">CANVAS OUT: 1920x1080 @ 60FPS | STANDBY</div>
-        <canvas id="mainCanvas" width="1920" height="1080"></canvas>
-        <div id="ytPlayersContainer"></div>
+
+
+    <!-- =======================================================
+         LEFT / MAIN AREA
+         ======================================================= -->
+
+    <section class="main-area">
+
+
+      <!-- =====================================================
+           VISUAL OUTPUT
+           ===================================================== -->
+
+      <div
+        id="canvasContainer"
+        class="canvas-container"
+      >
+
+        <canvas
+          id="outputCanvas"
+          width="1280"
+          height="720"
+        ></canvas>
+
+
+        <!--
+          YouTube players viven aquí.
+          Se mantienen fuera del flujo normal.
+        -->
+
+        <div
+          id="ytPlayersContainer"
+          aria-hidden="true"
+        ></div>
+
+
+        <!--
+          Estado visual
+        -->
+
+        <div
+          id="canvasOverlayTag"
+          class="canvas-overlay-tag"
+        >
+          STANDBY
+        </div>
+
       </div>
 
-      <!-- 8 Pads Grid -->
-      <div class="pads-grid" id="padsGrid">
-        <!-- Generado dinámicamente por JS -->
-      </div>
+
+      <!-- =====================================================
+           PAD GRID
+           ===================================================== -->
+
+      <section
+        id="padsGrid"
+        class="pads-grid"
+        aria-label="Sampler pads"
+      >
+        <!--
+          Los 8 pads son generados por JavaScript.
+        -->
+      </section>
+
+
     </section>
 
-    <!-- Right Sidebar: Settings & Controls -->
+
+    <!-- =======================================================
+         SIDEBAR
+         ======================================================= -->
+
     <aside class="sidebar">
-      
-      <!-- Keyboard Mapping Info -->
-      <div class="settings-card">
-        <div class="card-title">⌨️ Disparo por Teclado QWER/ASDF</div>
-        <div class="keyboard-map-grid">
-          <div><kbd>Q</kbd> Pad 1</div>
-          <div><kbd>W</kbd> Pad 2</div>
-          <div><kbd>E</kbd> Pad 3</div>
-          <div><kbd>R</kbd> Pad 4</div>
-          <div><kbd>A</kbd> Pad 5</div>
-          <div><kbd>S</kbd> Pad 6</div>
-          <div><kbd>D</kbd> Pad 7</div>
-          <div><kbd>F</kbd> Pad 8</div>
-        </div>
-      </div>
 
-      <!-- Audio Settings -->
-      <div class="settings-card">
-        <div class="card-title">🔊 Ruteo de Audio</div>
+
+      <!-- =====================================================
+           SELECTED PAD
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          PAD SELECCIONADO
+        </div>
+
+        <div
+          id="selectedPadInfo"
+          class="selected-pad-info"
+        >
+          <strong>
+            PAD 1
+          </strong>
+
+          <span>
+            Q
+          </span>
+        </div>
+
+        <button
+          id="visualMasterButton"
+          class="btn"
+          type="button"
+        >
+          USAR COMO VIDEO
+        </button>
+
+      </section>
+
+
+      <!-- =====================================================
+           KEYBOARD
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          KEYBOARD
+        </div>
+
+        <div
+          id="keyboardMap"
+          class="keyboard-map-grid"
+        >
+
+          <div>
+            <kbd>Q</kbd>
+            PAD 1
+          </div>
+
+          <div>
+            <kbd>W</kbd>
+            PAD 2
+          </div>
+
+          <div>
+            <kbd>E</kbd>
+            PAD 3
+          </div>
+
+          <div>
+            <kbd>R</kbd>
+            PAD 4
+          </div>
+
+          <div>
+            <kbd>A</kbd>
+            PAD 5
+          </div>
+
+          <div>
+            <kbd>S</kbd>
+            PAD 6
+          </div>
+
+          <div>
+            <kbd>D</kbd>
+            PAD 7
+          </div>
+
+          <div>
+            <kbd>F</kbd>
+            PAD 8
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           MIDI
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          MIDI
+        </div>
+
         <div class="form-group">
-          <label class="form-label" for="audioOutputSelect">Dispositivo de Salida (Sink ID)</label>
-          <select id="audioOutputSelect" class="form-select">
-            <option>Cargando interfaces de audio...</option>
+
+          <label
+            class="form-label"
+            for="midiInputSelect"
+          >
+            Entrada MIDI
+          </label>
+
+          <select
+            id="midiInputSelect"
+            class="form-select"
+          >
+
+            <option value="">
+              MIDI no disponible
+            </option>
+
           </select>
-        </div>
-      </div>
 
-      <!-- MIDI Settings -->
-      <div class="settings-card">
-        <div class="card-title">🎹 Configuración MIDI</div>
+        </div>
+
+        <div
+          id="midiStatus"
+          class="form-label"
+        >
+          MIDI desconectado
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           AUDIO OUTPUT
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          AUDIO
+        </div>
+
         <div class="form-group">
-          <label class="form-label" for="midiInputSelect">Dispositivo MIDI Detectado</label>
-          <select id="midiInputSelect" class="form-select" disabled>
-            <option>Ningún dispositivo conectado</option>
+
+          <label
+            class="form-label"
+            for="audioOutputSelect"
+          >
+            Salida
+          </label>
+
+          <select
+            id="audioOutputSelect"
+            class="form-select"
+          >
+
+            <option value="">
+              Salida predeterminada
+            </option>
+
           </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Control HPF / LPF Global</label>
-          <input type="text" class="form-input" value="CC 112 (HPF) | CC 113 (LPF)" readonly>
-        </div>
-      </div>
 
-      <div class="code-box">
-        💡 <strong>Play Automático</strong>: Pulsa ▶ en un Pad para dejar corriendo un loop de hasta 10 segundos. Al no tocar otro pad, la salida de pantalla mantendrá la reproducción de este.
-      </div>
+        </div>
+
+        <button
+          id="audioOutputRefresh"
+          class="btn"
+          type="button"
+        >
+          ACTUALIZAR SALIDAS
+        </button>
+
+      </section>
+
+
+      <!-- =====================================================
+           PROJECT
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          PROYECTO
+        </div>
+
+        <div class="form-group">
+
+          <label class="form-label">
+            Archivo
+          </label>
+
+          <div
+            id="projectInfo"
+            class="code-box"
+          >
+            Proyecto nuevo
+          </div>
+
+        </div>
+
+        <button
+          id="clearProjectButton"
+          class="btn"
+          type="button"
+        >
+          LIMPIAR PROYECTO
+        </button>
+
+      </section>
+
+
+      <!-- =====================================================
+           RECORDING
+           ===================================================== -->
+
+      <section class="settings-card">
+
+        <div class="card-title">
+          GRABACIÓN
+        </div>
+
+        <div
+          id="recordingStatus"
+          class="form-label"
+        >
+          No grabando
+        </div>
+
+        <div
+          id="recordingTimer"
+          class="code-box"
+        >
+          00:00
+        </div>
+
+      </section>
+
 
     </aside>
+
   </main>
 
-  <div id="videoBank" style="display: none;"></div>
 
-  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- =========================================================
+       HIDDEN FILE INPUTS
+       ========================================================= -->
+
+  <!-- Vídeo/audio local -->
+
+  <input
+    id="mediaFileInput"
+    type="file"
+    accept="video/*,audio/*"
+    hidden
+  >
+
+
+  <!-- Proyecto JSON -->
+
+  <input
+    id="projectFileInput"
+    type="file"
+    accept="application/json,.json"
+    hidden
+  >
+
+
+  <!-- =========================================================
+       HIDDEN MEDIA BANK
+       ========================================================= -->
+
+  <div
+    id="videoBank"
+    hidden
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- =========================================================
+       JAVASCRIPT
+       ========================================================= -->
+
   <script src="app.js"></script>
+
 </body>
 </html>
