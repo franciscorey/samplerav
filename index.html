@@ -1,531 +1,654 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AV Sampler &amp; Chopper</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void: #0a0a0d;
+    --bg-panel: #15151b;
+    --bg-raised: #1e1e26;
+    --bg-raised-hover: #26262f;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --text-primary: #e9e9ee;
+    --text-dim: #83838f;
+    --text-faint: #4c4c56;
+    --accent: #00ffcc;
+    --accent-dim: rgba(0, 255, 204, 0.14);
+    --rec: #ff4d5e;
+    --rec-dim: rgba(255, 77, 94, 0.14);
+    --warn: #ffb020;
+    --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, monospace;
+    --radius: 4px;
+  }
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+  * { box-sizing: border-box; }
 
-  <meta
-    name="description"
-    content="Sampler audiovisual de 8 pads con vídeo, MIDI, BPM y grabación."
-  >
+  html, body {
+    margin: 0;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+  }
 
-  <title>AV Sampler</title>
+  body { padding-bottom: 48px; }
 
-  <!--
-    Tu CSS actual.
-    Lo dejamos separado para trabajarlo después.
-  -->
-  <link rel="stylesheet" href="style.css">
+  button, select, input {
+    font-family: inherit;
+    color: inherit;
+  }
 
-  <!-- YouTube IFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
+  button {
+    cursor: pointer;
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  }
+
+  button:hover { background: var(--bg-raised-hover); border-color: var(--border-strong); }
+
+  button:focus-visible,
+  select:focus-visible,
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  button.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  select, input[type="text"], input[type="number"] {
+    background: var(--bg-raised);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 6px 8px;
+    font-size: 0.78rem;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 3px;
+    background: var(--border-strong);
+    border-radius: 2px;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 6px rgba(0, 255, 204, 0.6);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+
+  output {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    min-width: 3.4em;
+    text-align: right;
+  }
+
+  .app {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 18px 20px 0;
+  }
+
+  /* ============ TOPBAR ============ */
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .brand h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  .brand span {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    letter-spacing: 0.08em;
+  }
+
+  .topbar-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  #statusBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+  }
+
+  #statusDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    flex-shrink: 0;
+  }
+
+  #recordButton.recording {
+    background: var(--rec-dim);
+    border-color: var(--rec);
+    color: var(--rec);
+    animation: rec-pulse 1.4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    #recordButton.recording { animation: none; }
+  }
+
+  @keyframes rec-pulse {
+    0%, 100% { box-shadow: 0 0 0 rgba(255, 77, 94, 0); }
+    50% { box-shadow: 0 0 10px rgba(255, 77, 94, 0.5); }
+  }
+
+  /* ============ WORKSPACE (visor + master panel) ============ */
+
+  .workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  @media (max-width: 860px) {
+    .workspace { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .panel-label {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* --- Visor --- */
+
+  #canvasContainer {
+    position: relative;
+    background: #000;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+  }
+
+  #outputCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  #canvasOverlayTag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.05em;
+    padding: 4px 9px;
+    background: rgba(10, 10, 13, 0.75);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--text-dim);
+  }
+
+  .visor-mode {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  .visor-mode select {
+    background: rgba(10, 10, 13, 0.75);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+  }
+
+  .visor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  #selectedPadInfo {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+
+  #selectedPadInfo strong { color: var(--text-primary); }
+
+  /* --- Master panel --- */
+
+  .master-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .control-group h2 {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    margin: 0 0 8px;
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .control-row + .control-row { margin-top: 8px; }
+
+  .control-row label {
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    width: 46px;
+    flex-shrink: 0;
+  }
+
+  .control-row select,
+  .control-row button {
+    flex: 1;
+  }
+
+  #globalBpmValue {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent);
+    min-width: 70px;
+  }
+
+  #midiStatus, #recordingStatus, #projectInfo {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text-faint);
+    margin-top: 4px;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-row button { flex: 1; }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* ============ PADS ============ */
+
+  .pads-section { margin-top: 20px; }
+
+  .pads-section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+
+  .pads-section-head h2 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .pads-section-head p {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-faint);
+    margin: 0;
+  }
+
+  .pads-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  @media (max-width: 900px) {
+    .pads-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .pad-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 10px;
+    cursor: pointer;
+    transition: border-color 0.12s ease, background 0.12s ease;
+  }
+
+  .pad-card:hover { border-color: var(--border-strong); }
+
+  .pad-card.selected {
+    border-color: var(--accent);
+  }
+
+  .pad-card.playing {
+    background: var(--bg-raised);
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 16px rgba(0, 255, 204, 0.12);
+  }
+
+  .pad-card.drag-highlight {
+    border-color: var(--warn);
+    border-style: dashed;
+  }
+
+  .pad-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .pad-title-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .pad-number {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-dim);
+  }
+
+  .pad-key-badge {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--accent);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    padding: 1px 5px;
+  }
+
+  .pad-play-btn {
+    padding: 5px 10px;
+    font-size: 0.68rem;
+  }
+
+  .pad-source-select {
+    width: 100%;
+    margin-bottom: 6px;
+  }
+
+  .yt-input-group {
+    gap: 6px;
+    margin-bottom: 6px;
+  }
+
+  .yt-input-group input {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .yt-input-group button {
+    flex-shrink: 0;
+    padding: 6px 10px;
+    font-size: 0.68rem;
+  }
+
+  .pad-thumb {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .pad-meter-bar {
+    height: 3px;
+    background: var(--bg-raised);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+
+  .pad-meter-progress {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.08s linear;
+  }
+
+  .pad-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .pad-control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+  }
+
+  .pad-control-row > span:first-child {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    color: var(--text-faint);
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .num-input-sm {
+    width: 56px;
+    text-align: right;
+  }
+
+  .pad-control-row button {
+    flex: 1;
+    padding: 5px 0;
+    font-size: 0.6rem;
+  }
+
+  .btn-mute.active { background: rgba(255, 77, 94, 0.14); border-color: var(--rec); color: var(--rec); }
+  .btn-solo.active { background: rgba(255, 176, 32, 0.14); border-color: var(--warn); color: var(--warn); }
+  .btn-sync.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+  /* hidden helper containers (video/audio elements, YouTube players, file inputs) */
+  [hidden] { display: none !important; }
+</style>
 </head>
-
 <body>
 
-  <!-- =========================================================
-       APP HEADER
-       ========================================================= -->
+<div class="app">
 
-  <header class="app-header">
-
+  <header class="topbar">
     <div class="brand">
-
-      <div
-        class="brand-logo"
-        aria-hidden="true"
-      ></div>
-
-      <div>
-        <div class="brand-title">
-          AV SAMPLER
-        </div>
-
-        <div class="brand-subtitle">
-          audiovisual performance
-        </div>
+      <h1>AV Sampler</h1>
+      <span>chop · sync · stream</span>
+    </div>
+    <div class="topbar-controls">
+      <div id="statusBadge">
+        <span id="statusDot"></span>
+        <span id="statusText">READY</span>
       </div>
-
+      <button id="audioStartButton" type="button">ACTIVAR AUDIO</button>
+      <button id="recordButton" type="button">● REC <span id="recordingTimer">00:00</span></button>
     </div>
-
-
-    <!-- MASTER / BPM -->
-
-    <div class="master-vol-container">
-
-      <label for="masterVolume">
-        MASTER
-      </label>
-
-      <input
-        id="masterVolume"
-        type="range"
-        min="0"
-        max="1"
-        step="0.01"
-        value="0.8"
-        aria-label="Volumen master"
-      >
-
-    </div>
-
-
-    <div class="global-bpm-container">
-
-      <div class="bpm-display">
-
-        <span id="globalBpmValue">
-          120
-        </span>
-
-        <small>BPM</small>
-
-      </div>
-
-      <button
-        id="globalTapButton"
-        class="btn-tap"
-        type="button"
-      >
-        TAP
-      </button>
-
-    </div>
-
-
-    <!-- STATUS -->
-
-    <div
-      id="statusBadge"
-      class="status-badge"
-      role="status"
-      aria-live="polite"
-    >
-
-      <span
-        id="statusDot"
-        class="status-dot"
-      ></span>
-
-      <span id="statusText">
-        READY
-      </span>
-
-    </div>
-
-
-    <!-- HEADER ACTIONS -->
-
-    <div class="header-controls">
-
-      <button
-        id="audioStartButton"
-        class="btn"
-        type="button"
-      >
-        AUDIO
-      </button>
-
-      <button
-        id="loadProjectButton"
-        class="btn"
-        type="button"
-      >
-        LOAD
-      </button>
-
-      <button
-        id="saveProjectButton"
-        class="btn"
-        type="button"
-      >
-        SAVE
-      </button>
-
-      <button
-        id="recordButton"
-        class="btn btn-rec"
-        type="button"
-      >
-        REC
-      </button>
-
-    </div>
-
   </header>
 
+  <main class="workspace">
 
-  <!-- =========================================================
-       MAIN LAYOUT
-       ========================================================= -->
+    <!-- VISOR -->
+    <section class="panel">
+      <div id="canvasContainer">
+        <canvas id="outputCanvas" width="960" height="540"></canvas>
+        <span id="canvasOverlayTag">STANDBY</span>
+        <div class="visor-mode">
+          <select id="modeSelect">
+            <option value="CHOP">CHOP</option>
+            <option value="MULTI">MULTI</option>
+          </select>
+        </div>
+      </div>
+      <div class="visor-footer">
+        <span id="selectedPadInfo"><strong>PAD 1</strong> · Q</span>
+        <button id="visualMasterButton" type="button">USAR COMO VIDEO</button>
+      </div>
+    </section>
 
-  <main class="app-layout">
+    <!-- MASTER PANEL -->
+    <aside class="panel">
+      <div class="panel-label">MASTER</div>
+      <div class="master-body">
 
+        <div class="control-group">
+          <h2>Volumen &amp; tempo</h2>
+          <div class="control-row">
+            <label for="masterVolume">VOL</label>
+            <input id="masterVolume" type="range" min="0" max="1" step="0.01" value="0.8">
+          </div>
+          <div class="control-row">
+            <span id="globalBpmValue">120 BPM</span>
+            <button id="globalTapButton" type="button">TAP</button>
+          </div>
+        </div>
 
-    <!-- =======================================================
-         LEFT / MAIN AREA
-         ======================================================= -->
+        <hr class="divider">
 
-    <section class="main-area">
+        <div class="control-group">
+          <h2>MIDI</h2>
+          <select id="midiInputSelect">
+            <option value="">SELECCIONAR MIDI</option>
+          </select>
+          <div id="midiStatus">DESCONECTADO</div>
+        </div>
 
+        <hr class="divider">
 
-      <!-- =====================================================
-           VISUAL OUTPUT
-           ===================================================== -->
+        <div class="control-group">
+          <h2>Salida de audio</h2>
+          <div class="control-row">
+            <select id="audioOutputSelect">
+              <option value="">SALIDA DEFAULT</option>
+            </select>
+            <button id="audioOutputRefresh" type="button" title="Actualizar salidas">↻</button>
+          </div>
+        </div>
 
-      <div
-        id="canvasContainer"
-        class="canvas-container"
-      >
+        <hr class="divider">
 
-        <canvas
-          id="outputCanvas"
-          width="1280"
-          height="720"
-        ></canvas>
-
-
-        <!--
-          YouTube players viven aquí.
-          Se mantienen fuera del flujo normal.
-        -->
-
-        <div
-          id="ytPlayersContainer"
-          aria-hidden="true"
-        ></div>
-
-
-        <!--
-          Estado visual
-        -->
-
-        <div
-          id="canvasOverlayTag"
-          class="canvas-overlay-tag"
-        >
-          STANDBY
+        <div class="control-group">
+          <h2>Proyecto</h2>
+          <div class="btn-row">
+            <button id="loadProjectButton" type="button">CARGAR</button>
+            <button id="saveProjectButton" type="button">GUARDAR</button>
+          </div>
+          <div class="btn-row" style="margin-top: 6px;">
+            <button id="clearProjectButton" type="button">REINICIAR</button>
+          </div>
+          <div id="projectInfo">Proyecto nuevo</div>
+          <div id="recordingStatus"></div>
         </div>
 
       </div>
-
-
-      <!-- =====================================================
-           PAD GRID
-           ===================================================== -->
-
-      <section
-        id="padsGrid"
-        class="pads-grid"
-        aria-label="Sampler pads"
-      >
-        <!--
-          Los 8 pads son generados por JavaScript.
-        -->
-      </section>
-
-
-    </section>
-
-
-    <!-- =======================================================
-         SIDEBAR
-         ======================================================= -->
-
-    <aside class="sidebar">
-
-
-      <!-- =====================================================
-           SELECTED PAD
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          PAD SELECCIONADO
-        </div>
-
-        <div
-          id="selectedPadInfo"
-          class="selected-pad-info"
-        >
-          <strong>
-            PAD 1
-          </strong>
-
-          <span>
-            Q
-          </span>
-        </div>
-
-        <button
-          id="visualMasterButton"
-          class="btn"
-          type="button"
-        >
-          USAR COMO VIDEO
-        </button>
-
-      </section>
-
-
-      <!-- =====================================================
-           KEYBOARD
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          KEYBOARD
-        </div>
-
-        <div
-          id="keyboardMap"
-          class="keyboard-map-grid"
-        >
-
-          <div>
-            <kbd>Q</kbd>
-            PAD 1
-          </div>
-
-          <div>
-            <kbd>W</kbd>
-            PAD 2
-          </div>
-
-          <div>
-            <kbd>E</kbd>
-            PAD 3
-          </div>
-
-          <div>
-            <kbd>R</kbd>
-            PAD 4
-          </div>
-
-          <div>
-            <kbd>A</kbd>
-            PAD 5
-          </div>
-
-          <div>
-            <kbd>S</kbd>
-            PAD 6
-          </div>
-
-          <div>
-            <kbd>D</kbd>
-            PAD 7
-          </div>
-
-          <div>
-            <kbd>F</kbd>
-            PAD 8
-          </div>
-
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           MIDI
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          MIDI
-        </div>
-
-        <div class="form-group">
-
-          <label
-            class="form-label"
-            for="midiInputSelect"
-          >
-            Entrada MIDI
-          </label>
-
-          <select
-            id="midiInputSelect"
-            class="form-select"
-          >
-
-            <option value="">
-              MIDI no disponible
-            </option>
-
-          </select>
-
-        </div>
-
-        <div
-          id="midiStatus"
-          class="form-label"
-        >
-          MIDI desconectado
-        </div>
-
-      </section>
-
-
-      <!-- =====================================================
-           AUDIO OUTPUT
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          AUDIO
-        </div>
-
-        <div class="form-group">
-
-          <label
-            class="form-label"
-            for="audioOutputSelect"
-          >
-            Salida
-          </label>
-
-          <select
-            id="audioOutputSelect"
-            class="form-select"
-          >
-
-            <option value="">
-              Salida predeterminada
-            </option>
-
-          </select>
-
-        </div>
-
-        <button
-          id="audioOutputRefresh"
-          class="btn"
-          type="button"
-        >
-          ACTUALIZAR SALIDAS
-        </button>
-
-      </section>
-
-
-      <!-- =====================================================
-           PROJECT
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          PROYECTO
-        </div>
-
-        <div class="form-group">
-
-          <label class="form-label">
-            Archivo
-          </label>
-
-          <div
-            id="projectInfo"
-            class="code-box"
-          >
-            Proyecto nuevo
-          </div>
-
-        </div>
-
-        <button
-          id="clearProjectButton"
-          class="btn"
-          type="button"
-        >
-          LIMPIAR PROYECTO
-        </button>
-
-      </section>
-
-
-      <!-- =====================================================
-           RECORDING
-           ===================================================== -->
-
-      <section class="settings-card">
-
-        <div class="card-title">
-          GRABACIÓN
-        </div>
-
-        <div
-          id="recordingStatus"
-          class="form-label"
-        >
-          No grabando
-        </div>
-
-        <div
-          id="recordingTimer"
-          class="code-box"
-        >
-          00:00
-        </div>
-
-      </section>
-
-
     </aside>
 
   </main>
 
+  <!-- PADS -->
+  <section class="pads-section">
+    <div class="pads-section-head">
+      <h2>Pads</h2>
+      <p>teclado Q W E R / A S D F</p>
+    </div>
+    <div id="padsGrid" class="pads-grid"></div>
+  </section>
 
-  <!-- =========================================================
-       HIDDEN FILE INPUTS
-       ========================================================= -->
+</div>
 
-  <!-- Vídeo/audio local -->
+<!-- Contenedores ocultos: elementos <video>/<audio> reales y reproductores de YouTube -->
+<div id="videoBank" hidden></div>
+<div id="ytPlayersContainer" hidden></div>
 
-  <input
-    id="mediaFileInput"
-    type="file"
-    accept="video/*,audio/*"
-    hidden
-  >
+<!-- Inputs de archivo ocultos, disparados desde botones del JS -->
+<input id="mediaFileInput" type="file" accept="video/*,audio/*" hidden>
+<input id="projectFileInput" type="file" accept="application/json" hidden>
 
-
-  <!-- Proyecto JSON -->
-
-  <input
-    id="projectFileInput"
-    type="file"
-    accept="application/json,.json"
-    hidden
-  >
-
-
-  <!-- =========================================================
-       HIDDEN MEDIA BANK
-       ========================================================= -->
-
-  <div
-    id="videoBank"
-    hidden
-    aria-hidden="true"
-  ></div>
-
-
-  <!-- =========================================================
-       JAVASCRIPT
-       ========================================================= -->
-
-  <script src="app.js"></script>
-
+<script src="sampler.js" defer></script>
 </body>
 </html>
