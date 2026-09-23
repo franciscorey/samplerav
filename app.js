@@ -44,7 +44,14 @@ const CONFIG = {
   KEY_MAP: ["q", "w", "e", "r", "a", "s", "d", "f"],
   MIDI_NOTES: [36, 37, 38, 39, 40, 41, 42, 43],
   // Valores de velocidad que la YouTube IFrame API realmente acepta.
-  YT_ALLOWED_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2]
+  YT_ALLOWED_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
+
+  // Rango del EQ básico por pad (Hz). Los sliders usan una escala
+  // logarítmica (0-100) para que se sientan naturales al oído.
+  EQ_HP_MIN: 20,
+  EQ_HP_MAX: 2000,
+  EQ_LP_MIN: 200,
+  EQ_LP_MAX: 20000
 };
 
 /* ============================================================
@@ -84,6 +91,9 @@ function createPad(index) {
     key: CONFIG.KEY_MAP[index],
     midiNote: CONFIG.MIDI_NOTES[index],
     sourceType: "local",
+    // "trigger": un press reproduce de una vez (toggle start/stop).
+    // "gate": suena solo mientras la tecla/botón/nota MIDI está presionada.
+    triggerMode: "trigger",
     file: null,
     fileUrl: null,
     fileName: "Vacío",
@@ -297,9 +307,43 @@ function createPadCard(pad) {
   playButton.textContent = pad.playing ? "STOP" : "PLAY";
   if (pad.playing) playButton.classList.add("active");
 
+  // TRIGGER: el click hace toggle normal (empieza / para).
+  // GATE: el sonido sigue al estado de presión del botón (pointerdown/up),
+  // igual que sostener la tecla asignada.
+  playButton.addEventListener("pointerdown", event => {
+    event.stopPropagation();
+    const currentPad = pads[pad.id];
+    if (currentPad && currentPad.triggerMode === "gate") {
+      event.preventDefault();
+      try {
+        playButton.setPointerCapture(event.pointerId);
+      } catch (e) {}
+      if (!currentPad.playing) startPadPlayback(pad.id);
+    }
+  });
+
+  playButton.addEventListener("pointerup", event => {
+    event.stopPropagation();
+    const currentPad = pads[pad.id];
+    if (currentPad && currentPad.triggerMode === "gate" && currentPad.playing) {
+      stopPadPlayback(pad.id);
+    }
+  });
+
+  playButton.addEventListener("pointercancel", event => {
+    event.stopPropagation();
+    const currentPad = pads[pad.id];
+    if (currentPad && currentPad.triggerMode === "gate" && currentPad.playing) {
+      stopPadPlayback(pad.id);
+    }
+  });
+
   playButton.addEventListener("click", event => {
     event.stopPropagation();
-    togglePadPlayback(pad.id);
+    const currentPad = pads[pad.id];
+    if (currentPad && currentPad.triggerMode !== "gate") {
+      togglePadPlayback(pad.id);
+    }
   });
 
   header.append(titleGroup, playButton);
@@ -409,7 +453,61 @@ function createPadCard(pad) {
     pad.bpm = Math.min(400, Math.max(20, bpm));
   });
 
-  controls.append(cue.row, loopRow.row, rate.row, bpmRow.row);
+  // EQ básico: HP corta graves (sube el corte), LP corta agudos (baja el corte).
+  // Escala logarítmica (posición 0-100) para que la perilla se sienta musical.
+  const eqDisabled = pad.sourceType === "youtube";
+
+  const hp = createRangeRow(
+    "HP",
+    freqToSlider(pad.highpass, CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MAX),
+    0,
+    100,
+    1,
+    value => {
+      const freq = sliderToFreq(value, CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MAX);
+      pad.highpass = freq;
+      if (pad.highpassNode) pad.highpassNode.frequency.value = freq;
+    },
+    val => formatFreq(sliderToFreq(val, CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MAX))
+  );
+  hp.input.disabled = eqDisabled;
+  if (eqDisabled) hp.input.title = "EQ no disponible para fuentes de YouTube";
+
+  const lp = createRangeRow(
+    "LP",
+    freqToSlider(pad.lowpass, CONFIG.EQ_LP_MIN, CONFIG.EQ_LP_MAX),
+    0,
+    100,
+    1,
+    value => {
+      const freq = sliderToFreq(value, CONFIG.EQ_LP_MIN, CONFIG.EQ_LP_MAX);
+      pad.lowpass = freq;
+      if (pad.lowpassNode) pad.lowpassNode.frequency.value = freq;
+    },
+    val => formatFreq(sliderToFreq(val, CONFIG.EQ_LP_MIN, CONFIG.EQ_LP_MAX))
+  );
+  lp.input.disabled = eqDisabled;
+  if (eqDisabled) lp.input.title = "EQ no disponible para fuentes de YouTube";
+
+  controls.append(cue.row, loopRow.row, rate.row, bpmRow.row, hp.row, lp.row);
+
+  /* MODO DE DISPARO: TRIGGER (toggle) vs GATE (mientras se mantiene presionado) */
+  const modeRow = document.createElement("div");
+  modeRow.className = "pad-mode-row";
+
+  const modeButton = document.createElement("button");
+  modeButton.type = "button";
+  modeButton.className = "btn-mode";
+  modeButton.textContent = pad.triggerMode === "gate" ? "GATE" : "TRIGGER";
+  if (pad.triggerMode === "gate") modeButton.classList.add("active");
+
+  modeButton.addEventListener("click", event => {
+    event.stopPropagation();
+    toggleTriggerMode(pad.id);
+  });
+
+  modeRow.appendChild(modeButton);
+  controls.appendChild(modeRow);
 
   /* BUTTON ROW */
   const buttonRow = document.createElement("div");
@@ -488,12 +586,17 @@ function createPadCard(pad) {
     soloButton,
     syncButton,
     visualButton,
+    modeButton,
     thumb,
     meterProgress,
     cueInput: cue.input,
     cueOutput: cue.output,
     loopInput: loopRow.input,
-    loopOutput: loopRow.output
+    loopOutput: loopRow.output,
+    hpInput: hp.input,
+    hpOutput: hp.output,
+    lpInput: lp.input,
+    lpOutput: lp.output
   };
 
   return { card, refs };
@@ -561,6 +664,27 @@ function createNumberRow(label, value, onChange) {
   return { row, input };
 }
 
+/* ============================================================
+   EQ: conversión slider (0-100) <-> frecuencia (Hz), escala logarítmica
+   ============================================================ */
+
+function freqToSlider(freq, min, max) {
+  const clamped = clamp(freq, min, max);
+  return (Math.log(clamped / min) / Math.log(max / min)) * 100;
+}
+
+function sliderToFreq(pos, min, max) {
+  const clampedPos = clamp(Number(pos), 0, 100);
+  return min * Math.pow(max / min, clampedPos / 100);
+}
+
+function formatFreq(freq) {
+  if (freq >= 1000) {
+    return `${(freq / 1000).toFixed(freq >= 10000 ? 0 : 1)}kHz`;
+  }
+  return `${Math.round(freq)}Hz`;
+}
+
 function createSmallButton(text, active, className) {
   const button = document.createElement("button");
   button.type = "button";
@@ -590,6 +714,9 @@ function updatePadCardState(index) {
   refs.syncButton.classList.toggle("active", pad.sync);
   refs.visualButton.classList.toggle("active", index === state.visualPad);
 
+  refs.modeButton.textContent = pad.triggerMode === "gate" ? "GATE" : "TRIGGER";
+  refs.modeButton.classList.toggle("active", pad.triggerMode === "gate");
+
   refs.thumb.textContent = pad.fileName;
 
   if (!pad.playing) {
@@ -599,6 +726,30 @@ function updatePadCardState(index) {
 
 function updateAllPadCardStates() {
   pads.forEach((_, idx) => updatePadCardState(idx));
+}
+
+function toggleTriggerMode(index) {
+  const pad = pads[index];
+  if (!pad) return;
+
+  // Si el pad está sonando en modo GATE y lo pasamos a TRIGGER (o viceversa),
+  // lo más predecible es cortar el sonido para no dejar un estado ambiguo.
+  if (pad.playing) stopPadPlayback(index);
+
+  pad.triggerMode = pad.triggerMode === "gate" ? "trigger" : "gate";
+  updatePadCardState(index);
+}
+
+function refreshPadEQSliders(index) {
+  const pad = pads[index];
+  const refs = padCardRefs.get(index);
+  if (!pad || !refs) return;
+
+  refs.hpInput.value = freqToSlider(pad.highpass, CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MAX);
+  refs.hpOutput.textContent = formatFreq(pad.highpass);
+
+  refs.lpInput.value = freqToSlider(pad.lowpass, CONFIG.EQ_LP_MIN, CONFIG.EQ_LP_MAX);
+  refs.lpOutput.textContent = formatFreq(pad.lowpass);
 }
 
 function refreshPadRanges(index) {
@@ -1210,10 +1361,41 @@ function bindKeyboard() {
 
     const key = event.key.toLowerCase();
     const padIndex = CONFIG.KEY_MAP.indexOf(key);
+    if (padIndex === -1 || event.repeat) return;
 
-    if (padIndex !== -1 && !event.repeat) {
+    const pad = pads[padIndex];
+    if (!pad) return;
+
+    if (pad.triggerMode === "gate") {
+      // GATE: mientras la tecla esté abajo, el pad suena.
+      if (!pad.playing) startPadPlayback(padIndex);
+    } else {
+      // TRIGGER: un solo press arranca/para la reproducción.
       togglePadPlayback(padIndex);
     }
+  });
+
+  window.addEventListener("keyup", event => {
+    const key = event.key.toLowerCase();
+    const padIndex = CONFIG.KEY_MAP.indexOf(key);
+    if (padIndex === -1) return;
+
+    const pad = pads[padIndex];
+    if (!pad) return;
+
+    if (pad.triggerMode === "gate" && pad.playing) {
+      stopPadPlayback(padIndex);
+    }
+  });
+
+  // Seguro: si la ventana pierde el foco (alt-tab, cambio de pestaña) con una
+  // tecla de gate abajo, el keyup nunca llega. Cortamos esos pads igual.
+  window.addEventListener("blur", () => {
+    pads.forEach(pad => {
+      if (pad.triggerMode === "gate" && pad.playing) {
+        stopPadPlayback(pad.id);
+      }
+    });
   });
 }
 
@@ -1276,11 +1458,26 @@ function selectMIDIInput(inputId) {
 function handleMIDIMessage(event) {
   const [status, note, velocity] = event.data;
   const command = status >> 4;
+  const isNoteOn = command === 9 && velocity > 0;
+  const isNoteOff = command === 8 || (command === 9 && velocity === 0);
 
-  if (command === 9 && velocity > 0) {
+  if (isNoteOn) {
     const padIndex = CONFIG.MIDI_NOTES.indexOf(note);
     if (padIndex !== -1) {
-      togglePadPlayback(padIndex);
+      const pad = pads[padIndex];
+      if (pad.triggerMode === "gate") {
+        if (!pad.playing) startPadPlayback(padIndex);
+      } else {
+        togglePadPlayback(padIndex);
+      }
+    }
+  } else if (isNoteOff) {
+    const padIndex = CONFIG.MIDI_NOTES.indexOf(note);
+    if (padIndex !== -1) {
+      const pad = pads[padIndex];
+      if (pad.triggerMode === "gate" && pad.playing) {
+        stopPadPlayback(padIndex);
+      }
     }
   }
 
@@ -1289,11 +1486,13 @@ function handleMIDIMessage(event) {
     if (!pad) return;
 
     if (note === 112 && pad.sourceType === "local" && pad.highpassNode) {
-      pad.highpass = (velocity / 127) * 1000;
+      pad.highpass = (velocity / 127) * CONFIG.EQ_HP_MAX;
       pad.highpassNode.frequency.value = pad.highpass;
+      refreshPadEQSliders(pad.id);
     } else if (note === 113 && pad.sourceType === "local" && pad.lowpassNode) {
-      pad.lowpass = (velocity / 127) * 19800 + 20;
+      pad.lowpass = (velocity / 127) * (CONFIG.EQ_LP_MAX - CONFIG.EQ_LP_MIN) + CONFIG.EQ_LP_MIN;
       pad.lowpassNode.frequency.value = pad.lowpass;
+      refreshPadEQSliders(pad.id);
     } else if (note === 7) {
       // Ahora funciona también para pads de YouTube, ya que
       // updatePadGain() controla ambos motores de audio.
@@ -1448,6 +1647,7 @@ function exportProject() {
       sync: p.sync,
       bpm: p.bpm,
       volume: p.volume,
+      triggerMode: p.triggerMode,
       highpass: p.highpass,
       lowpass: p.lowpass
     }))
@@ -1510,8 +1710,9 @@ function loadProjectData(data) {
       pad.sync = !!pData.sync;
       pad.bpm = pData.bpm || CONFIG.DEFAULT_BPM;
       pad.volume = pData.volume !== undefined ? clamp(Number(pData.volume), 0, 1) : 1;
-      pad.highpass = pData.highpass || 20;
-      pad.lowpass = pData.lowpass || 20000;
+      pad.triggerMode = pData.triggerMode === "gate" ? "gate" : "trigger";
+      pad.highpass = clamp(pData.highpass || CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MIN, CONFIG.EQ_HP_MAX);
+      pad.lowpass = clamp(pData.lowpass || CONFIG.EQ_LP_MAX, CONFIG.EQ_LP_MIN, CONFIG.EQ_LP_MAX);
 
       if (pad.sourceType === "youtube" && pad.youtubeId) {
         pad.fileName = `YT: ${pad.youtubeId}`;
