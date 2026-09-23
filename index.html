@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111318">
+  <meta name="description" content="AV Chopper — sampler audiovisual de 16 pads, cues y reproducción multicapa.">
+  <title>AV Chopper</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="app">
+
+    <!-- =========================================================
+         HEADER / TRANSPORT
+         ========================================================= -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">AV</div>
+        <div>
+          <h1>AV Chopper</h1>
+          <p>Audio · Video · Cues · Performance</p>
+        </div>
+      </div>
+
+      <div class="mode-switch" role="tablist" aria-label="Modo de trabajo">
+        <button id="editModeBtn" class="mode-btn is-active" type="button" data-mode="edit" role="tab" aria-selected="true">
+          CHOP / EDIT
+        </button>
+        <button id="performanceModeBtn" class="mode-btn" type="button" data-mode="performance" role="tab" aria-selected="false">
+          MULTI / PERFORMANCE
+        </button>
+      </div>
+
+      <div class="transport">
+        <button id="masterStopBtn" class="transport-btn" type="button" title="Detener todos los pads">■</button>
+        <button id="masterPlayBtn" class="transport-btn" type="button" title="Reproducir / reanudar">▶</button>
+        <div class="bpm-control">
+          <label for="globalBpmInput">BPM</label>
+          <input id="globalBpmInput" type="number" min="20" max="300" step="0.1" value="120">
+          <button id="globalTapBtn" type="button">TAP</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =========================================================
+         MAIN LAYOUT
+         ========================================================= -->
+    <main class="workspace">
+
+      <!-- =======================================================
+           LEFT: VIDEO PLAYLIST
+           ======================================================= -->
+      <aside id="playlistPanel" class="panel playlist-panel" aria-label="Playlist de videos">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">01</span>
+            <h2>Playlist</h2>
+          </div>
+          <span id="videoCountLabel" class="count-label">0 videos</span>
+        </div>
+
+        <div class="playlist-actions">
+          <button id="addVideoBtn" class="primary-btn" type="button">＋ Video</button>
+          <button id="addYoutubeBtn" class="secondary-btn" type="button">＋ YouTube</button>
+          <input id="videoFileInput" type="file" accept="video/*" multiple hidden>
+        </div>
+
+        <div id="videoDropZone" class="drop-zone">
+          <strong>Arrastra videos aquí</strong>
+          <span>o utiliza «＋ Video»</span>
+        </div>
+
+        <div id="videoPlaylist" class="video-playlist" role="listbox" aria-label="Videos cargados">
+          <!-- app.js inserta aquí los videos -->
+          <div id="playlistEmptyState" class="empty-state">
+            <span class="empty-icon">＋</span>
+            <strong>Sin videos cargados</strong>
+            <small>Carga uno o varios videos para comenzar a preparar cues.</small>
+          </div>
+        </div>
+
+        <div class="playlist-footer">
+          <button id="removeVideoBtn" type="button" class="danger-btn" disabled>Eliminar video</button>
+        </div>
+      </aside>
+
+      <!-- =======================================================
+           CENTER: EDITOR / VISUALIZER
+           ======================================================= -->
+      <section class="editor-column">
+
+        <!-- Selected video header -->
+        <section id="sourceHeader" class="panel source-header-panel">
+          <div class="source-title">
+            <span class="eyebrow">VIDEO SELECCIONADO</span>
+            <h2 id="selectedVideoName">Sin video seleccionado</h2>
+            <div class="source-meta">
+              <span id="selectedVideoDuration">00:00.000</span>
+              <span>·</span>
+              <span id="selectedVideoCueCount">0 cues</span>
+            </div>
+          </div>
+
+          <div class="source-actions">
+            <button id="previewSourceBtn" type="button">▶ Preview</button>
+            <button id="renameVideoBtn" type="button">Renombrar</button>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             TIMELINE / CUE EDITOR
+             ===================================================== -->
+        <section id="cueEditorPanel" class="panel cue-editor-panel">
+          <div class="panel-header timeline-header">
+            <div>
+              <span class="eyebrow">02</span>
+              <h2>Timeline / Cues</h2>
+            </div>
+
+            <div class="timeline-actions">
+              <button id="addCueBtn" class="primary-btn" type="button">＋ Cue</button>
+              <button id="split2Btn" type="button">2 partes</button>
+              <button id="split4Btn" type="button">4 partes</button>
+              <button id="split8Btn" type="button">8 partes</button>
+            </div>
+          </div>
+
+          <div class="timeline-transport">
+            <button id="timelinePlayBtn" type="button">▶</button>
+            <button id="timelineStopBtn" type="button">■</button>
+            <span id="timelineCurrentTime">00:00.000</span>
+            <span class="timeline-separator">/</span>
+            <span id="timelineDuration">00:00.000</span>
+            <div class="timeline-zoom">
+              <button id="timelineZoomOutBtn" type="button" aria-label="Alejar timeline">−</button>
+              <span id="timelineZoomLabel">1×</span>
+              <button id="timelineZoomInBtn" type="button" aria-label="Acercar timeline">＋</button>
+            </div>
+          </div>
+
+          <div id="timelineViewport" class="timeline-viewport" tabindex="0" aria-label="Editor de cues">
+            <div id="timelineRuler" class="timeline-ruler"></div>
+            <div id="timelineTrack" class="timeline-track">
+              <div id="timelinePlayhead" class="timeline-playhead" aria-hidden="true"></div>
+              <div id="cueLayer" class="cue-layer">
+                <!-- app.js inserta los cues aquí -->
+              </div>
+            </div>
+          </div>
+
+          <div class="timeline-footer">
+            <span id="timelineHint">Selecciona un video para editar sus cues.</span>
+            <span id="timelineStatus" class="status-text">Listo</span>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             CUE PROPERTIES
+             ===================================================== -->
+        <section id="cuePropertiesPanel" class="panel cue-properties-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">03</span>
+              <h2>Propiedades del cue</h2>
+            </div>
+            <span id="selectedCueLabel" class="selection-label">Ningún cue seleccionado</span>
+          </div>
+
+          <div id="cuePropertiesEmpty" class="empty-inline">
+            Selecciona un cue en el timeline para editarlo.
+          </div>
+
+          <div id="cuePropertiesForm" class="properties-grid" hidden>
+            <div class="field field-wide">
+              <label for="cueNameInput">Nombre</label>
+              <input id="cueNameInput" type="text" placeholder="Nombre del cue">
+            </div>
+
+            <div class="field">
+              <label for="cueStartInput">Inicio</label>
+              <input id="cueStartInput" type="text" inputmode="decimal" placeholder="00:00.000">
+            </div>
+
+            <div class="field">
+              <label for="cueEndInput">Fin</label>
+              <input id="cueEndInput" type="text" inputmode="decimal" placeholder="00:00.000">
+            </div>
+
+            <div class="field">
+              <label for="cueDurationInput">Duración</label>
+              <input id="cueDurationInput" type="text" inputmode="decimal" placeholder="00:00.000">
+            </div>
+
+            <div class="field">
+              <label for="cuePadSelect">Asignar a pad</label>
+              <select id="cuePadSelect">
+                <option value="">— Sin asignar —</option>
+              </select>
+            </div>
+
+            <div class="cue-actions field-wide">
+              <button id="cuePreviewBtn" type="button" class="primary-btn">▶ Preview cue</button>
+              <button id="cueGoStartBtn" type="button">↶ Ir al inicio</button>
+              <button id="duplicateCueBtn" type="button">Duplicar</button>
+              <button id="deleteCueBtn" type="button" class="danger-btn">Eliminar</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- =====================================================
+             VISUALIZER
+             ===================================================== -->
+        <section id="visualizerPanel" class="panel visualizer-panel">
+          <div class="panel-header">
+            <div>
+              <span class="eyebrow">04</span>
+              <h2>Visualizador</h2>
+            </div>
+
+            <div class="visualizer-mode" role="radiogroup" aria-label="Modo de visualización">
+              <button id="visualSimpleBtn" type="button" class="is-active" data-visual-mode="simple">SIMPLE</button>
+              <button id="visualSplit2Btn" type="button" data-visual-mode="split2">SPLIT 2</button>
+              <button id="visualSplit4Btn" type="button" data-visual-mode="split4">SPLIT 4</button>
+            </div>
+          </div>
+
+          <div id="visualizerViewport" class="visualizer-viewport">
+            <canvas id="visualizerCanvas" width="1280" height="720" aria-label="Salida visual"></canvas>
+
+            <div id="visualizerPlaceholder" class="visualizer-placeholder">
+              <strong>Salida visual</strong>
+              <span>Los videos reproducidos aparecerán aquí.</span>
+            </div>
+
+            <div id="visualizerOverlay" class="visualizer-overlay">
+              <span id="visualizerModeLabel">SIMPLE</span>
+              <span id="visualizerSourceLabel">—</span>
+            </div>
+          </div>
+
+          <div class="visualizer-footer">
+            <label class="inline-control">
+              <span>Fuentes visibles</span>
+              <span id="visualSourceCount">0 / 4</span>
+            </label>
+            <span id="visualizerStatus" class="status-text">Sin reproducción</span>
+          </div>
+        </section>
+      </section>
+
+      <!-- =======================================================
+           RIGHT: PERFORMANCE / PADS
+           ======================================================= -->
+      <aside id="performancePanel" class="panel performance-panel" aria-label="Performance">
+        <div class="panel-header">
+          <div>
+            <span class="eyebrow">05</span>
+            <h2>16 Pads</h2>
+          </div>
+          <span id="activePadCount" class="count-label">0 activos</span>
+        </div>
+
+        <div class="pad-keymap" aria-label="Distribución del teclado">
+          <span>1–4</span>
+          <span>Q–R</span>
+          <span>A–F</span>
+          <span>Z–V</span>
+        </div>
+
+        <div id="padsGrid" class="pads-grid" aria-label="16 pads">
+          <!-- app.js genera los 16 pads -->
+        </div>
+
+        <div id="padInspector" class="pad-inspector">
+          <div class="inspector-header">
+            <div>
+              <span class="eyebrow">PAD</span>
+              <h3 id="selectedPadName">Ningún pad seleccionado</h3>
+            </div>
+            <span id="selectedPadKey" class="pad-key-label">—</span>
+          </div>
+
+          <div id="padInspectorEmpty" class="empty-inline">
+            Selecciona un pad para editar sus parámetros de performance.
+          </div>
+
+          <div id="padInspectorForm" class="inspector-form" hidden>
+            <div class="inspector-source" id="padSourceInfo">
+              <span id="padVideoName">—</span>
+              <span>·</span>
+              <span id="padCueName">—</span>
+            </div>
+
+            <div class="segmented-control" role="radiogroup" aria-label="Modo de disparo">
+              <button id="padTriggerBtn" type="button" class="is-active" data-play-mode="trigger">TRIGGER</button>
+              <button id="padGateBtn" type="button" data-play-mode="gate">GATE</button>
+            </div>
+
+            <div class="inspector-row">
+              <label for="padLoopToggle">Loop</label>
+              <input id="padLoopToggle" type="checkbox">
+            </div>
+
+            <div class="field">
+              <label for="padVolumeInput">Volumen <output id="padVolumeValue">100%</output></label>
+              <input id="padVolumeInput" type="range" min="0" max="1.5" step="0.01" value="1">
+            </div>
+
+            <div class="field">
+              <label for="padHighPassInput">HPF <output id="padHighPassValue">20 Hz</output></label>
+              <input id="padHighPassInput" type="range" min="20" max="8000" step="1" value="20">
+            </div>
+
+            <div class="field">
+              <label for="padLowPassInput">LPF <output id="padLowPassValue">20 kHz</output></label>
+              <input id="padLowPassInput" type="range" min="20" max="20000" step="1" value="20000">
+            </div>
+
+            <div class="field">
+              <label for="padRateInput">Playback Rate <output id="padRateValue">1.00×</output></label>
+              <input id="padRateInput" type="range" min="0.25" max="2" step="0.01" value="1">
+            </div>
+
+            <div class="field">
+              <label for="padVisualModeSelect">Visual</label>
+              <select id="padVisualModeSelect">
+                <option value="auto">AUTO</option>
+                <option value="visible">VISIBLE</option>
+                <option value="hidden">HIDDEN</option>
+              </select>
+            </div>
+
+            <div class="inspector-actions">
+              <button id="padPreviewBtn" type="button">▶ Preview</button>
+              <button id="padStopBtn" type="button">■ Stop</button>
+              <button id="padMuteBtn" type="button">Mute</button>
+              <button id="padSoloBtn" type="button">Solo</button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- =========================================================
+         FOOTER / PROJECT / MIDI / RECORDING
+         ========================================================= -->
+    <footer class="app-footer">
+      <div class="footer-group">
+        <button id="exportProjectBtn" type="button">Exportar proyecto</button>
+        <button id="importProjectBtn" type="button">Importar proyecto</button>
+        <input id="projectFileInput" type="file" accept="application/json,.json" hidden>
+      </div>
+
+      <div class="footer-group">
+        <label for="midiInputSelect">MIDI</label>
+        <select id="midiInputSelect">
+          <option value="">Sin MIDI</option>
+        </select>
+        <span id="midiStatus" class="status-text">No conectado</span>
+      </div>
+
+      <div class="footer-group">
+        <label for="masterVolumeInput">Master</label>
+        <input id="masterVolumeInput" type="range" min="0" max="1" step="0.01" value="0.8">
+        <output id="masterVolumeValue">80%</output>
+      </div>
+
+      <div class="footer-group record-group">
+        <button id="recordBtn" class="record-btn" type="button">● REC</button>
+        <span id="recordStatus" class="status-text">Listo</span>
+      </div>
+    </footer>
+
+    <!-- =========================================================
+         HIDDEN MEDIA CONTAINERS
+         app.js puede insertar/reutilizar elementos <video> aquí.
+         ========================================================= -->
+    <div id="videoBank" class="media-bank" aria-hidden="true"></div>
+    <div id="youtubePlayers" class="youtube-players" aria-hidden="true"></div>
+
+    <!-- =========================================================
+         GLOBAL STATUS / NOTICES
+         ========================================================= -->
+    <div id="toastRegion" class="toast-region" aria-live="polite" aria-atomic="true"></div>
+
+    <div id="modalLayer" class="modal-layer" hidden>
+      <div id="modalBackdrop" class="modal-backdrop"></div>
+      <section id="appModal" class="app-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <header class="modal-header">
+          <h2 id="modalTitle">AV Chopper</h2>
+          <button id="modalCloseBtn" type="button" aria-label="Cerrar">×</button>
+        </header>
+        <div id="modalContent" class="modal-content"></div>
+        <footer class="modal-footer">
+          <button id="modalCancelBtn" type="button">Cancelar</button>
+          <button id="modalConfirmBtn" type="button" class="primary-btn">Aceptar</button>
+        </footer>
+      </section>
+    </div>
+  </div>
+
+  <!-- El nuevo app.js debe contener toda la lógica. -->
+  <script src="app.js" defer></script>
+</body>
+</html>
