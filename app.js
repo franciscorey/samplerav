@@ -40,9 +40,9 @@ const CONFIG = {
   MIN_PLAYBACK_RATE: 0.25,
   MAX_PLAYBACK_RATE: 4,
   MIN_LOOP_DURATION: 0.05,
-  MAX_LOOP_DURATION: 8,
+  MAX_LOOP_DURATION: 8.0,
   KEY_MAP: ["q", "w", "e", "r", "a", "s", "d", "f"],
-  MIDI_NOTES: [36, 37, 38, 39, 40, 41, 42, 43],
+  MIDI_NOTES: [29, 30, 31, 32, 33, 34, 35, 36],
   // Valores de velocidad que la YouTube IFrame API realmente acepta.
   YT_ALLOWED_RATES: [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2],
 
