@@ -135,6 +135,572 @@
 <div id="editorPreview" hidden></div>
 <div id="toastRegion" class="toast"></div>
 
-<script src="app.js" defer></script>
+<script>
+/* ============================================================
+   AV CHOPPER v3 — UNIFIED AUDIOVISUAL INSTRUMENT
+   PLAYLIST → CUES → PADS → PERFORMANCE → VISUALIZER
+   ============================================================ */
+"use strict";
+
+const CONFIG = {
+  PAD_COUNT: 16,
+  KEY_MAP: ["1","2","3","4","q","w","e","r","a","s","d","f","z","x","c","v"],
+  MIDI_BASE: 36,
+  DEFAULT_BPM: 120,
+  DEFAULT_MASTER: 0.8,
+  DEFAULT_PAD_VOLUME: 1,
+  DEFAULT_PAD_RATE: 1,
+  DEFAULT_HPF: 20,
+  DEFAULT_LPF: 20000,
+  MIN_RATE: 0.25,
+  MAX_RATE: 4,
+  MIN_CUE: 0.05,
+  NEW_CUE: 2,
+  VIS_LIMIT: { simple: 1, split2: 2, split4: 4 }
+};
+
+const $ = id => document.getElementById(id);
+let uid = 0;
+const id = p => `${p}-${Date.now().toString(36)}-${(++uid).toString(36)}`;
+const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
+const fmt = s => {
+  s = Math.max(0, Number(s)||0);
+  const m = Math.floor(s/60), sec = s-m*60;
+  return `${String(m).padStart(2,"0")}:${sec.toFixed(3).padStart(6,"0")}`;
+};
+const parseTime = v => {
+  if (typeof v === "number") return Math.max(0,v);
+  const s = String(v||"").trim();
+  if (!s) return 0;
+  if (s.includes(":")) {
+    const p=s.split(":");
+    return Math.max(0,(Number(p[0])||0)*60+(Number(p[1])||0));
+  }
+  return Math.max(0,Number(s)||0);
+};
+
+function makeVideo(data={}) {
+  return {
+    id: data.id || id("video"), name: data.name || data.fileName || "Video",
+    sourceType: data.sourceType === "youtube" ? "youtube" : "local",
+    sourceUrl: data.sourceUrl || null, fileName: data.fileName || "",
+    youtubeId: data.youtubeId || "", duration: Number(data.duration)||0, cues: [],
+    linked: data.sourceType === "youtube" ? true : !!data.sourceUrl,
+    editorEl: null, editorSource: null, editorGain: null
+  };
+}
+function makeCue(videoId, start=0, end=2, name="Cue") {
+  return { id:id("cue"), videoId, name, startTime:start, endTime:end };
+}
+function makePad(n) {
+  return {
+    id:n+1, key:CONFIG.KEY_MAP[n], midiNote:CONFIG.MIDI_BASE+n,
+    cueId:null,
+    playMode:"gate", loop:true, volume:1, muted:false, solo:false,
+    highPass:20, lowPass:20000, playbackRate:1, visualMode:"auto",
+    bpm:120, sync:false, playing:false, token:0,
+    engine:null, audioSource:null, hp:null, lp:null, gain:null
+  };
+}
+
+const videos=[];
+const pads=Array.from({length:CONFIG.PAD_COUNT},(_,i)=>makePad(i));
+const state={
+  selectedVideoId:null, selectedCueId:null, selectedPadId:1,
+  playhead:0, zoom:1, visualizerMode:"simple", visualSources:[],
+  master:CONFIG.DEFAULT_MASTER, bpm:CONFIG.DEFAULT_BPM,
+  midiAccess:null, midiInputId:"", midiConnected:false,
+  preview:{videoId:null, playing:false, end:0},
+  recording:false, recorder:null, chunks:[], recTimer:null, recStart:0,
+  tapTimes:[]
+};
+
+let audioCtx=null, masterGain=null, recordDest=null;
+let ytApiPromise=null;
+
+const dom={
+  statusDot:$('statusDot'), statusText:$('statusText'), audioStart:$('audioStartButton'),
+  record:$('recordButton'), recordTimer:$('recordingTimer'), master:$('masterVolume'),
+  bpm:$('globalBpm'), bpmValue:$('globalBpmValue'), tap:$('globalTapButton'),
+  playlistCount:$('playlistCount'), addLocal:$('addLocalVideoButton'), addYT:$('addYoutubeVideoButton'),
+  ytUrl:$('youtubeUrlInput'), drop:$('videoDropZone'), playlist:$('playlistList'),
+  clear:$('clearProjectButton'), save:$('saveProjectButton'), load:$('loadProjectButton'),
+  projectFile:$('projectFileInput'), midiConnect:$('midiConnectButton'), midiSelect:$('midiInputSelect'),
+  midiStatus:$('midiStatus'),
+  selectedVideoName:$('selectedVideoName'), selectedVideoMeta:$('selectedVideoMeta'), timelineTitle:$('timelineTitle'),
+  previewSource:$('previewSourceButton'), renameVideo:$('renameVideoButton'), removeVideo:$('removeVideoButton'), relink:$('relinkVideoButton'), relinkFile:$('relinkFileInput'),
+  cueNew:$('cueNewButton'), cueDiv2:$('cueDivide2'), cueDiv4:$('cueDivide4'), cueDiv8:$('cueDivide8'),
+  timeline:$('timelineViewport'), track:$('timelineTrack'), cues:$('timelineCues'), ruler:$('timelineRuler'), zoomLevel:$('timelineZoomLevel'),
+  playhead:$('timelinePlayhead'), timelineStatus:$('timelineStatus'), timelinePlay:$('transportPlayPause'),
+  timelineStart:$('transportGoStart'), timelineTime:$('playheadTimeLabel'), timelineDuration:$('timelineDuration'),
+  zoomOut:$('timelineZoomOut'), zoomLevel:$('timelineZoomLevel'), zoomIn:$('timelineZoomIn'),
+  cueLabel:$('selectedCueLabel'), cueEmpty:$('cuePropsEmpty'), cueForm:$('cuePropsForm'),
+  cueName:$('cueNameInput'), cueStart:$('cueStartInput'), cueEnd:$('cueEndInput'), cueDur:$('cueDurationInput'),
+  cueAssign:$('cuePadAssignGrid'), cuePreview:$('cuePreviewButton'), cueStartBtn:$('cueGoStartButton'),
+  cueEndBtn:$('cueGoEndButton'), cueDup:$('cueDuplicateButton'), cueSplit:$('cueSplitButton'),
+  cueMerge:$('cueMergeButton'), cueDelete:$('cueDeleteButton'),
+  visualBtns:$('visualizerModeButtons'), canvas:$('outputCanvas'), visualModeLabel:$('visualizerModeLabel'),
+  visualSourceLabel:$('visualizerSourceLabel'), visualCount:$('visualSourceCount'), placeholder:$('visualizerPlaceholder'),
+  ytMonitor:$('ytMonitor'), padsGrid:$('padsGrid'), activePads:$('activePadCount'),
+  padTitle:$('padDetailTitle'), padKey:$('padKeyLabel'), padEmpty:$('padDetailEmpty'), padForm:$('padDetailForm'),
+  padCue:$('padCueLabel'), padTrigger:$('padTriggerButton'), padMode:$('padModeButton'), padLoop:$('padLoopButton'),
+  padMute:$('padMuteButton'), padSolo:$('padSoloButton'), padVol:$('padVolumeInput'), padVolOut:$('padVolumeOutput'),
+  padHP:$('padHPInput'), padHPOut:$('padHPOutput'), padLP:$('padLPInput'), padLPOut:$('padLPOutput'),
+  padRate:$('padRateInput'), padRateOut:$('padRateOutput'), padBpm:$('padBpmInput'), padSync:$('padSyncButton'),
+  padVisual:$('padVisualSelect'), padUnassign:$('padUnassignButton'), videoBank:$('videoBank'),
+  editorPreview:$('editorPreview'), mediaFile:$('mediaFileInput'), relinkFile:$('relinkFileInput'),
+  toast:$('toastRegion')
+};
+
+function status(text, active=false){
+  if(dom.statusText) dom.statusText.textContent=text;
+  if(dom.statusDot) dom.statusDot.classList.toggle('active',!!active);
+}
+function toast(text){
+  if(!dom.toast)return;
+  dom.toast.textContent=text; dom.toast.classList.add('show');
+  clearTimeout(toast.t); toast.t=setTimeout(()=>dom.toast.classList.remove('show'),2200);
+}
+function getVideo(id){return videos.find(v=>v.id===id)||null;}
+function getCue(id){for(const v of videos){const c=v.cues.find(x=>x.id===id);if(c)return c;}return null;}
+function getPad(n){return pads.find(p=>p.id===n)||null;}
+function selectedVideo(){return getVideo(state.selectedVideoId);}
+function selectedCue(){return getCue(state.selectedCueId);}
+function cueVideo(c){return c?getVideo(c.videoId):null;}
+
+/* ---------------- AUDIO ---------------- */
+async function ensureAudio(){
+  if(!audioCtx){
+    const C=window.AudioContext||window.webkitAudioContext;
+    if(!C){status('AUDIO NO SOPORTADO');throw new Error('AudioContext no soportado');}
+    audioCtx=new C();
+    masterGain=audioCtx.createGain();
+    masterGain.gain.value=state.master;
+    masterGain.connect(audioCtx.destination);
+  }
+  if(audioCtx.state==='suspended') await audioCtx.resume();
+  if(dom.audioStart){dom.audioStart.textContent='AUDIO ✓';dom.audioStart.classList.add('active');}
+}
+function connectPadAudio(pad,el){
+  if(!audioCtx||pad.audioSource)return;
+  try{
+    pad.audioSource=audioCtx.createMediaElementSource(el);
+    pad.hp=audioCtx.createBiquadFilter(); pad.hp.type='highpass';
+    pad.lp=audioCtx.createBiquadFilter(); pad.lp.type='lowpass'; pad.gain=audioCtx.createGain();
+    pad.hp.frequency.value=pad.highPass; pad.lp.frequency.value=pad.lowPass;
+    pad.audioSource.connect(pad.hp).connect(pad.lp).connect(pad.gain).connect(masterGain);
+    updatePadGain(pad);
+  }catch(e){console.error('Audio pad:',e);status('ERROR AUDIO PAD');}
+}
+function connectEditorAudio(video,el){
+  if(!audioCtx||video.editorSource)return;
+  try{
+    video.editorSource=audioCtx.createMediaElementSource(el);
+    video.editorGain=audioCtx.createGain(); video.editorGain.gain.value=0.9;
+    video.editorSource.connect(video.editorGain).connect(masterGain);
+  }catch(e){console.error('Audio preview:',e);}
+}
+function updatePadGain(pad){
+  const solo=pads.some(p=>p.solo);
+  const g=pad.muted|| (solo&&!pad.solo) ? 0 : clamp(pad.volume,0,1);
+  if(pad.gain&&audioCtx)pad.gain.gain.setTargetAtTime(g,audioCtx.currentTime,.01);
+  updateYTVolume(pad);
+}
+
+function updateAllGains(){pads.forEach(updatePadGain);}
+
+/* ---------------- LOCAL VIDEO ENGINE ---------------- */
+function destroyPadEngine(pad){
+  pad.token++;
+  if(pad.audioSource)try{pad.audioSource.disconnect()}catch(e){}
+  if(pad.hp)try{pad.hp.disconnect()}catch(e){}
+  if(pad.lp)try{pad.lp.disconnect()}catch(e){}
+  if(pad.gain)try{pad.gain.disconnect()}catch(e){}
+  if(pad.engine?.videoEl){try{pad.engine.videoEl.pause();pad.engine.videoEl.remove()}catch(e){}}
+  if(pad.engine?.player)try{pad.engine.player.destroy()}catch(e){}
+  if(pad.engine?.iframe){try{pad.engine.iframe.remove()}catch(e){}}
+  if(pad.engine?.host){try{pad.engine.host.remove()}catch(e){}}
+  pad.audioSource=pad.hp=pad.lp=pad.gain=null; pad.engine=null; pad.playing=false;
+}
+function ensurePadEngine(pad,video){
+  if(pad.engine&&pad.engine.videoId===video.id)return pad.engine;
+  destroyPadEngine(pad);
+  if(video.sourceType==='local'){
+    const el=document.createElement('video'); el.src=video.sourceUrl||''; el.preload='auto'; el.playsInline=true; el.crossOrigin='anonymous';
+    el.dataset.pad=pad.id; dom.videoBank.appendChild(el);
+    pad.engine={kind:'local',videoId:video.id,videoEl:el};
+    if(audioCtx)connectPadAudio(pad,el);
+    el.addEventListener('ended',()=>{if(!pad.loop){stopPad(pad.id)}else{try{el.currentTime=findCueStart(pad);el.play()}catch(e){}}});
+    el.addEventListener('error',()=>{pad.playing=false;updatePadTile(pad);status(`PAD ${pad.id}: ERROR VIDEO`);});
+  }else{
+    const host=document.createElement('div');
+    host.className='yt-pad-runtime';
+    host.id=`yt-pad-${pad.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    dom.ytRuntimeBank.appendChild(host);
+    pad.engine={kind:'youtube',videoId:video.id,host,player:null,ready:false};
+    loadYouTubeAPI().then(()=>{
+      if(!pad.engine||pad.engine.videoId!==video.id)return;
+      pad.engine.player=new YT.Player(host.id,{videoId:video.youtubeId,width:'100%',height:'100%',playerVars:{autoplay:0,controls:1,playsinline:1,rel:0},events:{onReady:()=>{if(pad.engine){pad.engine.ready=true;updateYTVolume(pad)}}}});
+    }).catch(()=>status('YOUTUBE API NO DISPONIBLE'));
+  }
+  return pad.engine;
+}
+function findCueStart(pad){const c=getCue(pad.cueId);return c?c.startTime:0;}
+function findCueEnd(pad){const c=getCue(pad.cueId);return c?c.endTime:0;}
+
+function loadYouTubeAPI(){
+  if(window.YT&&window.YT.Player)return Promise.resolve();
+  if(ytApiPromise)return ytApiPromise;
+  ytApiPromise=new Promise((resolve,reject)=>{
+    const previous=window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady=()=>{try{previous?.();}catch(e){}resolve()};
+    const script=document.createElement('script');script.src='https://www.youtube.com/iframe_api';script.async=true;script.onerror=()=>reject(new Error('YouTube API'));document.head.appendChild(script);
+  });
+  return ytApiPromise;
+}
+function updateYTVolume(pad){
+  const player=pad.engine?.player;if(!player||!pad.engine.ready)return;
+  const solo=pads.some(x=>x.solo),g=pad.muted||(solo&&!pad.solo)?0:clamp(pad.volume,0,1);
+  try{player.setVolume(Math.round(g*100));if(g===0)player.mute();else player.unMute();player.setPlaybackRate(Math.min(2,Math.max(.25,pad.playbackRate)))}catch(e){}
+}
+
+async function startPad(n){
+  const pad=getPad(n); if(!pad||!pad.cueId){status(`PAD ${n}: SIN CUE`);return;}
+  const cue=getCue(pad.cueId), video=cueVideo(cue);
+  if(!cue||!video){status(`PAD ${n}: CUE INVÁLIDO`);return;}
+  if(video.sourceType==='local'&&!video.sourceUrl){status('FUENTE LOCAL NO VINCULADA');return;}
+  try{await ensureAudio()}catch(e){return;}
+  const engine=ensurePadEngine(pad,video); const token=++pad.token;
+  if(video.sourceType==='local'){
+    const el=engine.videoEl;
+    const begin=()=>{
+      if(token!==pad.token)return;
+      try{el.currentTime=clamp(cue.startTime,0,Math.max(0,el.duration||cue.startTime));el.playbackRate=effectiveRate(pad);el.preservesPitch=false}catch(e){}
+      el.play().then(()=>{if(token===pad.token){pad.playing=true;activateVisual(pad);updatePadTile(pad);status(`PLAY PAD ${n}`,true);}}).catch(()=>status(`PAD ${n}: PLAY BLOQUEADO`));
+    };
+    if(el.readyState>=1)begin();else el.addEventListener('loadedmetadata',begin,{once:true});
+  }else{
+    const attempt=()=>{
+      if(token!==pad.token)return;
+      const player=engine.player;
+      if(!engine.ready||!player){setTimeout(attempt,100);return}
+      try{player.seekTo(cue.startTime,true);player.setPlaybackRate(Math.min(2,Math.max(.25,effectiveRate(pad))));updateYTVolume(pad);player.playVideo();pad.playing=true;activateVisual(pad);updatePadTile(pad);status(`PLAY PAD ${n}`,true)}catch(e){status(`PAD ${n}: YOUTUBE ERROR`) }
+    };
+    attempt();
+  }
+}
+function stopPad(n){
+  const p=getPad(n);if(!p)return;p.token++;
+  if(p.engine?.videoEl)try{p.engine.videoEl.pause()}catch(e){}
+  if(p.engine?.player)try{p.engine.player.pauseVideo()}catch(e){}
+  p.playing=false;removeVisual(p.id);updatePadTile(p);renderCanvas();
+}
+function pressPad(n){
+  const p=getPad(n);if(!p)return;
+  if(p.playMode==='gate'){if(!p.playing)startPad(n)}
+  else if(p.playing)stopPad(n);
+  else startPad(n);
+}
+function releasePad(n){const p=getPad(n);if(p&&p.playMode==='gate')stopPad(n);}
+function effectiveRate(p){return p.sync&&p.bpm>0?clamp(state.bpm/p.bpm*p.playbackRate,.25,4):p.playbackRate;}
+
+/* ---------------- VISUALIZER ---------------- */
+function activateVisual(pad){
+  if(pad.visualMode==='hidden')return;
+  let list=state.visualSources.filter(n=>n!==pad.id);list.push(pad.id);
+  const max=CONFIG.VIS_LIMIT[state.visualizerMode]||1;
+  while(list.length>max){
+    const auto=list.findIndex(n=>{const p=getPad(n);return p&&p.visualMode!=='visible'});
+    list.splice(auto>=0?auto:0,1);
+  }
+  state.visualSources=list;
+}
+function removeVisual(n){state.visualSources=state.visualSources.filter(x=>x!==n);}
+function setVisualMode(mode){
+  if(!CONFIG.VIS_LIMIT[mode])return;
+  state.visualizerMode=mode;
+  state.visualSources=state.visualSources.slice(-CONFIG.VIS_LIMIT[mode]);
+  renderVisualButtons(); renderCanvas();
+}
+function visualCells(mode,w,h){
+  if(mode==='split2')return[{x:0,y:0,w:w/2,h},{x:w/2,y:0,w:w/2,h}];
+  if(mode==='split4')return[{x:0,y:0,w:w/2,h:h/2},{x:w/2,y:0,w:w/2,h:h/2},{x:0,y:h/2,w:w/2,h:h/2},{x:w/2,y:h/2,w:w/2,h:h/2}];
+  return[{x:0,y:0,w,h}];
+}
+function drawCellLabel(ctx,c,t){ctx.fillStyle='rgba(0,0,0,.65)';ctx.fillRect(c.x+7,c.y+7,100,19);ctx.fillStyle='#00ffcc';ctx.font='11px JetBrains Mono,monospace';ctx.fillText(t,c.x+12,c.y+20)}
+function renderCanvas(){
+  const c=dom.canvas;if(!c)return;const ctx=c.getContext('2d'),w=c.width,h=c.height;
+  ctx.fillStyle='#08090b';ctx.fillRect(0,0,w,h);
+  // Cue preview has priority and always uses the single visor.
+  if(state.preview.playing){
+    if(dom.placeholder)dom.placeholder.hidden=true;
+    const v=getVideo(state.preview.videoId);
+    if(v?.sourceType==='local'&&v.editorEl?.readyState>=2){ctx.drawImage(v.editorEl,0,0,w,h);drawCellLabel(ctx,{x:0,y:0},`PREVIEW · ${v.name}`);return;}
+    if(v?.sourceType==='youtube'){drawYTCanvasNotice(ctx,w,h,v);return;}
+  }
+  const active=state.visualSources.map(getPad).filter(p=>p?.playing);
+  if(dom.placeholder)dom.placeholder.hidden=active.length===0;
+  if(!active.length){ctx.fillStyle='#111318';ctx.fillRect(0,0,w,h);ctx.fillStyle='#555';ctx.font='14px JetBrains Mono,monospace';ctx.textAlign='center';ctx.fillText('VISOR EN ESPERA',w/2,h/2);ctx.textAlign='left';return;}
+  const cells=visualCells(state.visualizerMode,w,h);
+  active.forEach((p,i)=>{const cell=cells[i];if(!cell)return;const cue=getCue(p.cueId),v=cueVideo(cue);if(v?.sourceType==='local'&&p.engine?.videoEl?.readyState>=2)ctx.drawImage(p.engine.videoEl,cell.x,cell.y,cell.w,cell.h);else drawYTCanvasNotice(ctx,cell.w,cell.h,v,cell.x,cell.y);drawCellLabel(ctx,cell,`PAD ${p.id} · ${v?.name||''}`)});
+}
+function drawYTCanvasNotice(ctx,w,h,v,x=0,y=0){ctx.fillStyle='#17131c';ctx.fillRect(x,y,w,h);ctx.fillStyle='#ff4d5e';ctx.font='bold 15px JetBrains Mono,monospace';ctx.textAlign='center';ctx.fillText('YOUTUBE',x+w/2,y+h/2-5);ctx.fillStyle='#aaa';ctx.font='11px JetBrains Mono,monospace';ctx.fillText('no puede entrar al canvas',x+w/2,y+h/2+18);ctx.textAlign='left'}
+
+/* ---------------- EDITOR PREVIEW ---------------- */
+function ensureEditor(video){
+  if(video.sourceType!=='local')return null;
+  if(video.editorEl)return video.editorEl;
+  const el=document.createElement('video');el.src=video.sourceUrl||'';el.preload='auto';el.playsInline=true;el.muted=false;el.controls=false;el.crossOrigin='anonymous';
+  video.editorEl=el;dom.videoBank.appendChild(el);
+  el.addEventListener('loadedmetadata',()=>{video.duration=el.duration||video.duration;renderAll();});
+  if(audioCtx)connectEditorAudio(video,el);
+  return el;
+}
+function previewCue(cue){
+  if(!cue)return;const v=cueVideo(cue);if(!v)return;
+  stopPreview();state.preview={videoId:v.id,playing:true,end:cue.endTime};
+  if(v.sourceType==='local'){
+    const el=ensureEditor(v);if(!el)return;
+    ensureAudio().then(()=>{connectEditorAudio(v,el);el.currentTime=cue.startTime;el.play().catch(()=>{});});
+  }else{
+    state.preview.playing=true;
+    dom.ytMonitor.innerHTML='';
+    const iframe=document.createElement('iframe');iframe.className='yt-preview-frame';iframe.src=`https://www.youtube.com/embed/${v.youtubeId}?autoplay=1&start=${Math.floor(cue.startTime)}&controls=1&playsinline=1`;iframe.allow='autoplay; encrypted-media';dom.ytMonitor.appendChild(iframe);
+    dom.ytMonitor.classList.add('preview-active');
+  }
+  renderCanvas();
+}
+function stopPreview(){
+  const v=getVideo(state.preview.videoId);if(v?.editorEl)try{v.editorEl.pause()}catch(e){}
+  state.preview={videoId:null,playing:false,end:0};
+  dom.ytMonitor?.classList.remove('preview-active');
+  if(dom.ytMonitor)dom.ytMonitor.innerHTML='';
+}
+
+/* ---------------- PLAYLIST ---------------- */
+function selectVideo(vid){
+  stopPreview();state.selectedVideoId=vid;state.selectedCueId=null;state.playhead=0;
+  const v=getVideo(vid);if(v&&v.sourceType==='local')ensureEditor(v);
+  renderAll();
+}
+function addLocalFile(file){
+  if(!file||(!file.type.startsWith('video/')&&!file.type.startsWith('audio/'))){toast('Selecciona un video o audio compatible');return;}
+  const v=makeVideo({name:file.name,sourceType:'local',sourceUrl:URL.createObjectURL(file),fileName:file.name});
+  videos.push(v);state.selectedVideoId=v.id;state.selectedCueId=null;ensureEditor(v);
+  toast('Video agregado');renderAll();
+}
+function handleLocal(e){const f=e.target.files?.[0];e.target.value='';if(f)addLocalFile(f)}
+function addYouTube(){
+  const raw=dom.ytUrl.value.trim();const yt=extractYT(raw);if(!yt){toast('URL de YouTube no válida');return}
+  const v=makeVideo({name:`YouTube · ${yt}`,sourceType:'youtube',youtubeId:yt});videos.push(v);state.selectedVideoId=v.id;state.selectedCueId=null;dom.ytUrl.value='';toast('YouTube agregado');renderAll();
+}
+function extractYT(url){const m=String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(url)?url:'')}
+function relinkSelectedFile(file){
+  const v=selectedVideo();if(!v||v.sourceType!=='local'||!file)return;
+  if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);
+  v.sourceUrl=URL.createObjectURL(file);v.fileName=file.name;v.name=v.name||file.name;v.linked=true;
+  if(v.editorEl)try{v.editorEl.pause();v.editorEl.remove()}catch(e){}
+  v.editorEl=null;v.editorSource=null;v.editorGain=null;ensureEditor(v);toast('Fuente local vinculada');renderAll();
+}
+function relinkFileHandler(e){const f=e.target.files?.[0];e.target.value='';if(f)relinkSelectedFile(f)}
+
+function removeVideo(){const v=selectedVideo();if(!v)return;const assigned=pads.filter(p=>v.cues.some(c=>c.id===p.cueId));assigned.forEach(p=>{stopPad(p.id);p.cueId=null});if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);if(v.editorEl)try{v.editorEl.pause();v.editorEl.remove()}catch(e){}const i=videos.indexOf(v);if(i>=0)videos.splice(i,1);state.selectedVideoId=videos[0]?.id||null;state.selectedCueId=null;renderAll()}
+function renameVideo(){const v=selectedVideo();if(!v)return;const n=prompt('Nombre del video:',v.name);if(n?.trim()){v.name=n.trim();renderAll()}}
+function renderPlaylist(){
+  const sv=selectedVideo();
+  if(dom.selectedVideoName)dom.selectedVideoName.textContent=sv?sv.name:'Ningún video seleccionado';
+  if(dom.selectedVideoMeta)dom.selectedVideoMeta.textContent=sv?(sv.sourceType==='youtube'?'YOUTUBE':fmt(sv.duration)):'—';
+  if(dom.relink)dom.relink.hidden=!(sv&&sv.sourceType==='local'&&!sv.linked);
+  if(!dom.playlist)return;dom.playlist.innerHTML='';dom.playlistCount.textContent=`${videos.length} VIDEO${videos.length===1?'':'S'}`;
+  videos.forEach(v=>{const row=document.createElement('div');row.className='playlist-item';if(v.id===state.selectedVideoId)row.classList.add('selected');
+    const main=document.createElement('button');main.type='button';main.className='playlist-main';main.innerHTML=`<span class="source-dot ${v.sourceType}"></span><span class="playlist-name">${escapeHTML(v.name)}</span><span class="playlist-meta">${v.sourceType==='youtube'?'YT':fmt(v.duration)}</span>`;main.onclick=()=>selectVideo(v.id);
+    const x=document.createElement('button');x.type='button';x.className='playlist-delete';x.textContent='×';x.title='Eliminar';x.onclick=e=>{e.stopPropagation();state.selectedVideoId=v.id;removeVideo()};row.append(main,x);dom.playlist.appendChild(row);
+  });
+}
+function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+
+/* ---------------- TIMELINE ---------------- */
+function pxTime(x){const v=selectedVideo();if(!v)return 0;const width=Math.max(dom.cues?.clientWidth||800,300);return clamp((x/width)*v.duration,0,v.duration)}
+function renderTimeline(){
+  const v=selectedVideo();
+  if(!v){
+    if(dom.timelineTitle)dom.timelineTitle.textContent='Selecciona un video';
+    dom.timelineDuration.textContent='00:00.000';dom.cues.innerHTML='';dom.ruler.innerHTML='';
+    return;
+  }
+  if(dom.timelineTitle)dom.timelineTitle.textContent=`${v.name} · ${v.cues.length} CUE${v.cues.length===1?'':'S'}`;
+  dom.timelineDuration.textContent=fmt(v.duration);dom.timelineTime.textContent=fmt(state.playhead);
+  const base=Math.max(dom.track.clientWidth||900,600),width=base*state.zoom;
+  dom.cues.style.width=`${width}px`;dom.ruler.style.width=`${width}px`;
+  dom.cues.innerHTML='';dom.ruler.innerHTML='';
+  const ticks=Math.max(2,Math.ceil(v.duration/(10/state.zoom)));
+  for(let i=0;i<=ticks;i++){
+    const t=v.duration*i/ticks, r=document.createElement('span');
+    r.style.left=`${(t/v.duration)*100}%`;r.textContent=fmt(t).slice(0,5);dom.ruler.appendChild(r);
+  }
+  v.cues.slice().sort((a,b)=>a.startTime-b.startTime).forEach(c=>{
+    const b=document.createElement('div');b.className='cue-block';if(c.id===state.selectedCueId)b.classList.add('selected');
+    const left=(c.startTime/v.duration)*100,widthPct=Math.max((cueDuration(c)/v.duration)*100,.4);
+    b.style.left=`${left}%`;b.style.width=`${widthPct}%`;
+    const label=document.createElement('strong');label.textContent=c.name;
+    const time=document.createElement('small');time.textContent=`${fmt(c.startTime)} → ${fmt(c.endTime)}`;
+    const hs=document.createElement('span');hs.className='cue-handle start';
+    const he=document.createElement('span');he.className='cue-handle end';
+    b.append(hs,label,time,he);
+    b.onclick=e=>{e.stopPropagation();selectCue(c.id)};
+    b.onpointerdown=e=>{
+      e.stopPropagation();
+      selectCue(c.id);
+      const kind=e.target===hs?'resize-start':e.target===he?'resize-end':'move';
+      beginCueDrag(e,c,kind);
+    };
+    dom.cues.appendChild(b);
+  });
+  dom.timelineStatus.textContent=`${v.cues.length} CUE${v.cues.length===1?'':'S'} · ZOOM ${state.zoom}×`;
+  if(dom.zoomLevel)dom.zoomLevel.textContent=`${state.zoom}×`;
+  updateTimelineUI();
+}
+function beginCueDrag(e,cue,kind){
+  const v=cueVideo(cue);if(!v)return;
+  const rect=dom.cues.getBoundingClientRect(),origS=cue.startTime,origE=cue.endTime,startX=e.clientX;
+  const move=ev=>{
+    const dt=((ev.clientX-startX)/rect.width)*v.duration;
+    if(kind==='move'){
+      const dur=origE-origS;cue.startTime=clamp(origS+dt,0,v.duration-dur);cue.endTime=cue.startTime+dur;
+    }else if(kind==='resize-start'){
+      cue.startTime=clamp(origS+dt,0,origE-CONFIG.MIN_CUE);
+    }else{
+      cue.endTime=clamp(origE+dt,origS+CONFIG.MIN_CUE,v.duration);
+    }
+    state.playhead=kind==='resize-start'?cue.startTime:cue.endTime;
+    renderTimeline();renderCueProps();
+  };
+  const up=()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up)};
+  window.addEventListener('pointermove',move);window.addEventListener('pointerup',up);
+}
+function seekTimeline(e){const v=selectedVideo();if(!v)return;const r=dom.cues.getBoundingClientRect();state.playhead=clamp(((e.clientX-r.left)/r.width)*v.duration,0,v.duration);if(v.editorEl)try{v.editorEl.currentTime=state.playhead}catch(_){}updateTimelineUI()}
+function updateTimelineUI(){const v=selectedVideo();if(!v)return;dom.timelineTime.textContent=fmt(state.playhead);dom.playhead.style.left=`${v.duration?state.playhead/v.duration*100:0}%`}
+function addCue(){const v=selectedVideo();if(!v||!v.duration){toast('Carga/selecciona un video primero');return}const s=clamp(state.playhead,0,v.duration),e=Math.min(v.duration,s+CONFIG.NEW_CUE);const c=makeCue(v.id,s,e,`Cue ${v.cues.length+1}`);v.cues.push(c);state.selectedCueId=c.id;renderAll()}
+function duplicateCue(){const c=selectedCue();if(!c)return;const v=cueVideo(c),d=cueDuration(c),s=Math.min(v.duration-d,c.endTime+.01);const n=makeCue(v.id,s,s+d,`${c.name} copia`);v.cues.push(n);state.selectedCueId=n.id;renderAll()}
+function deleteCue(){const c=selectedCue();if(!c)return;pads.forEach(p=>{if(p.cueId===c.id){stopPad(p.id);p.cueId=null}});const v=cueVideo(c);v.cues=v.cues.filter(x=>x.id!==c.id);state.selectedCueId=null;renderAll()}
+function splitCue(){const c=selectedCue();if(!c)return;const v=cueVideo(c),t=state.playhead;if(t<=c.startTime+CONFIG.MIN_CUE||t>=c.endTime-CONFIG.MIN_CUE){toast('El playhead debe estar dentro del cue');return}const old=c.endTime;c.endTime=t;const n=makeCue(v.id,t,old,`${c.name} B`);v.cues.push(n);state.selectedCueId=n.id;renderAll()}
+function mergeCue(){const c=selectedCue();if(!c)return;const v=cueVideo(c),a=v.cues.slice().sort((x,y)=>x.startTime-y.startTime),i=a.findIndex(x=>x.id===c.id);if(i<0||!a[i+1])return;const n=a[i+1];c.endTime=Math.max(c.endTime,n.endTime);pads.forEach(p=>{if(p.cueId===n.id)p.cueId=c.id});v.cues=v.cues.filter(x=>x.id!==n.id);renderAll()}
+function divide(n){const v=selectedVideo();if(!v||!v.duration)return;const old=new Set(v.cues.map(c=>c.id));v.cues=[];for(let i=0;i<n;i++){const s=v.duration*i/n,e=v.duration*(i+1)/n;v.cues.push(makeCue(v.id,s,e,`Cue ${i+1}`))}pads.forEach(p=>{if(old.has(p.cueId)){stopPad(p.id);p.cueId=null}});state.selectedCueId=v.cues[0]?.id||null;renderAll()}
+function selectCue(cid){state.selectedCueId=cid;const c=getCue(cid);if(c)state.playhead=c.startTime;renderCueProps();renderTimeline()}
+function applyCueField(kind,val){const c=selectedCue(),v=cueVideo(c);if(!c||!v)return;const n=parseTime(val);if(kind==='start')c.startTime=clamp(n,0,c.endTime-CONFIG.MIN_CUE);if(kind==='end')c.endTime=clamp(n,c.startTime+CONFIG.MIN_CUE,v.duration);if(kind==='duration')c.endTime=clamp(c.startTime+n,c.startTime+CONFIG.MIN_CUE,v.duration);state.playhead=c.startTime;renderAll()}
+
+/* ---------------- CUE PROPERTIES ---------------- */
+function renderCueProps(){
+  const c=selectedCue();if(!c){dom.cueEmpty.hidden=false;dom.cueForm.hidden=true;dom.cueLabel.textContent='NINGÚN CUE';return}
+  dom.cueEmpty.hidden=true;dom.cueForm.hidden=false;dom.cueLabel.textContent=c.name;dom.cueName.value=c.name;dom.cueStart.value=fmt(c.startTime);dom.cueEnd.value=fmt(c.endTime);dom.cueDur.value=fmt(cueDuration(c));
+  dom.cueAssign.innerHTML='';pads.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='assign-pad';b.textContent=`${p.id}`;b.classList.toggle('active',p.cueId===c.id);b.title=`PAD ${p.id} · ${p.key.toUpperCase()}`;b.onclick=()=>{p.cueId=p.cueId===c.id?null:c.id;renderAll()};dom.cueAssign.appendChild(b)});
+}
+
+/* ---------------- PAD UI ---------------- */
+const padRefs=new Map();
+function renderPads(){
+  dom.padsGrid.innerHTML='';padRefs.clear();dom.activePads.textContent=`${pads.filter(p=>p.playing).length}/16`;
+  pads.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='pad';b.classList.toggle('selected',p.id===state.selectedPadId);b.classList.toggle('playing',p.playing);b.classList.toggle('empty',!p.cueId);b.innerHTML=`<span class="pad-num">${p.id}</span><kbd>${p.key.toUpperCase()}</kbd><strong>${escapeHTML(p.cueId?(getCue(p.cueId)?.name||'CUE'):'—')}</strong><small>${p.playMode.toUpperCase()} · ${p.loop?'LOOP':'ONE SHOT'}</small><i></i>`;b.onclick=()=>{state.selectedPadId=p.id;if(p.playMode==='trigger')pressPad(p.id);renderPads();renderPadProps()};b.onpointerdown=e=>{if(p.playMode==='gate'){e.preventDefault();b.setPointerCapture?.(e.pointerId);pressPad(p.id)}};b.onpointerup=()=>releasePad(p.id);b.onpointercancel=()=>releasePad(p.id);dom.padsGrid.appendChild(b);padRefs.set(p.id,b)});
+  renderPadProps();
+}
+function updatePadTile(p){const b=padRefs.get(p.id);if(!b)return;b.classList.toggle('playing',p.playing);b.classList.toggle('selected',p.id===state.selectedPadId);b.classList.toggle('empty',!p.cueId)}
+function renderPadProps(){
+  const p=getPad(state.selectedPadId);if(!p)return;dom.padEmpty.hidden=true;dom.padForm.hidden=false;dom.padTitle.textContent=`PAD ${p.id}`;dom.padKey.textContent=p.key.toUpperCase();dom.padCue.textContent=p.cueId?(getCue(p.cueId)?.name||'CUE'): 'SIN CUE';
+  dom.padMode.textContent=p.playMode==='gate'?'GATE':'TRIGGER';dom.padMode.classList.toggle('active',p.playMode==='gate');dom.padLoop.classList.toggle('active',p.loop);dom.padMute.classList.toggle('active',p.muted);dom.padSolo.classList.toggle('active',p.solo);dom.padSync.classList.toggle('active',p.sync);
+  dom.padVol.value=p.volume;dom.padVolOut.textContent=`${Math.round(p.volume*100)}%`;dom.padHP.value=freqSlider(p.highPass,20,8000);dom.padHPOut.textContent=freq(p.highPass);dom.padLP.value=freqSlider(p.lowPass,20,20000);dom.padLPOut.textContent=freq(p.lowPass);dom.padRate.value=p.playbackRate;dom.padRateOut.textContent=`${p.playbackRate.toFixed(2)}×`;dom.padBpm.value=p.bpm;dom.padVisual.value=p.visualMode;
+}
+function freqSlider(v,min,max){return Math.log(v/min)/Math.log(max/min)}
+function sliderFreq(v,min,max){return min*Math.pow(max/min,Number(v))}
+function freq(v){return v>=1000?`${(v/1000).toFixed(1)}k`:`${Math.round(v)}Hz`}
+function unassignPad(){const p=getPad(state.selectedPadId);if(!p)return;stopPad(p.id);p.cueId=null;renderAll()}
+
+/* ---------------- VISUAL UI ---------------- */
+function renderVisualButtons(){dom.visualBtns.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.dataset.mode===state.visualizerMode));dom.visualModeLabel.textContent=state.visualizerMode.toUpperCase();dom.visualCount.textContent=`${state.visualSources.length}/${CONFIG.VIS_LIMIT[state.visualizerMode]}`}
+
+/* ---------------- KEYBOARD ---------------- */
+function bindKeyboard(){
+  window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;const k=e.key.toLowerCase(),i=CONFIG.KEY_MAP.indexOf(k);if(i<0||e.repeat)return;e.preventDefault();pressPad(i+1)});
+  window.addEventListener('keyup',e=>{const i=CONFIG.KEY_MAP.indexOf(e.key.toLowerCase());if(i>=0)releasePad(i+1)});
+  window.addEventListener('blur',()=>pads.forEach(p=>{if(p.playMode==='gate')stopPad(p.id)}));
+}
+
+/* ---------------- MIDI ---------------- */
+async function connectMIDI(){
+  if(!navigator.requestMIDIAccess){dom.midiStatus.textContent='NO SOPORTADO EN ESTE NAVEGADOR';return false}
+  if(!window.isSecureContext){dom.midiStatus.textContent='REQUIERE HTTPS / LOCALHOST';return false}
+  try{
+    if(!state.midiAccess)state.midiAccess=await navigator.requestMIDIAccess({sysex:false});
+    bindMIDIInputs();
+    state.midiAccess.onstatechange=()=>bindMIDIInputs();
+    return true;
+  }catch(e){console.error('MIDI:',e);state.midiConnected=false;dom.midiStatus.textContent=e.name==='SecurityError'?'PERMISO MIDI DENEGADO':'ERROR MIDI';return false}
+}
+function bindMIDIInputs(){
+  const inputs=[...state.midiAccess.inputs.values()];dom.midiSelect.innerHTML='<option value="">SELECCIONAR CONTROLADOR</option>';inputs.forEach(i=>{const o=document.createElement('option');o.value=i.id;o.textContent=i.name||i.manufacturer||i.id;dom.midiSelect.appendChild(o)});
+  if(state.midiInputId&&!inputs.some(i=>i.id===state.midiInputId))state.midiInputId='';
+  dom.midiSelect.value=state.midiInputId;
+  state.midiConnected=!!state.midiInputId;
+  inputs.forEach(i=>i.onmidimessage=state.midiInputId===i.id?onMIDI:null);
+  dom.midiStatus.textContent=inputs.length?(state.midiInputId?'CONECTADO':'DISPOSITIVO DETECTADO · SELECCIONA UNO'):'SIN DISPOSITIVOS';
+}
+function selectMIDI(idv){state.midiInputId=idv;bindMIDIInputs();}
+function onMIDI(e){
+  const [st,note,vel]=e.data,cmd=st&0xf0;const pi=note-CONFIG.MIDI_BASE; if(pi>=0&&pi<16){if(cmd===0x90&&vel>0)pressPad(pi+1);if(cmd===0x80||(cmd===0x90&&vel===0))releasePad(pi+1)}
+  const p=getPad(state.selectedPadId);if(cmd===0xb0&&p){if(note===112){p.highPass=20+(vel/127)*7980;if(p.hp)p.hp.frequency.value=p.highPass}if(note===113){p.lowPass=20+(vel/127)*19980;if(p.lp)p.lp.frequency.value=p.lowPass}renderPadProps()}
+}
+
+/* ---------------- BPM ---------------- */
+function tapBPM(){const now=performance.now();state.tapTimes=state.tapTimes.filter(t=>now-t<2200);state.tapTimes.push(now);if(state.tapTimes.length>1){const diffs=state.tapTimes.slice(1).map((t,i)=>t-state.tapTimes[i]);state.bpm=clamp(60000/(diffs.reduce((a,b)=>a+b,0)/diffs.length),30,300);dom.bpm.value=state.bpm;dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`}}
+
+/* ---------------- RECORDING ---------------- */
+async function toggleRecording(){if(state.recording){stopRecording();return}try{await ensureAudio();const stream=dom.canvas.captureStream(30);recordDest=new MediaStreamDestination();masterGain.connect(recordDest);const combined=new MediaStream([...stream.getVideoTracks(),...recordDest.stream.getAudioTracks()]);const types=['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'];const mime=types.find(x=>MediaRecorder.isTypeSupported(x));if(!mime)throw new Error('MediaRecorder no soportado');state.chunks=[];state.recorder=new MediaRecorder(combined,{mimeType:mime});state.recorder.ondataavailable=e=>e.data.size&&state.chunks.push(e.data);state.recorder.onstop=()=>{const blob=new Blob(state.chunks,{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`av-chopper-${Date.now()}.webm`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)};state.recorder.start();state.recording=true;state.recStart=Date.now();dom.record.classList.add('recording');dom.recordTimer.textContent='00:00';state.recTimer=setInterval(()=>{const s=Math.floor((Date.now()-state.recStart)/1000);dom.recordTimer.textContent=`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`},500);status('GRABANDO',true)}catch(e){console.error(e);toast('No se pudo iniciar la grabación')}}
+function stopRecording(){try{state.recorder?.stop()}catch(e){}state.recording=false;clearInterval(state.recTimer);state.recTimer=null;dom.record.classList.remove('recording');dom.recordTimer.textContent='00:00';if(recordDest){try{masterGain.disconnect(recordDest)}catch(e){}recordDest=null}status('READY')}
+
+/* ---------------- PROJECT ---------------- */
+function projectData(){return{version:3,globalBpm:state.bpm,masterVolume:state.master,visualizer:{mode:state.visualizerMode},videos:videos.map(v=>({id:v.id,name:v.name,sourceType:v.sourceType,fileName:v.fileName,youtubeId:v.youtubeId,duration:v.duration,cues:v.cues.map(c=>({id:c.id,name:c.name,startTime:c.startTime,endTime:c.endTime}))})),pads:pads.map(p=>({id:p.id,key:p.key,cueId:p.cueId,playMode:p.playMode,loop:p.loop,volume:p.volume,muted:p.muted,solo:p.solo,highPass:p.highPass,lowPass:p.lowPass,playbackRate:p.playbackRate,visualMode:p.visualMode,bpm:p.bpm,sync:p.sync}))}}
+function saveProject(){const blob=new Blob([JSON.stringify(projectData(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`av-chopper-v3-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function loadProjectFile(e){const f=e.target.files?.[0];e.target.value='';if(!f)return;const r=new FileReader();r.onload=()=>{try{loadProject(JSON.parse(r.result))}catch(err){console.error(err);toast('Proyecto inválido')}};r.readAsText(f)}
+function loadProject(d){clearProject(false);state.bpm=Number(d.globalBpm)||120;state.master=Number.isFinite(Number(d.masterVolume))?clamp(Number(d.masterVolume),0,1):.8;dom.master.value=state.master;dom.bpm.value=state.bpm;const map={};(d.videos||[]).forEach(x=>{const v=makeVideo({id:x.id,name:x.name,sourceType:x.sourceType,fileName:x.fileName,duration:x.duration,youtubeId:x.youtubeId});v.linked=v.sourceType==='youtube';v.cues=(x.cues||[]).map(c=>({id:c.id||id('cue'),videoId:v.id,name:c.name||'Cue',startTime:Number(c.startTime)||0,endTime:Number(c.endTime)||0}));videos.push(v);map[v.id]=v});for(let i=0;i<16;i++){const src=(d.pads||[]).find(p=>p.id===i+1),p=pads[i];if(src){p.cueId=src.cueId||null;p.playMode=src.playMode==='trigger'?'trigger':'gate';p.loop=src.loop!==undefined?!!src.loop:true;p.volume=src.volume!==undefined?clamp(Number(src.volume),0,1):1;p.muted=!!src.muted;p.solo=!!src.solo;p.highPass=Number(src.highPass)||20;p.lowPass=Number(src.lowPass)||20000;p.playbackRate=clamp(Number(src.playbackRate)||1,.25,4);p.visualMode=['auto','visible','hidden'].includes(src.visualMode)?src.visualMode:'auto';p.bpm=Number(src.bpm)||120;p.sync=!!src.sync}}state.visualizerMode=d.visualizer?.mode||'simple';state.selectedVideoId=videos[0]?.id||null;renderAll();toast('Proyecto cargado')}
+function clearProject(show=true){pads.forEach(p=>destroyPadEngine(p));videos.forEach(v=>{if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);if(v.editorEl)try{v.editorEl.remove()}catch(e){}});videos.length=0;pads.length=0;for(let i=0;i<16;i++)pads.push(makePad(i));state.selectedVideoId=null;state.selectedCueId=null;state.selectedPadId=1;state.playhead=0;state.visualSources=[];if(show)renderAll()}
+
+/* ---------------- UI BINDING ---------------- */
+function bind(){
+  dom.audioStart.onclick=()=>ensureAudio().then(()=>status('AUDIO READY',true)).catch(()=>{});
+  dom.master.oninput=e=>{state.master=Number(e.target.value);if(masterGain&&audioCtx)masterGain.gain.value=state.master};
+  dom.bpm.oninput=e=>{state.bpm=clamp(Number(e.target.value),30,300);dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`};dom.tap.onclick=tapBPM;
+  dom.record.onclick=toggleRecording;
+  dom.addLocal.onclick=()=>dom.mediaFile.click();dom.mediaFile.onchange=handleLocal;dom.addYT.onclick=addYouTube;
+  ['dragenter','dragover'].forEach(t=>dom.drop.addEventListener(t,e=>{e.preventDefault();dom.drop.classList.add('dragover')}));['dragleave','drop'].forEach(t=>dom.drop.addEventListener(t,e=>{e.preventDefault();dom.drop.classList.remove('dragover')}));dom.drop.addEventListener('drop',e=>{const f=e.dataTransfer.files?.[0];if(f)addLocalFile(f)});
+  dom.previewSource.onclick=()=>{const c=selectedCue();if(c)previewCue(c)};dom.renameVideo.onclick=renameVideo;dom.removeVideo.onclick=removeVideo;dom.relink?.addEventListener('click',()=>dom.relinkFile?.click());dom.relinkFile?.addEventListener('change',relinkFileHandler);
+  dom.cueNew.onclick=addCue;dom.cueDiv2.onclick=()=>divide(2);dom.cueDiv4.onclick=()=>divide(4);dom.cueDiv8.onclick=()=>divide(8);dom.cuePreview.onclick=()=>{const c=selectedCue();if(c)previewCue(c)};dom.cueStartBtn.onclick=()=>{const c=selectedCue();if(c){state.playhead=c.startTime;updateTimelineUI()}};dom.cueEndBtn.onclick=()=>{const c=selectedCue();if(c){state.playhead=c.endTime;updateTimelineUI()}};dom.cueDup.onclick=duplicateCue;dom.cueSplit.onclick=splitCue;dom.cueMerge.onclick=mergeCue;dom.cueDelete.onclick=deleteCue;
+  dom.cueName.onchange=e=>{const c=selectedCue();if(c){c.name=e.target.value.trim()||c.name;renderAll()}};dom.cueStart.onchange=e=>applyCueField('start',e.target.value);dom.cueEnd.onchange=e=>applyCueField('end',e.target.value);dom.cueDur.onchange=e=>applyCueField('duration',e.target.value);
+  dom.track.addEventListener('pointerdown',e=>{if(e.target===dom.track||e.target===dom.ruler||e.target===dom.cues)seekTimeline(e)});dom.timelinePlay.onclick=async()=>{const v=selectedVideo();if(!v)return;if(state.preview.playing){stopPreview();return}if(v.sourceType==='local'){const el=ensureEditor(v);await ensureAudio();if(el.paused){el.currentTime=state.playhead;el.play().catch(()=>{})}else el.pause()}};dom.timelineStart.onclick=()=>{state.playhead=0;const v=selectedVideo();if(v?.editorEl)v.editorEl.currentTime=0;updateTimelineUI()};dom.zoomIn.onclick=()=>{state.zoom=clamp(state.zoom*2,1,16);renderTimeline()};dom.zoomOut.onclick=()=>{state.zoom=clamp(state.zoom/2,1,16);renderTimeline()};
+  dom.visualBtns.addEventListener('click',e=>{const b=e.target.closest('button[data-mode]');if(b)setVisualMode(b.dataset.mode)});
+  dom.padTrigger.onclick=()=>pressPad(state.selectedPadId);dom.padMode.onclick=()=>{const p=getPad(state.selectedPadId);p.playMode=p.playMode==='gate'?'trigger':'gate';renderAll()};dom.padLoop.onclick=()=>{const p=getPad(state.selectedPadId);p.loop=!p.loop;renderAll()};dom.padMute.onclick=()=>{const p=getPad(state.selectedPadId);p.muted=!p.muted;updateAllGains();renderAll()};dom.padSolo.onclick=()=>{const p=getPad(state.selectedPadId);p.solo=!p.solo;updateAllGains();renderAll()};dom.padSync.onclick=()=>{const p=getPad(state.selectedPadId);p.sync=!p.sync;renderAll()};
+  dom.padVol.oninput=e=>{const p=getPad(state.selectedPadId);p.volume=Number(e.target.value);updatePadGain(p);renderPadProps()};dom.padHP.oninput=e=>{const p=getPad(state.selectedPadId);p.highPass=sliderFreq(e.target.value,20,8000);if(p.hp)p.hp.frequency.value=p.highPass;renderPadProps()};dom.padLP.oninput=e=>{const p=getPad(state.selectedPadId);p.lowPass=sliderFreq(e.target.value,20,20000);if(p.lp)p.lp.frequency.value=p.lowPass;renderPadProps()};dom.padRate.oninput=e=>{const p=getPad(state.selectedPadId);p.playbackRate=Number(e.target.value);if(p.engine?.videoEl)p.engine.videoEl.playbackRate=effectiveRate(p);renderPadProps()};dom.padBpm.onchange=e=>{const p=getPad(state.selectedPadId);p.bpm=clamp(Number(e.target.value),20,400);renderPadProps()};dom.padVisual.onchange=e=>{const p=getPad(state.selectedPadId);p.visualMode=e.target.value;if(p.visualMode==='hidden')removeVisual(p.id);else if(p.playing)activateVisual(p);renderCanvas()};dom.padUnassign.onclick=unassignPad;
+  dom.midiConnect.onclick=connectMIDI;dom.midiSelect.onchange=e=>selectMIDI(e.target.value);
+  dom.save.onclick=saveProject;dom.load.onclick=()=>dom.projectFile.click();dom.projectFile.onchange=loadProjectFile;dom.clear.onclick=()=>{if(confirm('¿Reiniciar proyecto?'))clearProject()};
+}
+
+function renderAll(){renderPlaylist();renderTimeline();renderCueProps();renderPads();renderVisualButtons();updateTimelineUI();dom.bpm.value=state.bpm;dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`;dom.master.value=state.master;renderCanvas();}
+
+/* ---------------- ANIMATION / PREVIEW END ---------------- */
+function tick(){
+  const v=selectedVideo();
+  if(state.preview.playing&&v?.editorEl){state.playhead=v.editorEl.currentTime;dom.timelineTime.textContent=fmt(state.playhead);dom.playhead.style.left=`${v.duration?state.playhead/v.duration*100:0}%`;if(state.playhead>=state.preview.end-.02){stopPreview();}}
+  if(v?.editorEl&&!v.editorEl.paused&&!state.preview.playing){state.playhead=v.editorEl.currentTime;updateTimelineUI()}
+  // Auto-stop pads at cue end unless looping. This avoids playing past the cue.
+  pads.forEach(p=>{if(!p.playing||p.playMode==='gate')return;const c=getCue(p.cueId),e=p.engine?.videoEl;if(c&&e&&e.currentTime>=c.endTime-.01){if(p.loop){try{e.currentTime=c.startTime;e.play()}catch(_){} }else stopPad(p.id)}});
+  renderCanvas();requestAnimationFrame(tick);
+}
+
+/* ---------------- INIT ---------------- */
+document.addEventListener('DOMContentLoaded',()=>{
+  // IMPORTANT: AudioContext is intentionally NOT created here.
+  bind();renderAll();status('READY');requestAnimationFrame(tick);
+  // MIDI is attempted only after a real user gesture through the CONNECT button.
+});
+
+</script>
 </body>
 </html>
