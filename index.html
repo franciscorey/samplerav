@@ -21,6 +21,8 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 .workspace{display:grid;grid-template-columns:250px minmax(0,1fr) 320px;gap:10px;align-items:start}.workspace>*{min-width:0}.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);min-width:0}.panel-head{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid var(--line);font:10px var(--mono);letter-spacing:.1em;color:var(--dim)}.panel-body{padding:10px}.section-title{font:9px var(--mono);color:var(--dim);letter-spacing:.12em;margin:0 0 6px}.stack{display:grid;gap:7px}.btn{padding:7px 9px;font-size:10px}.wide{width:100%}
 .source-input{display:grid;grid-template-columns:1fr auto;gap:5px}.source-input input,.field input,.field select,.cue-select{width:100%;min-width:0;background:var(--raised);border:1px solid var(--line);padding:7px 7px;border-radius:var(--r);font:10px var(--mono)}.drop{padding:9px;border:1px dashed var(--line2);text-align:center;color:var(--faint);font:9px var(--mono)}.drop.drag{border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan)}
 .playlist{display:grid;gap:4px;max-height:390px;overflow:auto}.playlist-row{display:grid;grid-template-columns:1fr 26px;gap:4px}.playlist-main{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center;padding:8px;text-align:left;min-width:0}.playlist-row.selected .playlist-main{border-color:var(--cyan);background:var(--cyan-dim)}.source-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}.source-dot.youtube{background:var(--red)}.playlist-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:10px var(--mono)}.playlist-meta{font:8px var(--mono);color:var(--dim)}.playlist-delete{padding:0;color:var(--red)}.project-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.project-grid .wide{grid-column:1/-1}.midi-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-row select{min-width:0}.midi-status,.hint{font:8px var(--mono);line-height:1.45;color:var(--dim)}
+.midi-card{display:grid;gap:6px;padding:7px;border:1px solid var(--line);background:#0d0f13}.midi-monitor{display:grid;gap:3px;font:8px var(--mono);color:var(--dim);min-height:29px}.midi-monitor strong{color:var(--cyan);font-weight:500}.midi-learn-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-learn-row button{padding:6px 8px;font:9px var(--mono)}
+.seq-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.seq-controls select,.seq-controls input{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.seq-grid-wrap{overflow:auto;border:1px solid var(--line);background:#0a0b0e}.seq-grid{display:grid;grid-template-columns:116px repeat(16,30px);min-width:596px}.seq-cell,.seq-head,.seq-label{height:28px;border-right:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055)}.seq-head{display:grid;place-items:center;font:8px var(--mono);color:var(--faint);background:#111318;position:sticky;top:0;z-index:2}.seq-label{display:flex;align-items:center;gap:5px;padding:0 6px;font:8px var(--mono);background:#111318;position:sticky;left:0;z-index:3;overflow:hidden}.seq-label strong{font-size:9px;color:var(--text)}.seq-label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}.seq-cell{position:relative;padding:3px;background:#101216;cursor:pointer}.seq-cell:hover{background:#1b2027}.seq-cell.active{background:var(--cyan-dim);box-shadow:inset 0 0 0 1px var(--cyan)}.seq-cell.current{box-shadow:inset 0 0 0 1px var(--yellow)}.seq-cell.current.active{box-shadow:inset 0 0 0 1px var(--cyan),inset 0 -3px 0 var(--yellow)}.seq-dot{display:block;width:100%;height:100%;background:transparent}.seq-cell.active .seq-dot{background:var(--cyan)}.seq-summary{display:flex;justify-content:space-between;gap:8px;font:8px var(--mono);color:var(--dim)}
 .center{display:grid;gap:9px;min-width:0}.visor{position:relative;height:min(48vw,540px);min-height:320px;overflow:hidden;background:#050608;border:1px solid var(--line2);contain:paint}.visor canvas{display:block;width:100%;height:100%;background:#050608}.visor-overlay{position:absolute;inset:0;pointer-events:none}.visor-top,.visor-bottom{position:absolute;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.visor-top{top:8px}.visor-bottom{bottom:8px;align-items:end}.visor-chip{padding:5px 7px;background:rgba(0,0,0,.65);border:1px solid var(--line);font:9px var(--mono);color:var(--dim)}.visor-chip strong{color:var(--cyan)}.visor-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#454b55;font:10px var(--mono)}.visual-buttons{display:flex;gap:4px;pointer-events:auto}.visual-buttons button{padding:4px 7px;font:9px var(--mono)}.yt-preview{position:absolute;inset:0;display:none;background:#000;pointer-events:auto}.yt-preview.show{display:block}.yt-preview iframe{width:100%;height:100%;border:0}
 .timeline-panel{min-width:0;overflow:hidden}.timeline-toolbar{display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--line);min-width:0}.timeline-toolbar .title{flex:1;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.timeline-toolbar .time{font:10px var(--mono);color:var(--dim);white-space:nowrap}.timeline-toolbar button{padding:5px 7px;font:9px var(--mono)}.timeline-toolbar .zoom-label{min-width:35px;text-align:center}.timeline-wrap{padding:8px;background:#0b0c0f;min-width:0}.timeline-viewport{height:168px;width:100%;overflow:auto;overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);background:#090a0d;min-width:0;contain:layout paint}.timeline-content{position:relative;width:100%;min-width:600px;height:136px}.ruler{position:absolute;left:0;top:0;height:28px;min-width:100%;border-bottom:1px solid var(--line)}.ruler span{position:absolute;top:8px;transform:translateX(-50%);font:8px var(--mono);color:var(--faint);white-space:nowrap}.track{position:absolute;left:0;right:0;top:28px;height:108px;background:repeating-linear-gradient(90deg,transparent 0,transparent 49px,rgba(255,255,255,.035) 50px)}.cue-layer{position:absolute;inset:16px 0 12px}.cue-block{position:absolute;top:10px;height:68px;min-width:8px;padding:7px 11px;background:var(--green);color:#07120b;border:1px solid #d6ffe0;border-radius:3px;overflow:hidden;cursor:grab;display:flex;flex-direction:column;justify-content:space-between;touch-action:none;user-select:none}.cue-block:active{cursor:grabbing}.cue-block.selected{background:var(--cyan);box-shadow:0 0 0 2px rgba(0,255,204,.2)}.cue-block strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cue-block small{font:8px var(--mono);white-space:nowrap}.cue-handle{position:absolute;top:0;bottom:0;width:8px;background:rgba(0,0,0,.12);opacity:0}.cue-block:hover .cue-handle,.cue-block.selected .cue-handle{opacity:.85}.cue-handle.start{left:0;cursor:ew-resize}.cue-handle.end{right:0;cursor:ew-resize}.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--red);box-shadow:0 0 8px rgba(255,104,118,.5);z-index:4;pointer-events:none}.playhead:before{content:"";position:absolute;left:-4px;top:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--red)}.timeline-status{display:flex;justify-content:space-between;gap:10px;padding:6px 2px 0;color:var(--dim);font:8px var(--mono)}
 .cue-panel .panel-body,.pad-panel .panel-body{display:grid;gap:8px}.cue-title{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.empty{padding:10px 0;color:var(--faint);font:10px var(--mono);line-height:1.45}.field{display:grid;gap:4px}.field label,.small-label{font:8px var(--mono);color:var(--dim);letter-spacing:.08em}.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.time-grid .full{grid-column:1/-1}.cue-tools{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cue-tools .wide{grid-column:1/-1}.assign-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.assign-pad{padding:6px 3px;font:9px var(--mono);text-align:left}.assign-pad span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.assign-pad small{display:block;margin-top:2px;color:var(--dim);font:7px var(--mono)}.assign-pad.active small{color:var(--cyan)}
@@ -64,7 +66,11 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div class="section-title" style="margin-top:4px">MIDI</div>
       <div class="midi-row"><select id="midiInputSelect"><option value="">SELECCIONAR CONTROLADOR</option></select><button id="midiConnectButton" class="btn">CONECTAR</button></div>
       <div id="midiStatus" class="midi-status">NO CONECTADO · PULSA CONECTAR</div>
-      <div class="hint">Pads MIDI: 36–51. Web MIDI requiere navegador compatible y contexto seguro.</div>
+      <div class="midi-card">
+        <div class="midi-learn-row"><button id="midiDetectButton" class="btn">DETECTAR MIDI</button><button id="midiLearnButton" class="btn">LEARN PAD</button></div>
+        <div class="midi-monitor"><div>PAD MIDI: <strong id="midiPadMapping">36 · CH ANY</strong></div><div>ÚLTIMO: <span id="midiLastMessage">—</span></div></div>
+      </div>
+      <div class="hint">Selecciona un pad y pulsa LEARN PAD; luego pulsa un pad o tecla de tu controlador. El mapeo queda guardado en el proyecto.</div>
     </div>
   </aside>
 
@@ -149,18 +155,20 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 </section>
 
 <section class="panel sequencer-panel" style="margin-top:10px">
-  <div class="panel-head"><span>05 · SECUENCIADOR</span><span id="seqStatus">0 PASOS</span></div>
+  <div class="panel-head"><span>05 · SECUENCIADOR</span><span id="seqStatus">16 PASOS · 0 ACTIVOS</span></div>
   <div class="panel-body stack">
-    <div class="cue-tools">
-      <button id="seqAddStepButton" type="button" class="btn wide active">+ AGREGAR PASO · PAD SELECCIONADO</button>
+    <div class="seq-controls">
+      <div><label class="small-label">RESOLUCIÓN</label><select id="seqDivision"><option value="1/16">1/16</option><option value="1/8">1/8</option><option value="1/4">1/4</option></select></div>
+      <div><label class="small-label">SWING</label><input id="seqSwing" type="range" min="0" max="50" value="0" step="1"><div id="seqSwingOutput" class="hint">0%</div></div>
+      <div style="display:grid;align-items:end"><button id="seqFollowButton" type="button" class="btn wide active">FOLLOW PAD</button></div>
     </div>
-    <div id="seqList" class="stack" style="max-height:220px;overflow:auto"></div>
+    <div id="seqGridWrap" class="seq-grid-wrap"><div id="seqGrid" class="seq-grid"></div></div>
     <div class="cue-tools">
-      <button id="seqPlayButton" type="button" class="btn wide">▶ REPRODUCIR SECUENCIA</button>
+      <button id="seqPlayButton" type="button" class="btn wide active">▶ REPRODUCIR SECUENCIA</button>
       <button id="seqLoopButton" type="button" class="btn active">LOOP</button>
-      <button id="seqClearButton" type="button" class="btn danger wide">VACIAR SECUENCIA</button>
+      <button id="seqClearButton" type="button" class="btn danger wide">VACIAR PATRÓN</button>
     </div>
-    <div class="hint">Selecciona un pad en el panel 04 y pulsa "AGREGAR PASO" para sumarlo al final. Ajusta la duración (segundos) de cada paso y reordénalos con las flechas.</div>
+    <div class="seq-summary"><span id="seqPatternInfo">120 BPM · 1/16</span><span>CLICK CELDA = ACTIVAR · SELECTOR DE PAD = EDITA FILA</span></div>
   </div>
 </section>
 
@@ -175,233 +183,3456 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 <script>
 "use strict";
 
-const CONFIG={
-  PAD_COUNT:16,
-  KEY_MAP:["1","2","3","4","q","w","e","r","a","s","d","f","z","x","c","v"],
-  MIDI_BASE:36, DEFAULT_BPM:120, DEFAULT_MASTER:.8, NEW_CUE:2, MIN_CUE:.05,
-  MIN_RATE:.25, MAX_RATE:2, VIS_LIMIT:{simple:1,split2:2,split4:4}, ZOOM_MAX:16
-};
-const $=id=>document.getElementById(id);
-let uid=0; const makeId=p=>`${p}-${Date.now().toString(36)}-${(++uid).toString(36)}`;
-const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
-const fmt=s=>{s=Math.max(0,Number(s)||0);const m=Math.floor(s/60),sec=s-m*60;return `${String(m).padStart(2,"0")}:${sec.toFixed(3).padStart(6,"0")}`};
-const parseTime=v=>{if(typeof v==="number")return Math.max(0,v);const s=String(v??"").trim();if(!s)return 0;if(/^\d+(?::\d{1,2}(?:\.\d{1,3})?)?$/.test(s)){if(!s.includes(":"))return Math.max(0,Number(s));const [m,sec]=s.split(":");return Math.max(0,(Number(m)||0)*60+(Number(sec)||0))}return Math.max(0,Number(s)||0)};
-const cueDuration=c=>Math.max(0,c.endTime-c.startTime);
-const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]));
+/* ==========================================================
+   AV CHOPPER V3 — REFACTORED CORE
+   Arquitectura:
+   PLAYLIST → CUES → PADS → PERFORMANCE
+                  ↘ SECUENCIADOR
+   El playhead pertenece al EDITOR. La performance es independiente.
+========================================================== */
 
-function makeVideo(d={}){return{
-  id:d.id||makeId("video"),name:d.name||d.fileName||"Video",sourceType:d.sourceType==="youtube"?"youtube":"local",mediaKind:d.mediaKind||"video",
-  sourceUrl:d.sourceUrl||null,fileName:d.fileName||"",youtubeId:d.youtubeId||"",duration:Number(d.duration)||0,linked:d.sourceType==="youtube"?true:!!d.sourceUrl,
-  cues:Array.isArray(d.cues)?d.cues:[],editorEl:null,editorSource:null,editorGain:null
-}}
-function makeCue(videoId,start=0,end=2,name="Cue"){return{id:makeId("cue"),videoId,name,startTime:start,endTime:end,imageUrl:null}}
-function makePad(n){return{
-  id:n+1,key:CONFIG.KEY_MAP[n],midiNote:CONFIG.MIDI_BASE+n,cueId:null,playMode:"gate",loop:true,volume:1,muted:false,solo:false,
-  highPass:20,lowPass:20000,playbackRate:1,visualMode:"auto",bpm:120,sync:false,playing:false,token:0,
-  engine:null,audioSource:null,hp:null,lp:null,gain:null
-}}
-
-const videos=[];const pads=Array.from({length:CONFIG.PAD_COUNT},(_,i)=>makePad(i));
-const state={selectedVideoId:null,selectedCueId:null,selectedPadId:1,playhead:0,zoom:1,visualizerMode:"simple",visualSources:[],master:CONFIG.DEFAULT_MASTER,bpm:CONFIG.DEFAULT_BPM,midiAccess:null,midiInputId:"",midiConnected:false,preview:{videoId:null,playing:false,end:0,type:null,timer:null},recording:false,recorder:null,chunks:[],recTimer:null,recStart:0,tapTimes:[],sequencer:{steps:[],playing:false,index:-1,loop:true,timer:null},scrubbing:false};
-let audioCtx=null,masterGain=null,recordDest=null,ytApiPromise=null;
-
-const dom={
-  statusDot:$('statusDot'),statusText:$('statusText'),audioStart:$('audioStartButton'),record:$('recordButton'),recordTimer:$('recordingTimer'),master:$('masterVolume'),bpm:$('globalBpm'),bpmValue:$('globalBpmValue'),tap:$('globalTapButton'),
-  playlistCount:$('playlistCount'),addLocal:$('addLocalVideoButton'),addYT:$('addYoutubeVideoButton'),ytUrl:$('youtubeUrlInput'),drop:$('videoDropZone'),playlist:$('playlistList'),selectedVideoActions:$('selectedVideoActions'),renameVideo:$('renameVideoButton'),relinkVideo:$('relinkVideoButton'),removeVideo:$('removeVideoButton'),clear:$('clearProjectButton'),save:$('saveProjectButton'),load:$('loadProjectButton'),projectFile:$('projectFileInput'),relinkFile:$('relinkFileInput'),
-  midiConnect:$('midiConnectButton'),midiSelect:$('midiInputSelect'),midiStatus:$('midiStatus'),
-  visorContext:$('visorContext'),canvas:$('outputCanvas'),placeholder:$('visualizerPlaceholder'),ytPreview:$('ytPreview'),visualBtns:$('visualizerModeButtons'),visualModeLabel:$('visualizerModeLabel'),visualCount:$('visualSourceCount'),
-  timelineTitle:$('timelineTitle'),timelineViewport:$('timelineViewport'),timelineContent:$('timelineContent'),timelineRuler:$('timelineRuler'),timelineTrack:$('timelineTrack'),cues:$('timelineCues'),playhead:$('timelinePlayhead'),timelineStatus:$('timelineStatus'),timelinePlay:$('transportPlayPause'),timelineStart:$('transportGoStart'),timelineTime:$('playheadTimeLabel'),timelineDuration:$('timelineDuration'),zoomOut:$('timelineZoomOut'),zoomLevel:$('timelineZoomLevel'),zoomIn:$('timelineZoomIn'),
-  cueNew:$('cueNewButton'),cueLabel:$('selectedCueLabel'),cueEmpty:$('cuePropsEmpty'),cueForm:$('cuePropsForm'),cueEditorTitle:$('cueEditorTitle'),cueName:$('cueNameInput'),cueStart:$('cueStartInput'),cueEnd:$('cueEndInput'),cueDur:$('cueDurationInput'),cuePreview:$('cuePreviewButton'),cueStartBtn:$('cueGoStartButton'),cueEndBtn:$('cueGoEndButton'),cueDup:$('cueDuplicateButton'),cueSplit:$('cueSplitButton'),cueMerge:$('cueMergeButton'),cueDelete:$('cueDeleteButton'),cueDivide2:$('cueDivide2'),cueDivide4:$('cueDivide4'),cueDivide8:$('cueDivide8'),cueAssign:$('cuePadAssignGrid'),cueImage:$('cueImageInput'),
-  padsGrid:$('padsGrid'),activePads:$('activePadCount'),padSelectedLabel:$('padSelectedLabel'),padTitle:$('padDetailTitle'),padKey:$('padKeyLabel'),padCueSelect:$('padCueSelect'),padCue:$('padCueLabel'),padTrigger:$('padTriggerButton'),padMode:$('padModeButton'),padLoop:$('padLoopButton'),padMute:$('padMuteButton'),padSolo:$('padSoloButton'),padVol:$('padVolumeInput'),padVolOut:$('padVolumeOutput'),padHP:$('padHPInput'),padHPOut:$('padHPOutput'),padLP:$('padLPInput'),padLPOut:$('padLPOutput'),padRate:$('padRateInput'),padRateOut:$('padRateOutput'),padRateReset:$('padRateResetButton'),padRateBpm:$('padRateBpmHint'),padBpm:$('padBpmInput'),padSync:$('padSyncButton'),padVisual:$('padVisualSelect'),padUnassign:$('padUnassignButton'),
-  videoBank:$('videoBank'),mediaFile:$('mediaFileInput'),projectFile:$('projectFileInput'),relinkFile:$('relinkFileInput'),toast:$('toastRegion'),
-  seqStatus:$('seqStatus'),seqAddStep:$('seqAddStepButton'),seqList:$('seqList'),seqPlay:$('seqPlayButton'),seqLoop:$('seqLoopButton'),seqClear:$('seqClearButton')
+const CONFIG = {
+  PAD_COUNT: 16,
+  SEQ_STEPS: 16,
+  KEY_MAP: ["1","2","3","4","q","w","e","r","a","s","d","f","z","x","c","v"],
+  MIDI_BASE: 36,
+  DEFAULT_BPM: 120,
+  DEFAULT_MASTER: 0.8,
+  NEW_CUE: 2,
+  MIN_CUE: 0.05,
+  MIN_RATE: 0.25,
+  MAX_RATE: 2,
+  VIS_LIMIT: { simple: 1, split2: 2, split4: 4 },
+  ZOOM_MAX: 16,
+  SEQ_DIVISIONS: {
+    "1/16": 0.25,
+    "1/8": 0.5,
+    "1/4": 1
+  },
+  SEQ_LOOKAHEAD: 0.10,
+  SEQ_SCHEDULER_MS: 25
 };
 
-function status(text,on=false){dom.statusText.textContent=text;dom.statusDot.classList.toggle('on',on)}
-function toast(text){dom.toast.textContent=text;dom.toast.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>dom.toast.classList.remove('show'),2200)}
-function getVideo(v){return videos.find(x=>x.id===v)||null} function getCue(c){for(const v of videos){const hit=v.cues.find(x=>x.id===c);if(hit)return hit}return null} function getPad(n){return pads.find(p=>p.id===n)||null}
-function selectedVideo(){return getVideo(state.selectedVideoId)} function selectedCue(){return getCue(state.selectedCueId)} function cueVideo(c){return c?getVideo(c.videoId):null}
+const $ = id => document.getElementById(id);
+let uid = 0;
 
-/* ---------- AUDIO ---------- */
-async function ensureAudio(){
-  if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(!C){status("AUDIO NO SOPORTADO");throw Error("AudioContext no soportado")};audioCtx=new C();masterGain=audioCtx.createGain();masterGain.gain.value=state.master;masterGain.connect(audioCtx.destination)}
-  if(audioCtx.state==="suspended")await audioCtx.resume();dom.audioStart.textContent="AUDIO ✓";dom.audioStart.classList.add("active");
+function makeId(prefix) {
+  uid += 1;
+  return `${prefix}-${Date.now().toString(36)}-${uid.toString(36)}`;
 }
-function connectPadAudio(p,el){if(!audioCtx||p.audioSource)return;try{p.audioSource=audioCtx.createMediaElementSource(el);p.hp=audioCtx.createBiquadFilter();p.lp=audioCtx.createBiquadFilter();p.gain=audioCtx.createGain();p.hp.type="highpass";p.lp.type="lowpass";p.hp.frequency.value=p.highPass;p.lp.frequency.value=p.lowPass;p.audioSource.connect(p.hp).connect(p.lp).connect(p.gain).connect(masterGain);updatePadGain(p)}catch(e){console.error(e);toast("No se pudo conectar el audio del pad")}}
-function connectEditorAudio(v,el){if(!audioCtx||v.editorSource)return;try{v.editorSource=audioCtx.createMediaElementSource(el);v.editorGain=audioCtx.createGain();v.editorGain.gain.value=.9;v.editorSource.connect(v.editorGain).connect(masterGain)}catch(e){console.error(e)}}
-function updatePadGain(p){const solo=pads.some(x=>x.solo),g=p.muted||(solo&&!p.solo)?0:clamp(p.volume,0,1);if(p.gain&&audioCtx)p.gain.gain.setTargetAtTime(g,audioCtx.currentTime,.01);updateYTVolume(p)}
-function updateAllGains(){pads.forEach(updatePadGain)}
-function destroyPadEngine(p){p.token++;if(p.audioSource)try{p.audioSource.disconnect()}catch{};[p.hp,p.lp,p.gain].forEach(n=>{if(n)try{n.disconnect()}catch{}});if(p.engine?.videoEl)try{p.engine.videoEl.pause();p.engine.videoEl.remove()}catch{};if(p.engine?.player)try{p.engine.player.destroy()}catch{};if(p.engine?.host)try{p.engine.host.remove()}catch{};p.audioSource=p.hp=p.lp=p.gain=null;p.engine=null;p.playing=false;removeVisual(p.id)}
 
-/* ---------- PLAYBACK ---------- */
-function findPadCue(p){return getCue(p.cueId)}
-function effectiveRate(p){return p.sync&&p.bpm>0?clamp(state.bpm/p.bpm*p.playbackRate,CONFIG.MIN_RATE,CONFIG.MAX_RATE):p.playbackRate}
-function ensurePadEngine(p,v){if(p.engine&&p.engine.videoId===v.id)return p.engine;destroyPadEngine(p);if(v.sourceType==="local"){
-    const el=document.createElement(v.mediaKind==="audio"?"audio":"video");el.src=v.sourceUrl||"";el.preload="auto";el.playsInline=true;el.crossOrigin="anonymous";el.dataset.pad=p.id;el.addEventListener("error",()=>{p.playing=false;updatePadTile(p);toast(`PAD ${p.id}: error de fuente`)});el.addEventListener("ended",()=>{if(!p.playing)return;const c=findPadCue(p);if(p.loop&&c){try{el.currentTime=c.startTime;el.play()}catch{}}else stopPad(p.id)})
-    dom.videoBank.appendChild(el);p.engine={kind:"local",videoId:v.id,videoEl:el};if(audioCtx)connectPadAudio(p,el)
-  }else{
-    const host=document.createElement("div");host.style.display="none";host.id=`yt-pad-${p.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`;dom.videoBank.appendChild(host);p.engine={kind:"youtube",videoId:v.id,host,player:null,ready:false};
-    loadYouTubeAPI().then(()=>{if(!p.engine||p.engine.videoId!==v.id)return;p.engine.player=new YT.Player(host.id,{videoId:v.youtubeId,width:280,height:158,playerVars:{autoplay:0,controls:1,playsinline:1,rel:0},events:{onReady:()=>{if(p.engine){p.engine.ready=true;updateYTVolume(p)}}}})}).catch(()=>toast("YouTube API no disponible"))
-  }return p.engine}
-async function startPad(n){const p=getPad(n),c=p?.cueId?findPadCue(p):null,v=c?cueVideo(c):null;if(!p||!c||!v){status(`PAD ${n}: SIN CUE`);return}if(v.sourceType==="local"&&!v.sourceUrl){toast("Fuente local no vinculada");return}try{await ensureAudio()}catch{return}const engine=ensurePadEngine(p,v),token=++p.token;
-  if(v.sourceType==="local"){
-    const el=engine.videoEl;const go=()=>{if(token!==p.token)return;try{el.currentTime=clamp(c.startTime,0,Math.max(0,(el.duration||v.duration||c.startTime)));el.playbackRate=effectiveRate(p);if("preservesPitch" in el)el.preservesPitch=false}catch{};el.play().then(()=>{if(token===p.token){p.playing=true;activateVisual(p);updatePadTile(p);status(`PLAY PAD ${n}`,true)}}).catch(()=>toast(`PAD ${n}: reproducción bloqueada`))};
-    if(el.readyState>=1)go();else el.addEventListener("loadedmetadata",go,{once:true});
-  }else{
-    const attempt=()=>{if(token!==p.token)return;const player=engine.player;if(!engine.ready||!player){setTimeout(attempt,80);return}try{player.seekTo(c.startTime,true);player.setPlaybackRate(clamp(effectiveRate(p),CONFIG.MIN_RATE,CONFIG.MAX_RATE));updateYTVolume(p);player.playVideo();p.playing=true;activateVisual(p);updatePadTile(p);status(`PLAY PAD ${n}`,true)}catch{toast(`PAD ${n}: error YouTube`)}};attempt();
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const cueDuration = c => Math.max(0, c.endTime - c.startTime);
+
+function fmt(seconds) {
+  const s = Math.max(0, Number(seconds) || 0);
+  const m = Math.floor(s / 60);
+  const sec = s - m * 60;
+  return `${String(m).padStart(2, "0")}:${sec.toFixed(3).padStart(6, "0")}`;
+}
+
+function parseTime(value) {
+  if (typeof value === "number" && Number.isFinite(value)) return Math.max(0, value);
+  const s = String(value ?? "").trim();
+  if (!s) return 0;
+  if (/^\d+(?::\d{1,2}(?:\.\d{1,3})?)?$/.test(s)) {
+    if (!s.includes(":")) return Math.max(0, Number(s));
+    const [m, sec] = s.split(":");
+    return Math.max(0, (Number(m) || 0) * 60 + (Number(sec) || 0));
+  }
+  return Math.max(0, Number(s) || 0);
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
+function makeVideo(data = {}) {
+  return {
+    id: data.id || makeId("video"),
+    name: data.name || data.fileName || "Video",
+    sourceType: data.sourceType === "youtube" ? "youtube" : "local",
+    mediaKind: data.mediaKind || "video",
+    sourceUrl: data.sourceUrl || null,
+    fileName: data.fileName || "",
+    youtubeId: data.youtubeId || "",
+    duration: Number(data.duration) || 0,
+    linked: data.sourceType === "youtube" ? true : !!data.sourceUrl,
+    cues: Array.isArray(data.cues) ? data.cues : [],
+    editorEl: null,
+    editorSource: null,
+    editorGain: null
+  };
+}
+
+function makeCue(videoId, start = 0, end = 2, name = "Cue") {
+  return {
+    id: makeId("cue"),
+    videoId,
+    name,
+    startTime: start,
+    endTime: end,
+    imageUrl: null
+  };
+}
+
+function makePad(index) {
+  return {
+    id: index + 1,
+    key: CONFIG.KEY_MAP[index],
+    midiNote: CONFIG.MIDI_BASE + index,
+    midiChannel: null,
+    cueId: null,
+    playMode: "gate",
+    loop: true,
+    volume: 1,
+    muted: false,
+    solo: false,
+    highPass: 20,
+    lowPass: 20000,
+    playbackRate: 1,
+    visualMode: "auto",
+    bpm: CONFIG.DEFAULT_BPM,
+    sync: false,
+    playing: false,
+    token: 0,
+    engine: null,
+    audioSource: null,
+    hp: null,
+    lp: null,
+    gain: null,
+    sequenceOwned: false
+  };
+}
+
+const videos = [];
+const pads = Array.from({ length: CONFIG.PAD_COUNT }, (_, i) => makePad(i));
+
+function makeSequenceStep() {
+  return { pads: [] };
+}
+
+const state = {
+  selectedVideoId: null,
+  selectedCueId: null,
+  selectedPadId: 1,
+  playhead: 0,
+  zoom: 1,
+
+  visualizerMode: "simple",
+  visualSources: [],
+
+  master: CONFIG.DEFAULT_MASTER,
+  bpm: CONFIG.DEFAULT_BPM,
+
+  midiAccess: null,
+  midiInputId: "",
+  midiConnected: false,
+  midiLearnPadId: null,
+  midiDetecting: false,
+
+  preview: {
+    videoId: null,
+    cueId: null,
+    playing: false,
+    end: 0,
+    type: null,
+    timer: null
+  },
+
+  recording: false,
+  recorder: null,
+  chunks: [],
+  recordDest: null,
+  recordStream: null,
+  recTimer: null,
+  recStart: 0,
+
+  tapTimes: [],
+  scrubbing: false,
+  lastYTPoll: 0,
+
+  sequencer: {
+    pattern: Array.from({ length: CONFIG.SEQ_STEPS }, () => makeSequenceStep()),
+    division: "1/16",
+    swing: 0,
+    playing: false,
+    index: -1,
+    loop: true,
+    followPad: true,
+    schedulerTimer: null,
+    nextDue: 0,
+    cursor: -1,
+    scheduleToken: 0,
+    activePads: new Set()
+  }
+};
+
+let audioCtx = null;
+let masterGain = null;
+let ytApiPromise = null;
+const imageCache = new Map();
+
+const dom = {
+  statusDot: $("statusDot"),
+  statusText: $("statusText"),
+  audioStart: $("audioStartButton"),
+  record: $("recordButton"),
+  recordTimer: $("recordingTimer"),
+  master: $("masterVolume"),
+  bpm: $("globalBpm"),
+  bpmValue: $("globalBpmValue"),
+  tap: $("globalTapButton"),
+
+  playlistCount: $("playlistCount"),
+  addLocal: $("addLocalVideoButton"),
+  addYT: $("addYoutubeVideoButton"),
+  ytUrl: $("youtubeUrlInput"),
+  drop: $("videoDropZone"),
+  playlist: $("playlistList"),
+  selectedVideoActions: $("selectedVideoActions"),
+  renameVideo: $("renameVideoButton"),
+  relinkVideo: $("relinkVideoButton"),
+  removeVideo: $("removeVideoButton"),
+  clear: $("clearProjectButton"),
+  save: $("saveProjectButton"),
+  load: $("loadProjectButton"),
+  projectFile: $("projectFileInput"),
+  relinkFile: $("relinkFileInput"),
+
+  midiConnect: $("midiConnectButton"),
+  midiDetect: $("midiDetectButton"),
+  midiLearn: $("midiLearnButton"),
+  midiSelect: $("midiInputSelect"),
+  midiStatus: $("midiStatus"),
+  midiPadMapping: $("midiPadMapping"),
+  midiLastMessage: $("midiLastMessage"),
+
+  visorContext: $("visorContext"),
+  canvas: $("outputCanvas"),
+  placeholder: $("visualizerPlaceholder"),
+  ytPreview: $("ytPreview"),
+  visualBtns: $("visualizerModeButtons"),
+  visualModeLabel: $("visualizerModeLabel"),
+  visualCount: $("visualSourceCount"),
+
+  timelineTitle: $("timelineTitle"),
+  timelineViewport: $("timelineViewport"),
+  timelineContent: $("timelineContent"),
+  timelineRuler: $("timelineRuler"),
+  cues: $("timelineCues"),
+  playhead: $("timelinePlayhead"),
+  timelineStatus: $("timelineStatus"),
+  timelinePlay: $("transportPlayPause"),
+  timelineStart: $("transportGoStart"),
+  timelineTime: $("playheadTimeLabel"),
+  timelineDuration: $("timelineDuration"),
+  zoomOut: $("timelineZoomOut"),
+  zoomLevel: $("timelineZoomLevel"),
+  zoomIn: $("timelineZoomIn"),
+
+  cueNew: $("cueNewButton"),
+  cueLabel: $("selectedCueLabel"),
+  cueEmpty: $("cuePropsEmpty"),
+  cueForm: $("cuePropsForm"),
+  cueEditorTitle: $("cueEditorTitle"),
+  cueName: $("cueNameInput"),
+  cueStart: $("cueStartInput"),
+  cueEnd: $("cueEndInput"),
+  cueDur: $("cueDurationInput"),
+  cueImage: $("cueImageInput"),
+  cuePreview: $("cuePreviewButton"),
+  cueStartBtn: $("cueGoStartButton"),
+  cueEndBtn: $("cueGoEndButton"),
+  cueDup: $("cueDuplicateButton"),
+  cueSplit: $("cueSplitButton"),
+  cueMerge: $("cueMergeButton"),
+  cueDelete: $("cueDeleteButton"),
+  cueDivide2: $("cueDivide2"),
+  cueDivide4: $("cueDivide4"),
+  cueDivide8: $("cueDivide8"),
+  cueAssign: $("cuePadAssignGrid"),
+
+  padsGrid: $("padsGrid"),
+  activePads: $("activePadCount"),
+  padSelectedLabel: $("padSelectedLabel"),
+  padTitle: $("padDetailTitle"),
+  padKey: $("padKeyLabel"),
+  padCueSelect: $("padCueSelect"),
+  padCue: $("padCueLabel"),
+  padTrigger: $("padTriggerButton"),
+  padMode: $("padModeButton"),
+  padLoop: $("padLoopButton"),
+  padMute: $("padMuteButton"),
+  padSolo: $("padSoloButton"),
+  padVol: $("padVolumeInput"),
+  padVolOut: $("padVolumeOutput"),
+  padHP: $("padHPInput"),
+  padHPOut: $("padHPOutput"),
+  padLP: $("padLPInput"),
+  padLPOut: $("padLPOutput"),
+  padRate: $("padRateInput"),
+  padRateOut: $("padRateOutput"),
+  padRateReset: $("padRateResetButton"),
+  padRateBpm: $("padRateBpmHint"),
+  padBpm: $("padBpmInput"),
+  padSync: $("padSyncButton"),
+  padVisual: $("padVisualSelect"),
+  padUnassign: $("padUnassignButton"),
+
+  videoBank: $("videoBank"),
+  mediaFile: $("mediaFileInput"),
+  projectFileInput: $("projectFileInput"),
+  relinkFileInput: $("relinkFileInput"),
+  toast: $("toastRegion"),
+
+  seqStatus: $("seqStatus"),
+  seqGrid: $("seqGrid"),
+  seqDivision: $("seqDivision"),
+  seqSwing: $("seqSwing"),
+  seqSwingOutput: $("seqSwingOutput"),
+  seqFollow: $("seqFollowButton"),
+  seqPlay: $("seqPlayButton"),
+  seqLoop: $("seqLoopButton"),
+  seqClear: $("seqClearButton"),
+  seqPatternInfo: $("seqPatternInfo")
+};
+
+function status(text, on = false) {
+  dom.statusText.textContent = text;
+  dom.statusDot.classList.toggle("on", on);
+}
+
+function toast(text) {
+  dom.toast.textContent = text;
+  dom.toast.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => dom.toast.classList.remove("show"), 2300);
+}
+
+function getVideo(id) {
+  return videos.find(v => v.id === id) || null;
+}
+
+function getCue(id) {
+  if (!id) return null;
+  for (const v of videos) {
+    const cue = v.cues.find(c => c.id === id);
+    if (cue) return cue;
+  }
+  return null;
+}
+
+function getPad(id) {
+  return pads.find(p => p.id === Number(id)) || null;
+}
+
+function selectedVideo() {
+  return getVideo(state.selectedVideoId);
+}
+
+function selectedCue() {
+  return getCue(state.selectedCueId);
+}
+
+function cueVideo(cue) {
+  return cue ? getVideo(cue.videoId) : null;
+}
+
+function selectedPad() {
+  return getPad(state.selectedPadId);
+}
+
+/* ==========================================================
+   AUDIO
+========================================================== */
+
+async function ensureAudio() {
+  if (!audioCtx) {
+    const AudioCtor = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtor) {
+      status("AUDIO NO SOPORTADO");
+      throw new Error("AudioContext no soportado");
+    }
+
+    audioCtx = new AudioCtor();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.value = state.master;
+    masterGain.connect(audioCtx.destination);
+  }
+
+  if (audioCtx.state === "suspended") {
+    await audioCtx.resume();
+  }
+
+  videos.forEach(v => {
+    if (v.editorEl) connectEditorAudio(v, v.editorEl);
+  });
+
+  pads.forEach(p => {
+    if (p.engine?.kind === "local" && p.engine.videoEl) {
+      connectPadAudio(p, p.engine.videoEl);
+    }
+  });
+
+  dom.audioStart.textContent = "AUDIO ✓";
+  dom.audioStart.classList.add("active");
+}
+
+function connectEditorAudio(video, el) {
+  if (!audioCtx || video.editorSource) return;
+
+  try {
+    video.editorSource = audioCtx.createMediaElementSource(el);
+    video.editorGain = audioCtx.createGain();
+    video.editorGain.gain.value = 0.9;
+    video.editorSource.connect(video.editorGain).connect(masterGain);
+  } catch (error) {
+    console.error("Editor audio connection", error);
   }
 }
-function stopPad(n){const p=getPad(n);if(!p)return;p.token++;if(p.engine?.videoEl)try{p.engine.videoEl.pause()}catch{};if(p.engine?.player)try{p.engine.player.pauseVideo()}catch{};p.playing=false;removeVisual(p.id);updatePadTile(p);renderCanvas()}
-function pressPad(n){const p=getPad(n);if(!p)return;if(p.playMode==="gate"){if(!p.playing)startPad(n)}else p.playing?stopPad(n):startPad(n)}
-function releasePad(n){const p=getPad(n);if(p?.playMode==="gate")stopPad(n)}
-function updateYTVolume(p){const player=p.engine?.player;if(!player||!p.engine.ready)return;const solo=pads.some(x=>x.solo),g=p.muted||(solo&&!p.solo)?0:clamp(p.volume,0,1);try{player.setVolume(Math.round(g*100));g?player.unMute():player.mute();player.setPlaybackRate(clamp(effectiveRate(p),CONFIG.MIN_RATE,CONFIG.MAX_RATE))}catch{}}
 
-/* ---------- VISUAL ---------- */
-function activateVisual(p){if(p.visualMode==="hidden")return;let list=state.visualSources.filter(n=>n!==p.id);list.push(p.id);const max=CONFIG.VIS_LIMIT[state.visualizerMode];while(list.length>max){const idx=list.findIndex(n=>getPad(n)?.visualMode!=="visible");list.splice(idx>=0?idx:0,1)}state.visualSources=list;renderVisualButtons();renderCanvas()}
-function removeVisual(n){state.visualSources=state.visualSources.filter(x=>x!==n);renderVisualButtons()}
-function setVisualMode(m){if(!CONFIG.VIS_LIMIT[m])return;state.visualizerMode=m;state.visualSources=state.visualSources.slice(-CONFIG.VIS_LIMIT[m]);renderAll()}
-function visualCells(m,w,h){if(m==="split2")return[{x:0,y:0,w:w/2,h},{x:w/2,y:0,w:w/2,h}];if(m==="split4")return[{x:0,y:0,w:w/2,h:h/2},{x:w/2,y:0,w:w/2,h:h/2},{x:0,y:h/2,w:w/2,h:h/2},{x:w/2,y:h/2,w:w/2,h:h/2}];return[{x:0,y:0,w,h}]}
-function drawCover(ctx,media,cell){const sw=media.videoWidth,sh=media.videoHeight;if(!sw||!sh)return;const scale=Math.max(cell.w/sw,cell.h/sh),dw=sw*scale,dh=sh*scale;ctx.drawImage(media,cell.x+(cell.w-dw)/2,cell.y+(cell.h-dh)/2,dw,dh)}
-function withCellClip(ctx,cell,draw){ctx.save();ctx.beginPath();ctx.rect(cell.x,cell.y,cell.w,cell.h);ctx.clip();draw();ctx.restore()}
-function drawCellNotice(ctx,cell,text){ctx.fillStyle="#17131c";ctx.fillRect(cell.x,cell.y,cell.w,cell.h);ctx.fillStyle="#ff4d5e";ctx.font="bold 14px JetBrains Mono,monospace";ctx.textAlign="center";ctx.fillText(text,cell.x+cell.w/2,cell.y+cell.h/2);ctx.textAlign="left"}
-const imageCache=new Map();
-function getImageEntry(url){if(!url)return null;let entry=imageCache.get(url);if(!entry){entry={img:new Image(),loaded:false,error:false};entry.img.crossOrigin="anonymous";entry.img.onload=()=>{entry.loaded=true;renderCanvas()};entry.img.onerror=()=>{entry.error=true};entry.img.src=url;imageCache.set(url,entry)}return entry}
-function drawCoverImage(ctx,img,cell){const sw=img.naturalWidth,sh=img.naturalHeight;if(!sw||!sh)return;const scale=Math.max(cell.w/sw,cell.h/sh),dw=sw*scale,dh=sh*scale;ctx.drawImage(img,cell.x+(cell.w-dw)/2,cell.y+(cell.h-dh)/2,dw,dh)}
-function cueFallbackImageUrl(v){return v?.sourceType==="youtube"&&v.youtubeId?`https://img.youtube.com/vi/${v.youtubeId}/hqdefault.jpg`:null}
-function drawCellImageOrNotice(ctx,cell,url,noticeText){if(url){const entry=getImageEntry(url);if(entry&&entry.loaded){drawCoverImage(ctx,entry.img,cell);return}}drawCellNotice(ctx,cell,noticeText)}
-function renderCanvas(){const c=dom.canvas,ctx=c.getContext("2d"),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);ctx.fillStyle="#08090b";ctx.fillRect(0,0,w,h);const preview=state.preview.playing;if(preview){const v=getVideo(state.preview.videoId),pc=selectedCue();const overrideUrl=pc?.imageUrl;const cell={x:0,y:0,w,h};if(overrideUrl){const entry=getImageEntry(overrideUrl);if(entry?.loaded)drawCoverImage(ctx,entry.img,cell);else if(v?.sourceType==="local"&&v.mediaKind==="video"&&v.editorEl?.readyState>=2)drawCover(ctx,v.editorEl,cell);else drawCellNotice(ctx,cell,"CARGANDO IMAGEN…")}else if(v?.sourceType==="local"&&v.mediaKind==="video"&&v.editorEl?.readyState>=2)drawCover(ctx,v.editorEl,cell);else if(v?.mediaKind==="audio")drawCellImageOrNotice(ctx,cell,cueFallbackImageUrl(v),"AUDIO PREVIEW");else drawCellImageOrNotice(ctx,cell,cueFallbackImageUrl(v),"YOUTUBE PREVIEW");dom.visorContext.textContent=`PREVIEW · ${pc?.name||"CUE"}`;dom.placeholder.hidden=true;return}
-  const active=state.visualSources.map(id=>getPad(id)).filter(p=>p?.playing);dom.placeholder.hidden=active.length>0;dom.visorContext.textContent=active.length?`${active.length} PAD${active.length>1?"S":""} · VISUAL`:"SIN REPRODUCCIÓN";if(!active.length)return;const cells=visualCells(state.visualizerMode,w,h);active.forEach((p,i)=>{const cell=cells[i];if(!cell)return;const cue=findPadCue(p),v=cue?cueVideo(cue):null;const overrideUrl=cue?.imageUrl;withCellClip(ctx,cell,()=>{if(overrideUrl){const entry=getImageEntry(overrideUrl);if(entry?.loaded){drawCoverImage(ctx,entry.img,cell);return}}if(v?.sourceType==="local"&&v.mediaKind==="video"&&p.engine?.videoEl?.readyState>=2)drawCover(ctx,p.engine.videoEl,cell);else if(v?.mediaKind==="audio")drawCellImageOrNotice(ctx,cell,cueFallbackImageUrl(v),"AUDIO");else if(v?.sourceType==="youtube")drawCellImageOrNotice(ctx,cell,cueFallbackImageUrl(v),"YOUTUBE");else drawCellNotice(ctx,cell,"SIN VIDEO")})})}
-function renderVisualButtons(){dom.visualBtns.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.mode===state.visualizerMode));dom.visualModeLabel.textContent=state.visualizerMode.toUpperCase();dom.visualCount.textContent=`${state.visualSources.length}/${CONFIG.VIS_LIMIT[state.visualizerMode]}`}
+function connectPadAudio(pad, el) {
+  if (!audioCtx || pad.audioSource) return;
 
-/* ---------- PREVIEW / TIMELINE PLAY ---------- */
-function stopPreview(){clearTimeout(state.preview.timer);const v=getVideo(state.preview.videoId);if(v?.editorEl)try{v.editorEl.pause()}catch{};state.preview={videoId:null,playing:false,end:0,type:null,timer:null};dom.ytPreview.classList.remove("show");dom.ytPreview.innerHTML="";dom.timelinePlay.textContent="▶ REPRODUCIR";renderCanvas()}
-function startLocalPreview(v,start,end){const el=ensureEditor(v);if(!el)return;ensureAudio().then(()=>{state.preview={videoId:v.id,playing:true,end,type:"local",timer:null};el.currentTime=start;el.play().catch(()=>toast("Reproducción bloqueada"));dom.timelinePlay.textContent="■ DETENER";renderCanvas()})}
-function startYTPreview(v,start,end){clearTimeout(state.preview.timer);const iframe=document.createElement("iframe");iframe.src=`https://www.youtube.com/embed/${v.youtubeId}?autoplay=1&start=${Math.floor(start)}&controls=1&playsinline=1&rel=0`;iframe.allow="autoplay; encrypted-media";dom.ytPreview.innerHTML="";dom.ytPreview.appendChild(iframe);dom.ytPreview.classList.add("show");state.preview={videoId:v.id,playing:true,end,type:"youtube",timer:setTimeout(stopPreview,Math.max(200,end-start)*1000)};dom.timelinePlay.textContent="■ DETENER";renderCanvas()}
-function previewCue(c){const v=cueVideo(c);if(!v)return;stopPreview();startPreviewRange(v,c.startTime,c.endTime)}
-function startPreviewRange(v,start,end){if(!v)return;state.playhead=clamp(start,0,v.duration||end);if(v.sourceType==="local")startLocalPreview(v,state.playhead,end);else startYTPreview(v,state.playhead,end);updateTimelineUI()}
-function toggleTimelinePlayback(){const v=selectedVideo();if(!v){toast("Selecciona un video");return}if(state.preview.playing){stopPreview();return}if(!v.duration){toast("La duración aún no está disponible");return}startPreviewRange(v,state.playhead,v.duration)}
+  try {
+    pad.audioSource = audioCtx.createMediaElementSource(el);
+    pad.hp = audioCtx.createBiquadFilter();
+    pad.lp = audioCtx.createBiquadFilter();
+    pad.gain = audioCtx.createGain();
 
-/* ---------- EDITOR MEDIA ---------- */
-function ensureEditor(v){if(v.sourceType!=="local")return null;if(v.editorEl)return v.editorEl;const el=document.createElement(v.mediaKind==="audio"?"audio":"video");el.src=v.sourceUrl||"";el.preload="metadata";el.playsInline=true;el.controls=false;el.crossOrigin="anonymous";v.editorEl=el;dom.videoBank.appendChild(el);el.addEventListener("loadedmetadata",()=>{v.duration=Number(el.duration)||v.duration;normalizeCues(v);renderAll()});el.addEventListener("error",()=>toast(`No se pudo leer ${v.name}`));if(audioCtx)connectEditorAudio(v,el);return el}
-function normalizeCues(v){v.cues=v.cues.filter(c=>c.endTime>c.startTime&&c.startTime>=0).map(c=>({...c,videoId:v.id,startTime:clamp(c.startTime,0,Math.max(0,v.duration-CONFIG.MIN_CUE)),endTime:clamp(c.endTime,CONFIG.MIN_CUE,v.duration||c.endTime)}));v.cues.forEach(c=>{if(c.endTime<=c.startTime)c.endTime=Math.min(v.duration,c.startTime+CONFIG.MIN_CUE)})}
-function addLocalFile(file){if(!file||(!file.type.startsWith("video/")&&!file.type.startsWith("audio/"))){toast("Selecciona un video o audio compatible");return}const v=makeVideo({name:file.name,fileName:file.name,sourceType:"local",mediaKind:file.type.startsWith("audio/")?"audio":"video",sourceUrl:URL.createObjectURL(file)});videos.push(v);state.selectedVideoId=v.id;state.selectedCueId=null;state.playhead=0;ensureEditor(v);renderAll();toast("Fuente agregada")}
-function handleLocal(e){const f=e.target.files?.[0];e.target.value="";if(f)addLocalFile(f)}
-function extractYT(url){const m=String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);return m?m[1]:(/^[\w-]{11}$/.test(url)?url:"")}
-function addYouTube(){const raw=dom.ytUrl.value.trim(),yt=extractYT(raw);if(!yt){toast("URL de YouTube no válida");return}const v=makeVideo({name:`YouTube · ${yt}`,sourceType:"youtube",youtubeId:yt});videos.push(v);state.selectedVideoId=v.id;state.selectedCueId=null;dom.ytUrl.value="";renderAll();loadYTDuration(v);toast("YouTube agregado")}
-function loadYTDuration(v){loadYouTubeAPI().then(()=>new Promise(resolve=>{const host=document.createElement("div");host.id=`yt-meta-${v.id}`;host.style.cssText="position:fixed;left:-9999px;width:2px;height:2px";document.body.appendChild(host);const p=new YT.Player(host.id,{videoId:v.youtubeId,width:2,height:2,events:{onReady:()=>{v.duration=Number(p.getDuration())||0;try{p.destroy()}catch{}host.remove();renderAll();resolve()}}});})).catch(()=>{})}
-function relinkSelected(file){const v=selectedVideo();if(!v||v.sourceType!=="local")return;if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);if(v.editorEl)try{v.editorEl.pause();v.editorEl.remove()}catch{};v.editorEl=null;v.editorSource=null;v.editorGain=null;v.sourceUrl=URL.createObjectURL(file);v.fileName=file.name;v.linked=true;ensureEditor(v);renderAll();toast("Fuente vinculada")}
-function removeVideo(){const v=selectedVideo();if(!v)return;stopPreview();pads.forEach(p=>{if(v.cues.some(c=>c.id===p.cueId)){stopPad(p.id);p.cueId=null}});if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);if(v.editorEl)try{v.editorEl.remove()}catch{};const i=videos.indexOf(v);if(i>=0)videos.splice(i,1);state.selectedVideoId=videos[0]?.id||null;state.selectedCueId=null;state.playhead=0;renderAll()}
-function renameVideo(){const v=selectedVideo();if(!v)return;const n=prompt("Nombre del video:",v.name);if(n?.trim()){v.name=n.trim();renderAll()}}
-function selectVideo(id){stopPreview();state.selectedVideoId=id;state.selectedCueId=null;state.playhead=0;const v=getVideo(id);if(v?.sourceType==="local")ensureEditor(v);else if(v&&!v.duration)loadYTDuration(v);renderAll()}
+    pad.hp.type = "highpass";
+    pad.lp.type = "lowpass";
 
-/* ---------- TIMELINE ---------- */
-function timelineBaseWidth(){return Math.max(dom.timelineViewport.clientWidth-2,600)}
-function timelineContentWidth(){return Math.max(timelineBaseWidth()*state.zoom,600)}
-function xToTime(clientX){const v=selectedVideo();if(!v||!v.duration)return 0;const r=dom.timelineContent.getBoundingClientRect();return clamp(((clientX-r.left)/dom.timelineContent.clientWidth)*v.duration,0,v.duration)}
-function renderTimeline(){const v=selectedVideo();if(!v){dom.timelineTitle.textContent="Selecciona un video";dom.timelineDuration.textContent="00:00.000";dom.timelineTime.textContent="00:00.000";dom.cues.innerHTML="";dom.timelineRuler.innerHTML="";dom.timelineContent.style.width="100%";dom.timelineStatus.textContent="0 CUES";return}const width=timelineContentWidth();dom.timelineContent.style.width=`${width}px`;dom.timelineTitle.textContent=`${v.name} · ${v.cues.length} CUE${v.cues.length===1?"":"S"}`;dom.timelineDuration.textContent=fmt(v.duration);dom.timelineTime.textContent=fmt(state.playhead);dom.timelineRuler.innerHTML="";dom.cues.innerHTML="";
-  if(v.duration>0){const tickStep=state.zoom>=8?1:state.zoom>=4?2:state.zoom>=2?5:Math.max(5,Math.ceil(v.duration/10));for(let t=0;t<=v.duration+.0001;t+=tickStep){const s=document.createElement("span");s.style.left=`${(t/v.duration)*100}%`;s.textContent=fmt(t).slice(0,5);dom.timelineRuler.appendChild(s)}}
-  v.cues.slice().sort((a,b)=>a.startTime-b.startTime).forEach(c=>{const b=document.createElement("div");b.className="cue-block";if(c.id===state.selectedCueId)b.classList.add("selected");b.dataset.id=c.id;b.style.left=`${(c.startTime/v.duration)*100}%`;b.style.width=`${Math.max((cueDuration(c)/v.duration)*100,.25)}%`;const hs=document.createElement("span"),he=document.createElement("span");hs.className="cue-handle start";he.className="cue-handle end";const label=document.createElement("strong"),tm=document.createElement("small");label.textContent=c.name;tm.textContent=`${fmt(c.startTime)} → ${fmt(c.endTime)}`;b.append(hs,label,tm,he);b.addEventListener("click",e=>{e.stopPropagation();selectCue(c.id)});b.addEventListener("pointerdown",e=>{e.stopPropagation();selectCue(c.id);beginCueDrag(e,c,e.target===hs?"start":e.target===he?"end":"move")});dom.cues.appendChild(b)});
-  dom.timelineStatus.textContent=`${v.cues.length} CUE${v.cues.length===1?"":"S"} · ZOOM ${state.zoom}×`;dom.zoomLevel.textContent=`${state.zoom}×`;updateTimelineUI();
-}
-function updateCueBlockDOM(c){const el=dom.cues.querySelector(`[data-id="${CSS.escape(c.id)}"]`);if(!el)return;const v=cueVideo(c);el.style.left=`${v.duration?(c.startTime/v.duration)*100:0}%`;el.style.width=`${v.duration?Math.max((cueDuration(c)/v.duration)*100,.25):0}%`;const small=el.querySelector("small");if(small)small.textContent=`${fmt(c.startTime)} → ${fmt(c.endTime)}`}
-function beginCueDrag(e,c,kind){const v=cueVideo(c);if(!v||!v.duration)return;const rect=dom.timelineContent.getBoundingClientRect(),startX=e.clientX,origS=c.startTime,origE=c.endTime;const move=ev=>{const dt=((ev.clientX-startX)/rect.width)*v.duration;if(kind==="move"){const d=origE-origS;c.startTime=clamp(origS+dt,0,v.duration-d);c.endTime=c.startTime+d}else if(kind==="start")c.startTime=clamp(origS+dt,0,origE-CONFIG.MIN_CUE);else c.endTime=clamp(origE+dt,origS+CONFIG.MIN_CUE,v.duration);state.playhead=kind==="start"?c.startTime:kind==="end"?c.endTime:c.startTime;updateCueBlockDOM(c);updateTimelineUI();renderCueFields(false)};const up=()=>{window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up);renderAll()};window.addEventListener("pointermove",move);window.addEventListener("pointerup",up);e.preventDefault()}
-function scrubToPlayhead(v){if(!v)return;if(v.editorEl)try{v.editorEl.currentTime=state.playhead}catch{};pads.forEach(p=>{if(!p.playing)return;const c=findPadCue(p);if(!c||c.videoId!==v.id)return;if(p.engine?.kind==="local"&&p.engine.videoEl){try{p.engine.videoEl.currentTime=state.playhead}catch{}}else if(p.engine?.kind==="youtube"&&p.engine.ready&&p.engine.player){try{p.engine.player.seekTo(state.playhead,true)}catch{}}})}
-function seekTimeline(e){const v=selectedVideo();if(!v||!v.duration)return;state.playhead=xToTime(e.clientX);const c=selectedCue();scrubToPlayhead(v);if(c&&state.playhead<c.startTime)state.selectedCueId=null;updateTimelineUI();renderCanvas()}
-function beginPlayheadDrag(e){const v=selectedVideo();if(!v||!v.duration){seekTimeline(e);return}state.scrubbing=true;seekTimeline(e);const move=ev=>{state.playhead=xToTime(ev.clientX);scrubToPlayhead(v);updateTimelineUI();renderCanvas()};const up=()=>{state.scrubbing=false;window.removeEventListener("pointermove",move);window.removeEventListener("pointerup",up)};window.addEventListener("pointermove",move);window.addEventListener("pointerup",up);e.preventDefault()}
-function updateTimelineUI(){const v=selectedVideo();if(!v)return;dom.timelineTime.textContent=fmt(state.playhead);dom.playhead.style.left=`${v.duration?(state.playhead/v.duration)*100:0}%`}
-function addCueAt(time=state.playhead){const v=selectedVideo();if(!v||!v.duration){toast("Selecciona un video con duración disponible");return}const s=clamp(time,0,v.duration),e=Math.min(v.duration,s+CONFIG.NEW_CUE);if(e-s<CONFIG.MIN_CUE){toast("No hay espacio suficiente para crear el cue");return}const c=makeCue(v.id,s,e,`Cue ${v.cues.length+1}`);v.cues.push(c);state.selectedCueId=c.id;state.playhead=s;renderAll();setTimeout(()=>dom.cueName.focus(),0)}
-function addCue(){addCueAt(state.playhead)}
-function duplicateCue(){const c=selectedCue(),v=cueVideo(c);if(!c||!v)return;const d=cueDuration(c),s=clamp(c.endTime+.01,0,Math.max(0,v.duration-d));const n=makeCue(v.id,s,s+d,`${c.name} copia`);v.cues.push(n);state.selectedCueId=n.id;state.playhead=s;renderAll()}
-function deleteCue(){const c=selectedCue(),v=cueVideo(c);if(!c||!v)return;pads.forEach(p=>{if(p.cueId===c.id){stopPad(p.id);p.cueId=null}});v.cues=v.cues.filter(x=>x.id!==c.id);state.selectedCueId=null;renderAll();toast("Cue eliminado")}
-function splitCue(){const c=selectedCue(),v=cueVideo(c),t=state.playhead;if(!c||!v||t<=c.startTime+CONFIG.MIN_CUE||t>=c.endTime-CONFIG.MIN_CUE){toast("El playhead debe estar dentro del cue");return}const oldEnd=c.endTime;c.endTime=t;const n=makeCue(v.id,t,oldEnd,`${c.name} B`);v.cues.push(n);state.selectedCueId=n.id;renderAll()}
-function mergeCue(){const c=selectedCue(),v=cueVideo(c);if(!c||!v)return;const a=v.cues.slice().sort((x,y)=>x.startTime-y.startTime),i=a.findIndex(x=>x.id===c.id),n=a[i+1];if(!n){toast("No hay un cue siguiente");return}if(n.startTime>c.endTime+CONFIG.MIN_CUE){toast("El siguiente cue está separado por un espacio");return}c.endTime=Math.max(c.endTime,n.endTime);pads.forEach(p=>{if(p.cueId===n.id)p.cueId=c.id});v.cues=v.cues.filter(x=>x.id!==n.id);renderAll()}
-function divide(n){const v=selectedVideo();if(!v||!v.duration){toast("Selecciona un video con duración disponible");return}pads.forEach(p=>{if(v.cues.some(c=>c.id===p.cueId)){stopPad(p.id);p.cueId=null}});v.cues=Array.from({length:n},(_,i)=>makeCue(v.id,v.duration*i/n,v.duration*(i+1)/n,`Cue ${i+1}`));state.selectedCueId=v.cues[0]?.id||null;state.playhead=0;renderAll();toast(`Video dividido en ${n} cues`)}
-function selectCue(id){const c=getCue(id);if(!c)return;state.selectedCueId=c.id;state.selectedVideoId=c.videoId;state.playhead=c.startTime;renderAll()}
-function applyCueTime(kind,value){const c=selectedCue(),v=cueVideo(c);if(!c||!v||!v.duration)return;const n=clamp(parseTime(value),0,v.duration);if(kind==="start")c.startTime=clamp(n,0,c.endTime-CONFIG.MIN_CUE);if(kind==="end")c.endTime=clamp(n,c.startTime+CONFIG.MIN_CUE,v.duration);if(kind==="duration")c.endTime=clamp(c.startTime+n,c.startTime+CONFIG.MIN_CUE,v.duration);if(state.playhead<c.startTime||state.playhead>c.endTime)state.playhead=c.startTime;renderAll()}
-function renderCueFields(update=true){const c=selectedCue();if(!c){dom.cueEmpty.hidden=false;dom.cueForm.hidden=true;dom.cueLabel.textContent="NINGÚN CUE";return}dom.cueEmpty.hidden=true;dom.cueForm.hidden=false;dom.cueLabel.textContent=c.name;dom.cueEditorTitle.textContent=c.name;dom.cueName.value=c.name;dom.cueStart.value=fmt(c.startTime);dom.cueEnd.value=fmt(c.endTime);dom.cueDur.value=fmt(cueDuration(c));dom.cueImage.value=c.imageUrl||"";renderCueAssignments();if(update)renderPadSelect()}
-function renderCueAssignments(){const c=selectedCue();dom.cueAssign.innerHTML="";pads.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="assign-pad";b.classList.toggle("active",p.cueId===c?.id);b.innerHTML=`<span>${String(p.id).padStart(2,"0")} · ${p.key.toUpperCase()}</span><small>${escapeHTML(p.cueId?getCue(p.cueId)?.name||"OTRO CUE":"SIN CUE")}</small>`;b.title=p.cueId?`PAD ${p.id} · ${getCue(p.cueId)?.name||"OTRO CUE"}`:`PAD ${p.id} · SIN CUE`;b.onclick=()=>{if(c)assignCueToPad(p,p.cueId===c.id?null:c.id)};dom.cueAssign.appendChild(b)})}
+    pad.hp.frequency.value = pad.highPass;
+    pad.lp.frequency.value = pad.lowPass;
 
-/* ---------- PAD UI ---------- */
-const padRefs=new Map();
-function renderPads(){dom.padsGrid.innerHTML="";padRefs.clear();dom.activePads.textContent=`${pads.filter(p=>p.playing).length}/16`;pads.forEach(p=>{const b=document.createElement("button");b.type="button";b.className="pad";b.classList.toggle("selected",p.id===state.selectedPadId);b.classList.toggle("playing",p.playing);b.classList.toggle("empty",!p.cueId);const cue=getCue(p.cueId);b.innerHTML=`<span class="pad-num">${String(p.id).padStart(2,"0")}</span><kbd>${p.key.toUpperCase()}</kbd><strong>${escapeHTML(cue?.name||"—")}</strong><small>${p.playMode.toUpperCase()} · ${p.loop?"LOOP":"ONE SHOT"}</small><i></i>`;b.onclick=()=>{state.selectedPadId=p.id;renderPads();renderPadProps()};b.addEventListener("pointerdown",e=>{if(p.playMode==="gate"){e.preventDefault();b.setPointerCapture?.(e.pointerId);pressPad(p.id)}});b.addEventListener("pointerup",()=>releasePad(p.id));b.addEventListener("pointercancel",()=>releasePad(p.id));dom.padsGrid.appendChild(b);padRefs.set(p.id,b)});renderPadProps()}
-function updatePadTile(p){const b=padRefs.get(p.id);if(!b)return;b.classList.toggle("playing",p.playing);b.classList.toggle("selected",p.id===state.selectedPadId);b.classList.toggle("empty",!p.cueId)}
-function renderPadProps(){const p=getPad(state.selectedPadId);if(!p)return;dom.padSelectedLabel.textContent=`PAD ${p.id}`;dom.padTitle.textContent=`PAD ${p.id}`;dom.padKey.textContent=p.key.toUpperCase();dom.padCue.textContent=p.cueId?(getCue(p.cueId)?.name||"CUE"):"SIN CUE";dom.padMode.textContent=p.playMode==="gate"?"GATE":"TRIGGER";dom.padMode.classList.toggle("active",p.playMode==="gate");dom.padLoop.classList.toggle("active",p.loop);dom.padMute.classList.toggle("active",p.muted);dom.padSolo.classList.toggle("active",p.solo);dom.padVol.value=p.volume;dom.padVolOut.textContent=`${Math.round(p.volume*100)}%`;dom.padHP.value=freqSlider(p.highPass,20,8000);dom.padHPOut.textContent=freq(p.highPass);dom.padLP.value=freqSlider(p.lowPass,20,20000);dom.padLPOut.textContent=freq(p.lowPass);dom.padRate.value=p.playbackRate;dom.padRateOut.textContent=`${p.playbackRate.toFixed(2)}×`;dom.padBpm.value=p.bpm;dom.padSync.classList.toggle("active",p.sync);dom.padVisual.value=p.visualMode;dom.padRateBpm.textContent=`≈ ${Math.round(p.bpm*p.playbackRate)} BPM efectivos`;renderPadSelectValue(p)}
-function renderPadSelect(){renderPadSelectValue(getPad(state.selectedPadId))}
-function renderPadSelectValue(p){dom.padCueSelect.innerHTML="";const none=document.createElement("option");none.value="";none.textContent="SIN CUE";dom.padCueSelect.appendChild(none);videos.forEach(v=>{if(!v.cues.length)return;const group=document.createElement("optgroup");group.label=v.name;v.cues.slice().sort((a,b)=>a.startTime-b.startTime).forEach(c=>{const o=document.createElement("option");o.value=c.id;o.textContent=`${c.name} · ${fmt(c.startTime)}–${fmt(c.endTime)}`;group.appendChild(o)});dom.padCueSelect.appendChild(group)});dom.padCueSelect.value=p?.cueId||""}
-function assignCueToPad(p,cueId){if(!p)return;stopPad(p.id);p.cueId=cueId||null;if(p.cueId){const c=getCue(p.cueId),v=cueVideo(c);if(p.engine&&p.engine.videoId!==v.id)destroyPadEngine(p)}renderAll()}
-function setPadCue(p,cueId){assignCueToPad(p,cueId)}
-function freqSlider(v,min,max){return Math.log(v/min)/Math.log(max/min)}function sliderFreq(v,min,max){return min*Math.pow(max/min,Number(v))}function freq(v){return v>=1000?`${(v/1000).toFixed(v>=10000?0:1)}k`:`${Math.round(v)}Hz`}
+    pad.audioSource
+      .connect(pad.hp)
+      .connect(pad.lp)
+      .connect(pad.gain)
+      .connect(masterGain);
 
-/* ---------- PLAYLIST / PROJECT ---------- */
-function renderPlaylist(){const sv=selectedVideo();dom.selectedVideoActions.hidden=!sv;dom.relinkVideo.hidden=!(sv&&sv.sourceType==='local'&&!sv.linked);dom.playlistCount.textContent=`${videos.length} VIDEO${videos.length===1?"":"S"}`;dom.playlist.innerHTML="";videos.forEach(v=>{const row=document.createElement("div");row.className="playlist-row";if(v.id===state.selectedVideoId)row.classList.add("selected");const main=document.createElement("button");main.type="button";main.className="playlist-main";main.innerHTML=`<span class="source-dot ${v.sourceType}"></span><span class="playlist-name">${escapeHTML(v.name)}</span><span class="playlist-meta">${v.sourceType==="youtube"?"YT":fmt(v.duration)}</span>`;main.onclick=()=>selectVideo(v.id);const x=document.createElement("button");x.type="button";x.className="playlist-delete";x.textContent="×";x.title="Eliminar";x.onclick=e=>{e.stopPropagation();state.selectedVideoId=v.id;removeVideo()};row.append(main,x);dom.playlist.appendChild(row)})}
-function projectData(){return{version:5,globalBpm:state.bpm,masterVolume:state.master,visualizerMode:state.visualizerMode,videos:videos.map(v=>({id:v.id,name:v.name,sourceType:v.sourceType,mediaKind:v.mediaKind,fileName:v.fileName,youtubeId:v.youtubeId,duration:v.duration,cues:v.cues.map(c=>({id:c.id,name:c.name,startTime:c.startTime,endTime:c.endTime,imageUrl:c.imageUrl||null}))})),pads:pads.map(p=>({id:p.id,key:p.key,cueId:p.cueId,playMode:p.playMode,loop:p.loop,volume:p.volume,muted:p.muted,solo:p.solo,highPass:p.highPass,lowPass:p.lowPass,playbackRate:p.playbackRate,visualMode:p.visualMode,bpm:p.bpm,sync:p.sync})),sequence:{loop:state.sequencer.loop,steps:state.sequencer.steps.map(s=>({padId:s.padId,duration:s.duration}))}}}
-function saveProject(){const a=document.createElement("a"),url=URL.createObjectURL(new Blob([JSON.stringify(projectData(),null,2)],{type:"application/json"}));a.href=url;a.download=`av-chopper-v4-${new Date().toISOString().replace(/[:.]/g,"-")}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),500);toast("Proyecto guardado")}
-function loadProjectFile(e){const f=e.target.files?.[0];e.target.value="";if(!f)return;const r=new FileReader();r.onload=()=>{try{loadProject(JSON.parse(r.result))}catch(err){console.error(err);toast("JSON de proyecto inválido")}};r.readAsText(f)}
-function clearProject(){stopPreview();stopSequencer();pads.forEach(p=>destroyPadEngine(p));videos.forEach(v=>{if(v.sourceUrl)URL.revokeObjectURL(v.sourceUrl);if(v.editorEl)try{v.editorEl.remove()}catch{}});videos.length=0;pads.length=0;for(let i=0;i<16;i++)pads.push(makePad(i));state.selectedVideoId=null;state.selectedCueId=null;state.selectedPadId=1;state.playhead=0;state.visualSources=[];state.sequencer={steps:[],playing:false,index:-1,loop:true,timer:null};renderAll();status("READY")}
-function loadProject(d){if(!d||!Array.isArray(d.videos)||!Array.isArray(d.pads))throw Error("Formato inválido");clearProject();state.bpm=clamp(Number(d.globalBpm)||CONFIG.DEFAULT_BPM,30,300);state.master=Number.isFinite(Number(d.masterVolume))?clamp(Number(d.masterVolume),0,1):CONFIG.DEFAULT_MASTER;state.visualizerMode=CONFIG.VIS_LIMIT[d.visualizerMode]?d.visualizerMode:"simple";const validCueIds=new Set();d.videos.forEach(x=>{const v=makeVideo(x);v.sourceUrl=null;v.linked=v.sourceType==="youtube";v.cues=(x.cues||[]).map(c=>({id:c.id||makeId("cue"),videoId:v.id,name:c.name||"Cue",startTime:Number(c.startTime)||0,endTime:Number(c.endTime)||0,imageUrl:c.imageUrl||null}));v.cues.forEach(c=>validCueIds.add(c.id));videos.push(v)});for(let i=0;i<16;i++){const src=d.pads.find(p=>p.id===i+1),p=pads[i];if(!src)continue;p.playMode=src.playMode==="trigger"?"trigger":"gate";p.loop=src.loop!==false;p.volume=clamp(Number(src.volume),0,1);p.muted=!!src.muted;p.solo=!!src.solo;p.highPass=Number(src.highPass)||20;p.lowPass=Number(src.lowPass)||20000;p.playbackRate=clamp(Number(src.playbackRate)||1,CONFIG.MIN_RATE,CONFIG.MAX_RATE);p.visualMode=["auto","visible","hidden"].includes(src.visualMode)?src.visualMode:"auto";p.bpm=clamp(Number(src.bpm)||120,20,400);p.sync=!!src.sync;p.cueId=validCueIds.has(src.cueId)?src.cueId:null}state.selectedVideoId=videos[0]?.id||null;state.selectedCueId=null;state.playhead=0;const validPadIds=new Set(pads.map(p=>p.id));state.sequencer={steps:Array.isArray(d.sequence?.steps)?d.sequence.steps.filter(s=>validPadIds.has(Number(s.padId))).map(s=>({id:makeId("step"),padId:Number(s.padId),duration:clamp(Number(s.duration)||2,.1,60)})):[],playing:false,index:-1,loop:d.sequence?.loop!==false,timer:null};dom.master.value=state.master;dom.bpm.value=state.bpm;renderAll();toast("Proyecto cargado · fuentes locales requieren vinculación")}
-
-/* ---------- MIDI / BPM / REC ---------- */
-async function connectMIDI(){if(!navigator.requestMIDIAccess){dom.midiStatus.textContent="MIDI NO SOPORTADO EN ESTE NAVEGADOR";return}if(!window.isSecureContext){dom.midiStatus.textContent="REQUIERE HTTPS / LOCALHOST";return}dom.midiConnect.disabled=true;dom.midiStatus.textContent="CONECTANDO…";try{state.midiAccess=state.midiAccess||await navigator.requestMIDIAccess({sysex:false});state.midiAccess.onstatechange=bindMIDIInputs;bindMIDIInputs()}catch(e){console.error(e);state.midiAccess=null;dom.midiStatus.textContent=e.name==="SecurityError"?"PERMISO MIDI DENEGADO · REVISA LOS PERMISOS DEL NAVEGADOR":"ERROR AL CONECTAR MIDI"}finally{dom.midiConnect.disabled=false}}
-function bindMIDIInputs(){if(!state.midiAccess)return;const ins=[...state.midiAccess.inputs.values()];dom.midiSelect.innerHTML='<option value="">SELECCIONAR CONTROLADOR</option>';ins.forEach(i=>{const o=document.createElement("option");o.value=i.id;o.textContent=i.name||i.manufacturer||i.id;dom.midiSelect.appendChild(o)});if(!ins.some(i=>i.id===state.midiInputId))state.midiInputId="";if(!state.midiInputId&&ins.length===1)state.midiInputId=ins[0].id;dom.midiSelect.value=state.midiInputId;ins.forEach(i=>i.onmidimessage=state.midiInputId===i.id?onMIDI:null);const connected=ins.find(i=>i.id===state.midiInputId);state.midiConnected=!!connected;dom.midiConnect.classList.toggle("active",state.midiConnected);dom.midiStatus.textContent=ins.length?(connected?`CONECTADO · ${escapeHTML(connected.name||connected.manufacturer||"DISPOSITIVO")}`:"DISPOSITIVO DETECTADO · SELECCIONA UNO"):"SIN DISPOSITIVOS DETECTADOS"}
-function selectMIDI(v){state.midiInputId=v;bindMIDIInputs()}
-async function tryAutoConnectMIDI(){if(!navigator.requestMIDIAccess||!navigator.permissions?.query)return;try{const perm=await navigator.permissions.query({name:"midi",sysex:false});if(perm.state==="granted")await connectMIDI();else if(perm.state==="prompt")dom.midiStatus.textContent="NO CONECTADO · PULSA CONECTAR"}catch{}}
-function onMIDI(e){const [st,note,vel]=e.data,cmd=st&0xf0,pi=note-CONFIG.MIDI_BASE;if(pi>=0&&pi<16){if(cmd===0x90&&vel>0)pressPad(pi+1);if(cmd===0x80||(cmd===0x90&&vel===0))releasePad(pi+1)}const p=getPad(state.selectedPadId);if(cmd===0xb0&&p){if(note===112){p.highPass=20+vel/127*7980;if(p.hp)p.hp.frequency.value=p.highPass}if(note===113){p.lowPass=20+vel/127*19980;if(p.lp)p.lp.frequency.value=p.lowPass}renderPadProps()}}
-function tapBPM(){const now=performance.now();state.tapTimes=state.tapTimes.filter(t=>now-t<2200);state.tapTimes.push(now);if(state.tapTimes.length>1){const ds=state.tapTimes.slice(1).map((t,i)=>t-state.tapTimes[i]);state.bpm=clamp(60000/(ds.reduce((a,b)=>a+b,0)/ds.length),30,300);dom.bpm.value=state.bpm;dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`}}
-async function toggleRecording(){if(state.recording){stopRecording();return}try{await ensureAudio();if(!dom.canvas.captureStream||!window.MediaRecorder)throw Error("Grabación no soportada");recordDest=audioCtx.createMediaStreamDestination();masterGain.connect(recordDest);const combined=new MediaStream([...dom.canvas.captureStream(30).getVideoTracks(),...recordDest.stream.getAudioTracks()]);const mime=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"].find(x=>MediaRecorder.isTypeSupported(x));if(!mime)throw Error("Formato no disponible");state.chunks=[];state.recorder=new MediaRecorder(combined,{mimeType:mime});state.recorder.ondataavailable=e=>e.data.size&&state.chunks.push(e.data);state.recorder.onstop=()=>{const blob=new Blob(state.chunks,{type:mime}),a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=`av-chopper-${Date.now()}.webm`;a.click();setTimeout(()=>URL.revokeObjectURL(url),800)};state.recorder.start();state.recording=true;state.recStart=Date.now();dom.record.classList.add("recording");dom.recordTimer.textContent="00:00";state.recTimer=setInterval(()=>{const s=Math.floor((Date.now()-state.recStart)/1000);dom.recordTimer.textContent=`${String(Math.floor(s/60)).padStart(2,"0")}:${String(s%60).padStart(2,"0")}`},500);status("GRABANDO",true)}catch(e){console.error(e);toast("No se pudo iniciar la grabación")}}
-function stopRecording(){try{state.recorder?.stop()}catch{};state.recording=false;clearInterval(state.recTimer);state.recTimer=null;dom.record.classList.remove("recording");dom.recordTimer.textContent="00:00";if(recordDest&&masterGain)try{masterGain.disconnect(recordDest)}catch{}recordDest=null;status("READY")}
-
-/* ---------- SEQUENCER ---------- */
-function addSequencerStep(padId){const p=getPad(padId);if(!p){toast("Selecciona un pad válido");return}state.sequencer.steps.push({id:makeId("step"),padId:p.id,duration:2});renderSequencer()}
-function removeSequencerStep(id){const idx=state.sequencer.steps.findIndex(s=>s.id===id);if(idx<0)return;if(state.sequencer.playing&&idx===state.sequencer.index){stopSequencer();return}state.sequencer.steps=state.sequencer.steps.filter(s=>s.id!==id);if(state.sequencer.index>idx)state.sequencer.index--;renderSequencer()}
-function moveSequencerStep(id,dir){const i=state.sequencer.steps.findIndex(s=>s.id===id),j=i+dir;if(i<0||j<0||j>=state.sequencer.steps.length)return;const arr=state.sequencer.steps;[arr[i],arr[j]]=[arr[j],arr[i]];renderSequencer()}
-function setSequencerStepDuration(id,val){const s=state.sequencer.steps.find(x=>x.id===id);if(s)s.duration=clamp(Number(val)||1,.1,60)}
-function clearSequencer(){stopSequencer();state.sequencer.steps=[];renderSequencer()}
-function toggleSequencerLoop(){state.sequencer.loop=!state.sequencer.loop;renderSequencer()}
-function playSequencer(){if(state.sequencer.playing){stopSequencer();return}if(!state.sequencer.steps.length){toast("Agrega al menos un paso a la secuencia");return}ensureAudio().catch(()=>{});state.sequencer.playing=true;state.sequencer.index=-1;advanceSequencer()}
-function stopSequencer(){clearTimeout(state.sequencer.timer);state.sequencer.timer=null;const cur=state.sequencer.steps[state.sequencer.index];if(cur)stopPad(cur.padId);state.sequencer.playing=false;state.sequencer.index=-1;renderSequencer()}
-function advanceSequencer(){if(!state.sequencer.playing)return;const prev=state.sequencer.steps[state.sequencer.index];if(prev)stopPad(prev.padId);state.sequencer.index++;if(state.sequencer.index>=state.sequencer.steps.length){if(state.sequencer.loop&&state.sequencer.steps.length)state.sequencer.index=0;else{stopSequencer();return}}const step=state.sequencer.steps[state.sequencer.index];if(!step){stopSequencer();return}startPad(step.padId);renderSequencer();state.sequencer.timer=setTimeout(advanceSequencer,Math.max(100,step.duration*1000))}
-function renderSequencer(){if(!dom.seqList)return;dom.seqList.innerHTML="";state.sequencer.steps.forEach((s,i)=>{const row=document.createElement("div");row.className="seq-row";if(i===state.sequencer.index)row.classList.add("active");const pad=getPad(s.padId),cue=pad?.cueId?getCue(pad.cueId):null;row.innerHTML=`<span class="seq-index">${i+1}</span><span class="seq-pad">PAD ${s.padId} · ${escapeHTML(cue?.name||"SIN CUE")}</span><input type="number" class="mono" min=".1" max="60" step=".1" value="${s.duration}"><button type="button" class="seq-up">↑</button><button type="button" class="seq-down">↓</button><button type="button" class="seq-del danger">×</button>`;row.querySelector("input").onchange=e=>setSequencerStepDuration(s.id,e.target.value);row.querySelector(".seq-up").onclick=()=>moveSequencerStep(s.id,-1);row.querySelector(".seq-down").onclick=()=>moveSequencerStep(s.id,1);row.querySelector(".seq-del").onclick=()=>removeSequencerStep(s.id);dom.seqList.appendChild(row)});dom.seqStatus.textContent=`${state.sequencer.steps.length} PASO${state.sequencer.steps.length===1?"":"S"}${state.sequencer.playing?` · PASO ${state.sequencer.index+1}`:""}`;dom.seqPlay.textContent=state.sequencer.playing?"■ DETENER SECUENCIA":"▶ REPRODUCIR SECUENCIA";dom.seqPlay.classList.toggle("active",state.sequencer.playing);dom.seqLoop.classList.toggle("active",state.sequencer.loop)}
-
-/* ---------- KEYBOARD ---------- */
-function isTypingContext(el){if(!el)return false;const tag=el.tagName;if(tag==="TEXTAREA"||tag==="SELECT")return true;if(tag==="INPUT"){const type=(el.type||"text").toLowerCase();return!["range","checkbox","radio","button","color"].includes(type)}return!!el.isContentEditable}
-function bindKeyboard(){window.addEventListener("keydown",e=>{if(isTypingContext(document.activeElement))return;const i=CONFIG.KEY_MAP.indexOf(e.key.toLowerCase());if(i<0||e.repeat)return;e.preventDefault();pressPad(i+1)});window.addEventListener("keyup",e=>{const i=CONFIG.KEY_MAP.indexOf(e.key.toLowerCase());if(i>=0)releasePad(i+1)});window.addEventListener("blur",()=>pads.forEach(p=>{if(p.playMode==="gate")stopPad(p.id)}))}
-
-/* ---------- RENDER / BIND ---------- */
-function renderAll(){renderPlaylist();renderTimeline();renderCueFields();renderPads();renderVisualButtons();renderSequencer();dom.bpm.value=state.bpm;dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`;dom.master.value=state.master;updateTimelineUI();renderCanvas()}
-function changeZoom(dir){const old=state.zoom,neu=clamp(old*(dir>0?2:.5),1,CONFIG.ZOOM_MAX);if(neu===old)return;const v=selectedVideo(),before=state.playhead;const ratio=v?.duration?before/v.duration:.5;state.zoom=neu;renderTimeline();if(v)dom.timelineViewport.scrollLeft=Math.max(0,ratio*dom.timelineContent.clientWidth-dom.timelineViewport.clientWidth/2)}
-function bind(){
-  dom.audioStart.onclick=()=>ensureAudio().then(()=>status("AUDIO READY",true)).catch(()=>{});
-  dom.master.oninput=e=>{state.master=Number(e.target.value);if(masterGain&&audioCtx)masterGain.gain.value=state.master};
-  dom.bpm.oninput=e=>{state.bpm=clamp(Number(e.target.value)||120,30,300);dom.bpm.value=state.bpm;dom.bpmValue.textContent=`${Math.round(state.bpm)} BPM`;pads.forEach(p=>updatePadGain(p))};dom.tap.onclick=tapBPM;
-  dom.record.onclick=toggleRecording;dom.addLocal.onclick=()=>dom.mediaFile.click();dom.mediaFile.onchange=handleLocal;dom.addYT.onclick=addYouTube;dom.ytUrl.addEventListener("keydown",e=>{if(e.key==="Enter")addYouTube()});
-  ["dragenter","dragover"].forEach(t=>dom.drop.addEventListener(t,e=>{e.preventDefault();dom.drop.classList.add("drag")}));["dragleave","drop"].forEach(t=>dom.drop.addEventListener(t,e=>{e.preventDefault();dom.drop.classList.remove("drag")}));dom.drop.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(f)addLocalFile(f)});
-  dom.save.onclick=saveProject;dom.load.onclick=()=>dom.projectFile.click();dom.renameVideo.onclick=renameVideo;dom.removeVideo.onclick=removeVideo;dom.relinkVideo.onclick=()=>dom.relinkFile.click();dom.relinkFile.onchange=e=>{const f=e.target.files?.[0];e.target.value='';if(f)relinkSelected(f)};dom.projectFile.onchange=loadProjectFile;dom.clear.onclick=()=>{if(confirm("¿Reiniciar proyecto?"))clearProject()};dom.midiConnect.onclick=connectMIDI;dom.midiSelect.onchange=e=>selectMIDI(e.target.value);
-  dom.timelineViewport.addEventListener("pointerdown",e=>{if(!e.target.closest(".cue-block"))beginPlayheadDrag(e)});dom.timelineViewport.addEventListener("dblclick",e=>{if(!e.target.closest(".cue-block"))addCueAt(xToTime(e.clientX))});dom.timelinePlay.onclick=toggleTimelinePlayback;dom.timelineStart.onclick=()=>{stopPreview();state.playhead=0;const v=selectedVideo();if(v?.editorEl)try{v.editorEl.currentTime=0}catch{};updateTimelineUI();renderCanvas()};dom.zoomIn.onclick=()=>changeZoom(1);dom.zoomOut.onclick=()=>changeZoom(-1);
-  dom.visualBtns.addEventListener("click",e=>{const b=e.target.closest("button[data-mode]");if(b)setVisualMode(b.dataset.mode)});
-  dom.cueNew.onclick=addCue;dom.cuePreview.onclick=()=>{const c=selectedCue();if(c)previewCue(c)};dom.cueStartBtn.onclick=()=>{const c=selectedCue();if(c){state.playhead=c.startTime;const v=cueVideo(c);if(v?.editorEl)try{v.editorEl.currentTime=state.playhead}catch{};updateTimelineUI();renderCanvas()}};dom.cueEndBtn.onclick=()=>{const c=selectedCue();if(c){state.playhead=c.endTime;const v=cueVideo(c);if(v?.editorEl)try{v.editorEl.currentTime=state.playhead}catch{};updateTimelineUI();renderCanvas()}};dom.cueDup.onclick=duplicateCue;dom.cueSplit.onclick=splitCue;dom.cueMerge.onclick=mergeCue;dom.cueDelete.onclick=deleteCue;dom.cueDivide2.onclick=()=>divide(2);dom.cueDivide4.onclick=()=>divide(4);dom.cueDivide8.onclick=()=>divide(8);
-  dom.cueName.addEventListener("change",e=>{const c=selectedCue();if(c){c.name=e.target.value.trim()||c.name;renderAll()}});dom.cueStart.addEventListener("change",e=>applyCueTime("start",e.target.value));dom.cueEnd.addEventListener("change",e=>applyCueTime("end",e.target.value));dom.cueDur.addEventListener("change",e=>applyCueTime("duration",e.target.value));
-  dom.padCueSelect.onchange=e=>setPadCue(getPad(state.selectedPadId),e.target.value);dom.padTrigger.onclick=()=>pressPad(state.selectedPadId);dom.padMode.onclick=()=>{const p=getPad(state.selectedPadId);p.playMode=p.playMode==="gate"?"trigger":"gate";renderAll()};dom.padLoop.onclick=()=>{const p=getPad(state.selectedPadId);p.loop=!p.loop;renderAll()};dom.padMute.onclick=()=>{const p=getPad(state.selectedPadId);p.muted=!p.muted;updateAllGains();renderAll()};dom.padSolo.onclick=()=>{const p=getPad(state.selectedPadId);p.solo=!p.solo;updateAllGains();renderAll()};dom.padSync.onclick=()=>{const p=getPad(state.selectedPadId);p.sync=!p.sync;renderAll()};
-  dom.padVol.oninput=e=>{const p=getPad(state.selectedPadId);p.volume=Number(e.target.value);updatePadGain(p);renderPadProps()};dom.padHP.oninput=e=>{const p=getPad(state.selectedPadId);p.highPass=sliderFreq(e.target.value,20,8000);if(p.hp)p.hp.frequency.value=p.highPass;renderPadProps()};dom.padLP.oninput=e=>{const p=getPad(state.selectedPadId);p.lowPass=sliderFreq(e.target.value,20,20000);if(p.lp)p.lp.frequency.value=p.lowPass;renderPadProps()};dom.padRate.oninput=e=>{const p=getPad(state.selectedPadId);p.playbackRate=clamp(Number(e.target.value)||1,CONFIG.MIN_RATE,CONFIG.MAX_RATE);if(p.engine?.videoEl)p.engine.videoEl.playbackRate=effectiveRate(p);if(p.engine?.player)try{p.engine.player.setPlaybackRate(clamp(effectiveRate(p),CONFIG.MIN_RATE,CONFIG.MAX_RATE))}catch{};renderPadProps()};dom.padRateReset.onclick=()=>{const p=getPad(state.selectedPadId);if(!p)return;p.playbackRate=1;if(p.engine?.videoEl)p.engine.videoEl.playbackRate=effectiveRate(p);if(p.engine?.player)try{p.engine.player.setPlaybackRate(clamp(effectiveRate(p),CONFIG.MIN_RATE,CONFIG.MAX_RATE))}catch{};renderPadProps()};dom.padBpm.onchange=e=>{const p=getPad(state.selectedPadId);p.bpm=clamp(Number(e.target.value)||120,20,400);renderPadProps()};dom.padVisual.onchange=e=>{const p=getPad(state.selectedPadId);p.visualMode=e.target.value;if(p.visualMode==="hidden")removeVisual(p.id);else if(p.playing)activateVisual(p);renderAll()};dom.padUnassign.onclick=()=>{const p=getPad(state.selectedPadId);stopPad(p.id);p.cueId=null;renderAll()};
-  dom.cueImage.addEventListener("change",e=>{const c=selectedCue();if(c){c.imageUrl=e.target.value.trim()||null;renderAll()}});
-  dom.seqAddStep.onclick=()=>addSequencerStep(state.selectedPadId);dom.seqPlay.onclick=playSequencer;dom.seqLoop.onclick=toggleSequencerLoop;dom.seqClear.onclick=()=>{if(!state.sequencer.steps.length)return;if(confirm("¿Vaciar la secuencia?"))clearSequencer()};
+    updatePadGain(pad);
+  } catch (error) {
+    console.error("Pad audio connection", error);
+    toast(`PAD ${pad.id}: no se pudo conectar el audio`);
+  }
 }
 
-function animationTick(){const v=selectedVideo();let playheadSynced=false;
-  if(!state.scrubbing&&state.preview.playing&&state.preview.type==="local"&&v?.editorEl){state.playhead=v.editorEl.currentTime;playheadSynced=true;if(state.playhead>=state.preview.end-.02)stopPreview()}
-  pads.forEach(p=>{
-    if(!p.playing)return;const c=findPadCue(p);if(!c)return;
-    if(p.engine?.kind==="local"){const el=p.engine.videoEl;if(el&&el.currentTime>=c.endTime-.02){if(p.loop){try{el.currentTime=c.startTime;el.play()}catch{}}else stopPad(p.id)}
-      if(!state.scrubbing&&!playheadSynced&&v&&c.videoId===v.id&&el){state.playhead=el.currentTime;playheadSynced=true}}
-    else if(p.engine?.kind==="youtube"&&p.engine.ready&&p.engine.player){try{const t=p.engine.player.getCurrentTime();if(typeof t==="number"&&t>=c.endTime-.15){if(p.loop){p.engine.player.seekTo(c.startTime,true);p.engine.player.playVideo()}else stopPad(p.id)}
-      if(!state.scrubbing&&!playheadSynced&&v&&c.videoId===v.id&&typeof t==="number"){state.playhead=t;playheadSynced=true}}catch{}}
+function updatePadGain(pad) {
+  const hasSolo = pads.some(p => p.solo);
+  const gain = pad.muted || (hasSolo && !pad.solo) ? 0 : clamp(pad.volume, 0, 1);
+
+  if (pad.gain && audioCtx) {
+    pad.gain.gain.setTargetAtTime(gain, audioCtx.currentTime, 0.01);
+  }
+
+  updateYTVolume(pad);
+}
+
+function updateAllGains() {
+  pads.forEach(updatePadGain);
+}
+
+function destroyPadEngine(pad) {
+  pad.token += 1;
+
+  if (pad.audioSource) {
+    try { pad.audioSource.disconnect(); } catch {}
+  }
+
+  [pad.hp, pad.lp, pad.gain].forEach(node => {
+    if (node) {
+      try { node.disconnect(); } catch {}
+    }
   });
-  if(playheadSynced)updateTimelineUI();
-  renderCanvas();requestAnimationFrame(animationTick)}
 
-document.addEventListener("DOMContentLoaded",()=>{bind();bindKeyboard();renderAll();status("READY");requestAnimationFrame(animationTick);tryAutoConnectMIDI()});
+  if (pad.engine?.videoEl) {
+    try {
+      pad.engine.videoEl.pause();
+      pad.engine.videoEl.remove();
+    } catch {}
+  }
 
-/* YouTube API */
-function loadYouTubeAPI(){if(window.YT&&window.YT.Player)return Promise.resolve();if(ytApiPromise)return ytApiPromise;ytApiPromise=new Promise((resolve,reject)=>{const prev=window.onYouTubeIframeAPIReady;window.onYouTubeIframeAPIReady=()=>{try{prev?.()}catch{};resolve()};const s=document.createElement("script");s.src="https://www.youtube.com/iframe_api";s.async=true;s.onerror=()=>reject(Error("YouTube API"));document.head.appendChild(s)});return ytApiPromise}
+  if (pad.engine?.player) {
+    try { pad.engine.player.destroy(); } catch {}
+  }
+
+  if (pad.engine?.host) {
+    try { pad.engine.host.remove(); } catch {}
+  }
+
+  pad.audioSource = null;
+  pad.hp = null;
+  pad.lp = null;
+  pad.gain = null;
+  pad.engine = null;
+  pad.playing = false;
+  pad.sequenceOwned = false;
+
+  removeVisual(pad.id);
+}
+
+/* ==========================================================
+   PLAYBACK
+========================================================== */
+
+function findPadCue(pad) {
+  return getCue(pad.cueId);
+}
+
+function effectiveRate(pad) {
+  if (!pad.sync || !pad.bpm) return pad.playbackRate;
+  return clamp(
+    state.bpm / pad.bpm * pad.playbackRate,
+    CONFIG.MIN_RATE,
+    CONFIG.MAX_RATE
+  );
+}
+
+function ensurePadEngine(pad, video) {
+  if (pad.engine && pad.engine.videoId === video.id) return pad.engine;
+
+  destroyPadEngine(pad);
+
+  if (video.sourceType === "local") {
+    const el = document.createElement(video.mediaKind === "audio" ? "audio" : "video");
+    el.src = video.sourceUrl || "";
+    el.preload = "auto";
+    el.playsInline = true;
+    el.crossOrigin = "anonymous";
+    el.dataset.pad = pad.id;
+
+    el.addEventListener("error", () => {
+      pad.playing = false;
+      updatePadTile(pad);
+      toast(`PAD ${pad.id}: error de fuente`);
+    });
+
+    dom.videoBank.appendChild(el);
+
+    pad.engine = {
+      kind: "local",
+      videoId: video.id,
+      videoEl: el
+    };
+
+    if (audioCtx) connectPadAudio(pad, el);
+  } else {
+    const host = document.createElement("div");
+    host.style.display = "none";
+    host.id = `yt-pad-${pad.id}-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    dom.videoBank.appendChild(host);
+
+    pad.engine = {
+      kind: "youtube",
+      videoId: video.id,
+      host,
+      player: null,
+      ready: false
+    };
+
+    loadYouTubeAPI()
+      .then(() => {
+        if (!pad.engine || pad.engine.videoId !== video.id) return;
+
+        pad.engine.player = new YT.Player(host.id, {
+          videoId: video.youtubeId,
+          width: 280,
+          height: 158,
+          playerVars: {
+            autoplay: 0,
+            controls: 0,
+            playsinline: 1,
+            rel: 0
+          },
+          events: {
+            onReady: () => {
+              if (!pad.engine) return;
+              pad.engine.ready = true;
+              updateYTVolume(pad);
+            },
+            onError: () => toast(`PAD ${pad.id}: error YouTube`)
+          }
+        });
+      })
+      .catch(() => toast("YouTube API no disponible"));
+  }
+
+  return pad.engine;
+}
+
+async function startPad(padId, options = {}) {
+  const pad = getPad(padId);
+  const cue = pad ? findPadCue(pad) : null;
+  const video = cue ? cueVideo(cue) : null;
+
+  if (!pad || !cue || !video) {
+    status(`PAD ${padId}: SIN CUE`);
+    return false;
+  }
+
+  if (video.sourceType === "local" && !video.sourceUrl) {
+    toast(`PAD ${padId}: fuente local no vinculada`);
+    return false;
+  }
+
+  try {
+    await ensureAudio();
+  } catch {
+    return false;
+  }
+
+  const engine = ensurePadEngine(pad, video);
+  const token = ++pad.token;
+
+  if (video.sourceType === "local") {
+    const el = engine.videoEl;
+    if (!pad.audioSource) connectPadAudio(pad, el);
+
+    const play = () => {
+      if (token !== pad.token) return;
+
+      try {
+        el.currentTime = clamp(
+          cue.startTime,
+          0,
+          Math.max(0, el.duration || video.duration || cue.startTime)
+        );
+        el.playbackRate = effectiveRate(pad);
+        if ("preservesPitch" in el) el.preservesPitch = false;
+      } catch {}
+
+      el.play()
+        .then(() => {
+          if (token !== pad.token) return;
+          pad.playing = true;
+          pad.sequenceOwned = !!options.sequence;
+          activateVisual(pad);
+          updatePadTile(pad);
+          if (!options.silentStatus) status(`PLAY PAD ${padId}`, true);
+        })
+        .catch(() => toast(`PAD ${padId}: reproducción bloqueada`));
+    };
+
+    if (el.readyState >= 1) play();
+    else el.addEventListener("loadedmetadata", play, { once: true });
+    return true;
+  }
+
+  const tryYouTube = () => {
+    if (token !== pad.token) return;
+    const player = engine.player;
+
+    if (!engine.ready || !player) {
+      setTimeout(tryYouTube, 80);
+      return;
+    }
+
+    try {
+      player.seekTo(cue.startTime, true);
+      player.setPlaybackRate(clamp(effectiveRate(pad), CONFIG.MIN_RATE, CONFIG.MAX_RATE));
+      updateYTVolume(pad);
+      player.playVideo();
+      pad.playing = true;
+      pad.sequenceOwned = !!options.sequence;
+      activateVisual(pad);
+      updatePadTile(pad);
+      if (!options.silentStatus) status(`PLAY PAD ${padId}`, true);
+    } catch {
+      toast(`PAD ${padId}: error YouTube`);
+    }
+  };
+
+  tryYouTube();
+  return true;
+}
+
+function stopPad(padId) {
+  const pad = getPad(padId);
+  if (!pad) return;
+
+  pad.token += 1;
+
+  if (pad.engine?.videoEl) {
+    try { pad.engine.videoEl.pause(); } catch {}
+  }
+
+  if (pad.engine?.player) {
+    try { pad.engine.player.pauseVideo(); } catch {}
+  }
+
+  pad.playing = false;
+  pad.sequenceOwned = false;
+  removeVisual(pad.id);
+  updatePadTile(pad);
+  renderCanvas();
+}
+
+function pressPad(padId) {
+  const pad = getPad(padId);
+  if (!pad) return;
+
+  if (pad.playMode === "gate") {
+    if (!pad.playing) startPad(padId);
+  } else {
+    pad.playing ? stopPad(padId) : startPad(padId);
+  }
+}
+
+function releasePad(padId) {
+  const pad = getPad(padId);
+  if (pad?.playMode === "gate") stopPad(padId);
+}
+
+function updateYTVolume(pad) {
+  const player = pad.engine?.player;
+  if (!player || !pad.engine.ready) return;
+
+  const hasSolo = pads.some(p => p.solo);
+  const gain = pad.muted || (hasSolo && !pad.solo) ? 0 : clamp(pad.volume, 0, 1);
+
+  try {
+    player.setVolume(Math.round(gain * 100));
+    gain ? player.unMute() : player.mute();
+    player.setPlaybackRate(clamp(effectiveRate(pad), CONFIG.MIN_RATE, CONFIG.MAX_RATE));
+  } catch {}
+}
+
+/* ==========================================================
+   VISUAL
+========================================================== */
+
+function activateVisual(pad) {
+  if (pad.visualMode === "hidden") return;
+
+  let list = state.visualSources.filter(id => id !== pad.id);
+  list.push(pad.id);
+
+  const max = CONFIG.VIS_LIMIT[state.visualizerMode];
+
+  while (list.length > max) {
+    const removable = list.findIndex(id => getPad(id)?.visualMode !== "visible");
+    list.splice(removable >= 0 ? removable : 0, 1);
+  }
+
+  state.visualSources = list;
+  renderVisualButtons();
+  renderCanvas();
+}
+
+function removeVisual(padId) {
+  state.visualSources = state.visualSources.filter(id => id !== padId);
+  renderVisualButtons();
+}
+
+function setVisualMode(mode) {
+  if (!CONFIG.VIS_LIMIT[mode]) return;
+  state.visualizerMode = mode;
+  state.visualSources = state.visualSources.slice(-CONFIG.VIS_LIMIT[mode]);
+  renderAll();
+}
+
+function visualCells(mode, width, height) {
+  if (mode === "split2") {
+    return [
+      { x: 0, y: 0, w: width / 2, h: height },
+      { x: width / 2, y: 0, w: width / 2, h: height }
+    ];
+  }
+
+  if (mode === "split4") {
+    return [
+      { x: 0, y: 0, w: width / 2, h: height / 2 },
+      { x: width / 2, y: 0, w: width / 2, h: height / 2 },
+      { x: 0, y: height / 2, w: width / 2, h: height / 2 },
+      { x: width / 2, y: height / 2, w: width / 2, h: height / 2 }
+    ];
+  }
+
+  return [{ x: 0, y: 0, w: width, h: height }];
+}
+
+function withCellClip(ctx, cell, draw) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(cell.x, cell.y, cell.w, cell.h);
+  ctx.clip();
+  draw();
+  ctx.restore();
+}
+
+function drawCover(ctx, media, cell) {
+  const sw = media.videoWidth;
+  const sh = media.videoHeight;
+  if (!sw || !sh) return;
+
+  const scale = Math.max(cell.w / sw, cell.h / sh);
+  const dw = sw * scale;
+  const dh = sh * scale;
+
+  ctx.drawImage(
+    media,
+    cell.x + (cell.w - dw) / 2,
+    cell.y + (cell.h - dh) / 2,
+    dw,
+    dh
+  );
+}
+
+function drawCoverImage(ctx, image, cell) {
+  const sw = image.naturalWidth;
+  const sh = image.naturalHeight;
+  if (!sw || !sh) return;
+
+  const scale = Math.max(cell.w / sw, cell.h / sh);
+  const dw = sw * scale;
+  const dh = sh * scale;
+
+  ctx.drawImage(
+    image,
+    cell.x + (cell.w - dw) / 2,
+    cell.y + (cell.h - dh) / 2,
+    dw,
+    dh
+  );
+}
+
+function drawCellNotice(ctx, cell, text) {
+  ctx.fillStyle = "#17131c";
+  ctx.fillRect(cell.x, cell.y, cell.w, cell.h);
+  ctx.fillStyle = "#ff4d5e";
+  ctx.font = "bold 14px JetBrains Mono,monospace";
+  ctx.textAlign = "center";
+  ctx.fillText(text, cell.x + cell.w / 2, cell.y + cell.h / 2);
+  ctx.textAlign = "left";
+}
+
+function getImageEntry(url) {
+  if (!url) return null;
+
+  let entry = imageCache.get(url);
+
+  if (!entry) {
+    entry = {
+      img: new Image(),
+      loaded: false,
+      error: false
+    };
+
+    entry.img.crossOrigin = "anonymous";
+    entry.img.onload = () => {
+      entry.loaded = true;
+      renderCanvas();
+    };
+    entry.img.onerror = () => {
+      entry.error = true;
+    };
+    entry.img.src = url;
+    imageCache.set(url, entry);
+  }
+
+  return entry;
+}
+
+function cueFallbackImageUrl(video) {
+  return video?.sourceType === "youtube" && video.youtubeId
+    ? `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`
+    : null;
+}
+
+function drawImageOrNotice(ctx, cell, url, notice) {
+  if (url) {
+    const entry = getImageEntry(url);
+    if (entry?.loaded) {
+      drawCoverImage(ctx, entry.img, cell);
+      return;
+    }
+  }
+
+  drawCellNotice(ctx, cell, notice);
+}
+
+function renderCanvas() {
+  const canvas = dom.canvas;
+  if (!canvas) return;
+
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = "#08090b";
+  ctx.fillRect(0, 0, width, height);
+
+  if (state.preview.playing) {
+    const video = getVideo(state.preview.videoId);
+    const cue = getCue(state.preview.cueId) || selectedCue();
+    const cell = { x: 0, y: 0, w: width, h: height };
+    const imageUrl = cue?.imageUrl || null;
+
+    if (imageUrl) {
+      const entry = getImageEntry(imageUrl);
+      if (entry?.loaded) {
+        drawCoverImage(ctx, entry.img, cell);
+      } else if (video?.sourceType === "local" && video.mediaKind === "video" && video.editorEl?.readyState >= 2) {
+        drawCover(ctx, video.editorEl, cell);
+      } else {
+        drawCellNotice(ctx, cell, "CARGANDO IMAGEN…");
+      }
+    } else if (video?.sourceType === "local" && video.mediaKind === "video" && video.editorEl?.readyState >= 2) {
+      drawCover(ctx, video.editorEl, cell);
+    } else if (video?.mediaKind === "audio") {
+      drawImageOrNotice(ctx, cell, cueFallbackImageUrl(video), "AUDIO PREVIEW");
+    } else {
+      drawImageOrNotice(ctx, cell, cueFallbackImageUrl(video), "YOUTUBE PREVIEW");
+    }
+
+    dom.visorContext.textContent = `PREVIEW · ${cue?.name || "CUE"}`;
+    dom.placeholder.hidden = true;
+    return;
+  }
+
+  const active = state.visualSources
+    .map(getPad)
+    .filter(pad => pad?.playing);
+
+  dom.placeholder.hidden = active.length > 0;
+  dom.visorContext.textContent = active.length
+    ? `${active.length} PAD${active.length > 1 ? "S" : ""} · VISUAL`
+    : "SIN REPRODUCCIÓN";
+
+  if (!active.length) return;
+
+  const cells = visualCells(state.visualizerMode, width, height);
+
+  active.forEach((pad, index) => {
+    const cell = cells[index];
+    if (!cell) return;
+
+    const cue = findPadCue(pad);
+    const video = cue ? cueVideo(cue) : null;
+
+    withCellClip(ctx, cell, () => {
+      if (cue?.imageUrl) {
+        const entry = getImageEntry(cue.imageUrl);
+        if (entry?.loaded) {
+          drawCoverImage(ctx, entry.img, cell);
+          return;
+        }
+      }
+
+      if (video?.sourceType === "local" && video.mediaKind === "video" && pad.engine?.videoEl?.readyState >= 2) {
+        drawCover(ctx, pad.engine.videoEl, cell);
+      } else if (video?.mediaKind === "audio") {
+        drawImageOrNotice(ctx, cell, cueFallbackImageUrl(video), "AUDIO");
+      } else if (video?.sourceType === "youtube") {
+        drawImageOrNotice(ctx, cell, cueFallbackImageUrl(video), "YOUTUBE");
+      } else {
+        drawCellNotice(ctx, cell, "SIN VIDEO");
+      }
+    });
+  });
+}
+
+function renderVisualButtons() {
+  dom.visualBtns.querySelectorAll("button").forEach(button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.mode === state.visualizerMode
+    );
+  });
+
+  dom.visualModeLabel.textContent = state.visualizerMode.toUpperCase();
+  dom.visualCount.textContent = `${state.visualSources.length}/${CONFIG.VIS_LIMIT[state.visualizerMode]}`;
+}
+
+/* ==========================================================
+   PREVIEW / EDITOR TRANSPORT
+========================================================== */
+
+function stopPreview() {
+  clearTimeout(state.preview.timer);
+
+  const video = getVideo(state.preview.videoId);
+  if (video?.editorEl) {
+    try { video.editorEl.pause(); } catch {}
+  }
+
+  state.preview = {
+    videoId: null,
+    cueId: null,
+    playing: false,
+    end: 0,
+    type: null,
+    timer: null
+  };
+
+  dom.ytPreview.classList.remove("show");
+  dom.ytPreview.innerHTML = "";
+  dom.timelinePlay.textContent = "▶ REPRODUCIR";
+  renderCanvas();
+}
+
+function startLocalPreview(video, cue, start, end) {
+  const el = ensureEditor(video);
+  if (!el) return;
+
+  ensureAudio()
+    .then(() => {
+      state.preview = {
+        videoId: video.id,
+        cueId: cue?.id || null,
+        playing: true,
+        end,
+        type: "local",
+        timer: null
+      };
+
+      el.currentTime = start;
+      el.play().catch(() => toast("Reproducción bloqueada"));
+      dom.timelinePlay.textContent = "■ DETENER";
+      renderCanvas();
+    });
+}
+
+function startYTPreview(video, cue, start, end) {
+  clearTimeout(state.preview.timer);
+
+  const iframe = document.createElement("iframe");
+  iframe.src = `https://www.youtube.com/embed/${video.youtubeId}?autoplay=1&start=${Math.floor(start)}&controls=1&playsinline=1&rel=0`;
+  iframe.allow = "autoplay; encrypted-media";
+
+  dom.ytPreview.innerHTML = "";
+  dom.ytPreview.appendChild(iframe);
+  dom.ytPreview.classList.add("show");
+
+  state.preview = {
+    videoId: video.id,
+    cueId: cue?.id || null,
+    playing: true,
+    end,
+    type: "youtube",
+    timer: setTimeout(
+      stopPreview,
+      Math.max(200, end - start) * 1000
+    )
+  };
+
+  dom.timelinePlay.textContent = "■ DETENER";
+  renderCanvas();
+}
+
+function previewCue(cue) {
+  const video = cueVideo(cue);
+  if (!video) return;
+
+  stopPreview();
+  state.playhead = cue.startTime;
+  state.selectedCueId = cue.id;
+  updateTimelineUI();
+
+  if (video.sourceType === "local") {
+    startLocalPreview(video, cue, cue.startTime, cue.endTime);
+  } else {
+    startYTPreview(video, cue, cue.startTime, cue.endTime);
+  }
+}
+
+function toggleTimelinePlayback() {
+  const video = selectedVideo();
+  if (!video) {
+    toast("Selecciona un video");
+    return;
+  }
+
+  if (state.preview.playing) {
+    stopPreview();
+    return;
+  }
+
+  if (!video.duration) {
+    toast("La duración aún no está disponible");
+    return;
+  }
+
+  const cue = selectedCue();
+  const end = cue ? cue.endTime : video.duration;
+  startPreviewRange(video, cue, state.playhead, end);
+}
+
+function startPreviewRange(video, cue, start, end) {
+  if (!video) return;
+
+  state.playhead = clamp(
+    start,
+    0,
+    video.duration || end
+  );
+
+  if (video.sourceType === "local") {
+    startLocalPreview(video, cue, state.playhead, end);
+  } else {
+    startYTPreview(video, cue, state.playhead, end);
+  }
+
+  updateTimelineUI();
+}
+
+/* ==========================================================
+   MEDIA / PLAYLIST
+========================================================== */
+
+function ensureEditor(video) {
+  if (video.sourceType !== "local") return null;
+  if (video.editorEl) {
+    if (audioCtx) connectEditorAudio(video, video.editorEl);
+    return video.editorEl;
+  }
+
+  const el = document.createElement(video.mediaKind === "audio" ? "audio" : "video");
+  el.src = video.sourceUrl || "";
+  el.preload = "metadata";
+  el.playsInline = true;
+  el.controls = false;
+  el.crossOrigin = "anonymous";
+
+  video.editorEl = el;
+  dom.videoBank.appendChild(el);
+
+  el.addEventListener("loadedmetadata", () => {
+    video.duration = Number(el.duration) || video.duration;
+    normalizeCues(video);
+    renderAll();
+  });
+
+  el.addEventListener("error", () => {
+    toast(`No se pudo leer ${video.name}`);
+  });
+
+  el.addEventListener("ended", () => {
+    if (
+      state.preview.playing &&
+      state.preview.type === "local" &&
+      state.preview.videoId === video.id
+    ) {
+      stopPreview();
+    }
+  });
+
+  if (audioCtx) connectEditorAudio(video, el);
+  return el;
+}
+
+function normalizeCues(video) {
+  const duration = video.duration;
+  if (!duration) return;
+
+  video.cues = video.cues
+    .filter(cue => Number.isFinite(cue.startTime) && Number.isFinite(cue.endTime))
+    .map(cue => ({
+      ...cue,
+      videoId: video.id,
+      startTime: clamp(cue.startTime, 0, Math.max(0, duration - CONFIG.MIN_CUE)),
+      endTime: clamp(cue.endTime, CONFIG.MIN_CUE, duration)
+    }))
+    .filter(cue => cue.endTime - cue.startTime >= CONFIG.MIN_CUE);
+}
+
+function addLocalFile(file) {
+  if (!file || (!file.type.startsWith("video/") && !file.type.startsWith("audio/"))) {
+    toast("Selecciona un video o audio compatible");
+    return;
+  }
+
+  const video = makeVideo({
+    name: file.name,
+    fileName: file.name,
+    sourceType: "local",
+    mediaKind: file.type.startsWith("audio/") ? "audio" : "video",
+    sourceUrl: URL.createObjectURL(file)
+  });
+
+  videos.push(video);
+  state.selectedVideoId = video.id;
+  state.selectedCueId = null;
+  state.playhead = 0;
+
+  ensureEditor(video);
+  renderAll();
+  toast("Fuente agregada");
+}
+
+function handleLocal(event) {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (file) addLocalFile(file);
+}
+
+function extractYT(url) {
+  const m = String(url).match(
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/
+  );
+  return m ? m[1] : (/^[\w-]{11}$/.test(url) ? url : "");
+}
+
+function addYouTube() {
+  const raw = dom.ytUrl.value.trim();
+  const youtubeId = extractYT(raw);
+
+  if (!youtubeId) {
+    toast("URL de YouTube no válida");
+    return;
+  }
+
+  const video = makeVideo({
+    name: `YouTube · ${youtubeId}`,
+    sourceType: "youtube",
+    youtubeId
+  });
+
+  videos.push(video);
+  state.selectedVideoId = video.id;
+  state.selectedCueId = null;
+  state.playhead = 0;
+  dom.ytUrl.value = "";
+
+  renderAll();
+  loadYTDuration(video);
+  toast("YouTube agregado");
+}
+
+function loadYTDuration(video) {
+  loadYouTubeAPI()
+    .then(() => new Promise(resolve => {
+      const host = document.createElement("div");
+      host.id = `yt-meta-${video.id}`;
+      host.style.cssText = "position:fixed;left:-9999px;width:2px;height:2px";
+      document.body.appendChild(host);
+
+      const player = new YT.Player(host.id, {
+        videoId: video.youtubeId,
+        width: 2,
+        height: 2,
+        events: {
+          onReady: () => {
+            video.duration = Number(player.getDuration()) || 0;
+            try { player.destroy(); } catch {}
+            host.remove();
+            renderAll();
+            resolve();
+          },
+          onError: () => {
+            try { player.destroy(); } catch {}
+            host.remove();
+            resolve();
+          }
+        }
+      });
+    }))
+    .catch(() => {});
+}
+
+function relinkSelected(file) {
+  const video = selectedVideo();
+  if (!video || video.sourceType !== "local") return;
+
+  if (video.sourceUrl) URL.revokeObjectURL(video.sourceUrl);
+
+  if (video.editorEl) {
+    try { video.editorEl.pause(); video.editorEl.remove(); } catch {}
+  }
+
+  video.editorEl = null;
+  video.editorSource = null;
+  video.editorGain = null;
+  video.sourceUrl = URL.createObjectURL(file);
+  video.fileName = file.name;
+  video.linked = true;
+  video.mediaKind = file.type.startsWith("audio/") ? "audio" : "video";
+
+  ensureEditor(video);
+  renderAll();
+  toast("Fuente vinculada");
+}
+
+function removeVideo() {
+  const video = selectedVideo();
+  if (!video) return;
+
+  stopPreview();
+
+  pads.forEach(pad => {
+    if (video.cues.some(cue => cue.id === pad.cueId)) {
+      stopPad(pad.id);
+      pad.cueId = null;
+    }
+  });
+
+  if (video.sourceUrl) URL.revokeObjectURL(video.sourceUrl);
+  if (video.editorEl) {
+    try { video.editorEl.remove(); } catch {}
+  }
+
+  const index = videos.indexOf(video);
+  if (index >= 0) videos.splice(index, 1);
+
+  state.selectedVideoId = videos[0]?.id || null;
+  state.selectedCueId = null;
+  state.playhead = 0;
+  renderAll();
+}
+
+function renameVideo() {
+  const video = selectedVideo();
+  if (!video) return;
+
+  const value = prompt("Nombre del video:", video.name);
+  if (value?.trim()) {
+    video.name = value.trim();
+    renderAll();
+  }
+}
+
+function selectVideo(id) {
+  stopPreview();
+  state.selectedVideoId = id;
+  state.selectedCueId = null;
+  state.playhead = 0;
+
+  const video = getVideo(id);
+  if (video?.sourceType === "local") ensureEditor(video);
+  else if (video && !video.duration) loadYTDuration(video);
+
+  renderAll();
+}
+
+/* ==========================================================
+   TIMELINE + CUE EDITOR
+========================================================== */
+
+function timelineBaseWidth() {
+  return Math.max(dom.timelineViewport.clientWidth - 2, 600);
+}
+
+function timelineContentWidth() {
+  return Math.max(timelineBaseWidth() * state.zoom, 600);
+}
+
+function xToTime(clientX) {
+  const video = selectedVideo();
+  if (!video || !video.duration) return 0;
+
+  const rect = dom.timelineContent.getBoundingClientRect();
+
+  return clamp(
+    ((clientX - rect.left) / rect.width) * video.duration,
+    0,
+    video.duration
+  );
+}
+
+function renderTimeline() {
+  const video = selectedVideo();
+
+  if (!video) {
+    dom.timelineTitle.textContent = "Selecciona un video";
+    dom.timelineDuration.textContent = "00:00.000";
+    dom.timelineTime.textContent = "00:00.000";
+    dom.cues.innerHTML = "";
+    dom.timelineRuler.innerHTML = "";
+    dom.timelineContent.style.width = "100%";
+    dom.timelineStatus.textContent = "0 CUES";
+    return;
+  }
+
+  dom.timelineContent.style.width = `${timelineContentWidth()}px`;
+  dom.timelineTitle.textContent = `${video.name} · ${video.cues.length} CUE${video.cues.length === 1 ? "" : "S"}`;
+  dom.timelineDuration.textContent = fmt(video.duration);
+  dom.timelineTime.textContent = fmt(state.playhead);
+  dom.timelineRuler.innerHTML = "";
+  dom.cues.innerHTML = "";
+
+  if (video.duration > 0) {
+    const tickStep = state.zoom >= 8
+      ? 1
+      : state.zoom >= 4
+        ? 2
+        : state.zoom >= 2
+          ? 5
+          : Math.max(5, Math.ceil(video.duration / 10));
+
+    for (let t = 0; t <= video.duration + 0.0001; t += tickStep) {
+      const marker = document.createElement("span");
+      marker.style.left = `${(t / video.duration) * 100}%`;
+      marker.textContent = fmt(t).slice(0, 5);
+      dom.timelineRuler.appendChild(marker);
+    }
+  }
+
+  video.cues
+    .slice()
+    .sort((a, b) => a.startTime - b.startTime)
+    .forEach(cue => {
+      const block = document.createElement("div");
+      block.className = "cue-block";
+      block.dataset.id = cue.id;
+      block.style.left = `${video.duration ? (cue.startTime / video.duration) * 100 : 0}%`;
+      block.style.width = `${video.duration ? Math.max((cueDuration(cue) / video.duration) * 100, 0.25) : 0}%`;
+
+      if (cue.id === state.selectedCueId) block.classList.add("selected");
+
+      const startHandle = document.createElement("span");
+      startHandle.className = "cue-handle start";
+
+      const endHandle = document.createElement("span");
+      endHandle.className = "cue-handle end";
+
+      const label = document.createElement("strong");
+      label.textContent = cue.name;
+
+      const time = document.createElement("small");
+      time.textContent = `${fmt(cue.startTime)} → ${fmt(cue.endTime)}`;
+
+      block.append(startHandle, label, time, endHandle);
+
+      block.addEventListener("click", event => {
+        event.stopPropagation();
+        selectCue(cue.id);
+      });
+
+      block.addEventListener("pointerdown", event => {
+        event.stopPropagation();
+        selectCue(cue.id);
+        beginCueDrag(
+          event,
+          cue,
+          event.target === startHandle
+            ? "start"
+            : event.target === endHandle
+              ? "end"
+              : "move"
+        );
+      });
+
+      dom.cues.appendChild(block);
+    });
+
+  dom.timelineStatus.textContent = `${video.cues.length} CUE${video.cues.length === 1 ? "" : "S"} · ZOOM ${state.zoom}×`;
+  dom.zoomLevel.textContent = `${state.zoom}×`;
+  updateTimelineUI();
+}
+
+function updateCueBlockDOM(cue) {
+  const element = dom.cues.querySelector(`[data-id="${CSS.escape(cue.id)}"]`);
+  if (!element) return;
+
+  const video = cueVideo(cue);
+  if (!video?.duration) return;
+
+  element.style.left = `${(cue.startTime / video.duration) * 100}%`;
+  element.style.width = `${Math.max((cueDuration(cue) / video.duration) * 100, 0.25)}%`;
+
+  const time = element.querySelector("small");
+  if (time) time.textContent = `${fmt(cue.startTime)} → ${fmt(cue.endTime)}`;
+}
+
+function beginCueDrag(event, cue, kind) {
+  const video = cueVideo(cue);
+  if (!video?.duration) return;
+
+  const rect = dom.timelineContent.getBoundingClientRect();
+  const startX = event.clientX;
+  const originalStart = cue.startTime;
+  const originalEnd = cue.endTime;
+
+  const move = current => {
+    const delta = ((current.clientX - startX) / rect.width) * video.duration;
+
+    if (kind === "move") {
+      const duration = originalEnd - originalStart;
+      cue.startTime = clamp(originalStart + delta, 0, video.duration - duration);
+      cue.endTime = cue.startTime + duration;
+    } else if (kind === "start") {
+      cue.startTime = clamp(originalStart + delta, 0, originalEnd - CONFIG.MIN_CUE);
+    } else {
+      cue.endTime = clamp(originalEnd + delta, originalStart + CONFIG.MIN_CUE, video.duration);
+    }
+
+    state.playhead = kind === "end" ? cue.endTime : cue.startTime;
+    updateCueBlockDOM(cue);
+    updateTimelineUI();
+    renderCueFields(false);
+  };
+
+  const up = () => {
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", up);
+    renderAll();
+  };
+
+  window.addEventListener("pointermove", move);
+  window.addEventListener("pointerup", up);
+  event.preventDefault();
+}
+
+function beginPlayheadDrag(event) {
+  const video = selectedVideo();
+  if (!video?.duration) return;
+
+  state.scrubbing = true;
+  seekTimeline(event);
+
+  const move = current => {
+    state.playhead = xToTime(current.clientX);
+    updateTimelineUI();
+  };
+
+  const up = () => {
+    state.scrubbing = false;
+    const current = selectedVideo();
+    if (current?.editorEl) {
+      try { current.editorEl.currentTime = state.playhead; } catch {}
+    }
+    window.removeEventListener("pointermove", move);
+    window.removeEventListener("pointerup", up);
+    renderCanvas();
+  };
+
+  window.addEventListener("pointermove", move);
+  window.addEventListener("pointerup", up);
+  event.preventDefault();
+}
+
+function seekTimeline(event) {
+  const video = selectedVideo();
+  if (!video?.duration) return;
+
+  state.playhead = xToTime(event.clientX);
+  updateTimelineUI();
+  renderCanvas();
+}
+
+function updateTimelineUI() {
+  const video = selectedVideo();
+  if (!video) return;
+
+  state.playhead = clamp(state.playhead, 0, video.duration || 0);
+  dom.timelineTime.textContent = fmt(state.playhead);
+  dom.playhead.style.left = `${video.duration ? (state.playhead / video.duration) * 100 : 0}%`;
+}
+
+function addCueAt(time = state.playhead) {
+  const video = selectedVideo();
+
+  if (!video?.duration) {
+    toast("Selecciona un video con duración disponible");
+    return;
+  }
+
+  const start = clamp(time, 0, video.duration);
+  const end = Math.min(video.duration, start + CONFIG.NEW_CUE);
+
+  if (end - start < CONFIG.MIN_CUE) {
+    toast("No hay espacio suficiente para crear el cue");
+    return;
+  }
+
+  const cue = makeCue(
+    video.id,
+    start,
+    end,
+    `Cue ${video.cues.length + 1}`
+  );
+
+  video.cues.push(cue);
+  state.selectedCueId = cue.id;
+  state.playhead = start;
+  renderAll();
+
+  setTimeout(() => dom.cueName?.focus(), 0);
+}
+
+function addCue() {
+  addCueAt(state.playhead);
+}
+
+function selectCue(id) {
+  const cue = getCue(id);
+  if (!cue) return;
+
+  state.selectedCueId = cue.id;
+  state.selectedVideoId = cue.videoId;
+  state.playhead = cue.startTime;
+  renderAll();
+}
+
+function duplicateCue() {
+  const cue = selectedCue();
+  const video = cueVideo(cue);
+  if (!cue || !video) return;
+
+  const duration = cueDuration(cue);
+  const start = clamp(
+    cue.endTime + 0.01,
+    0,
+    Math.max(0, video.duration - duration)
+  );
+
+  const copy = makeCue(
+    video.id,
+    start,
+    start + duration,
+    `${cue.name} copia`
+  );
+
+  copy.imageUrl = cue.imageUrl || null;
+  video.cues.push(copy);
+  state.selectedCueId = copy.id;
+  state.playhead = start;
+  renderAll();
+}
+
+function deleteCue() {
+  const cue = selectedCue();
+  const video = cueVideo(cue);
+  if (!cue || !video) return;
+
+  pads.forEach(pad => {
+    if (pad.cueId === cue.id) {
+      stopPad(pad.id);
+      pad.cueId = null;
+    }
+  });
+
+  video.cues = video.cues.filter(item => item.id !== cue.id);
+  state.selectedCueId = null;
+  renderAll();
+  toast("Cue eliminado");
+}
+
+function splitCue() {
+  const cue = selectedCue();
+  const video = cueVideo(cue);
+  const time = state.playhead;
+
+  if (
+    !cue ||
+    !video ||
+    time <= cue.startTime + CONFIG.MIN_CUE ||
+    time >= cue.endTime - CONFIG.MIN_CUE
+  ) {
+    toast("El playhead debe estar dentro del cue");
+    return;
+  }
+
+  const oldEnd = cue.endTime;
+  cue.endTime = time;
+
+  const second = makeCue(
+    video.id,
+    time,
+    oldEnd,
+    `${cue.name} B`
+  );
+
+  video.cues.push(second);
+  state.selectedCueId = second.id;
+  renderAll();
+}
+
+function mergeCue() {
+  const cue = selectedCue();
+  const video = cueVideo(cue);
+  if (!cue || !video) return;
+
+  const ordered = video.cues
+    .slice()
+    .sort((a, b) => a.startTime - b.startTime);
+
+  const index = ordered.findIndex(item => item.id === cue.id);
+  const next = ordered[index + 1];
+
+  if (!next) {
+    toast("No hay un cue siguiente");
+    return;
+  }
+
+  if (next.startTime > cue.endTime + CONFIG.MIN_CUE) {
+    toast("El siguiente cue está separado por un espacio");
+    return;
+  }
+
+  cue.endTime = Math.max(cue.endTime, next.endTime);
+
+  pads.forEach(pad => {
+    if (pad.cueId === next.id) pad.cueId = cue.id;
+  });
+
+  video.cues = video.cues.filter(item => item.id !== next.id);
+  renderAll();
+}
+
+function divide(count) {
+  const video = selectedVideo();
+  if (!video?.duration) {
+    toast("Selecciona un video con duración disponible");
+    return;
+  }
+
+  pads.forEach(pad => {
+    if (video.cues.some(cue => cue.id === pad.cueId)) {
+      stopPad(pad.id);
+      pad.cueId = null;
+    }
+  });
+
+  video.cues = Array.from({ length: count }, (_, index) =>
+    makeCue(
+      video.id,
+      video.duration * index / count,
+      video.duration * (index + 1) / count,
+      `Cue ${index + 1}`
+    )
+  );
+
+  state.selectedCueId = video.cues[0]?.id || null;
+  state.playhead = 0;
+  renderAll();
+  toast(`Video dividido en ${count} cues`);
+}
+
+function applyCueTime(kind, value) {
+  const cue = selectedCue();
+  const video = cueVideo(cue);
+  if (!cue || !video?.duration) return;
+
+  const next = clamp(parseTime(value), 0, video.duration);
+
+  if (kind === "start") {
+    cue.startTime = clamp(next, 0, cue.endTime - CONFIG.MIN_CUE);
+  }
+
+  if (kind === "end") {
+    cue.endTime = clamp(next, cue.startTime + CONFIG.MIN_CUE, video.duration);
+  }
+
+  if (kind === "duration") {
+    cue.endTime = clamp(
+      cue.startTime + next,
+      cue.startTime + CONFIG.MIN_CUE,
+      video.duration
+    );
+  }
+
+  if (state.playhead < cue.startTime || state.playhead > cue.endTime) {
+    state.playhead = cue.startTime;
+  }
+
+  renderAll();
+}
+
+function renderCueFields(updatePadSelect = true) {
+  const cue = selectedCue();
+
+  if (!cue) {
+    dom.cueEmpty.hidden = false;
+    dom.cueForm.hidden = true;
+    dom.cueLabel.textContent = "NINGÚN CUE";
+    return;
+  }
+
+  dom.cueEmpty.hidden = true;
+  dom.cueForm.hidden = false;
+  dom.cueLabel.textContent = cue.name;
+  dom.cueEditorTitle.textContent = cue.name;
+  dom.cueName.value = cue.name;
+  dom.cueStart.value = fmt(cue.startTime);
+  dom.cueEnd.value = fmt(cue.endTime);
+  dom.cueDur.value = fmt(cueDuration(cue));
+  dom.cueImage.value = cue.imageUrl || "";
+
+  renderCueAssignments();
+  if (updatePadSelect) renderPadSelect();
+}
+
+function renderCueAssignments() {
+  const cue = selectedCue();
+  dom.cueAssign.innerHTML = "";
+
+  pads.forEach(pad => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "assign-pad";
+    button.classList.toggle("active", pad.cueId === cue?.id);
+
+    const assignedCue = pad.cueId ? getCue(pad.cueId) : null;
+
+    button.innerHTML = `
+      <span>${String(pad.id).padStart(2, "0")} · ${pad.key.toUpperCase()}</span>
+      <small>${escapeHTML(assignedCue?.name || "SIN CUE")}</small>`;
+
+    button.title = assignedCue
+      ? `PAD ${pad.id} · ${assignedCue.name}`
+      : `PAD ${pad.id} · SIN CUE`;
+
+    button.onclick = () => {
+      if (cue) assignCueToPad(pad, pad.cueId === cue.id ? null : cue.id);
+    };
+
+    dom.cueAssign.appendChild(button);
+  });
+}
+
+/* ==========================================================
+   PAD UI
+========================================================== */
+
+const padRefs = new Map();
+
+function renderPads() {
+  dom.padsGrid.innerHTML = "";
+  padRefs.clear();
+
+  dom.activePads.textContent = `${pads.filter(pad => pad.playing).length}/16`;
+
+  pads.forEach(pad => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "pad";
+    button.classList.toggle("selected", pad.id === state.selectedPadId);
+    button.classList.toggle("playing", pad.playing);
+    button.classList.toggle("empty", !pad.cueId);
+
+    const cue = getCue(pad.cueId);
+
+    button.innerHTML = `
+      <span class="pad-num">${String(pad.id).padStart(2, "0")}</span>
+      <kbd>${pad.key.toUpperCase()}</kbd>
+      <strong>${escapeHTML(cue?.name || "—")}</strong>
+      <small>${pad.playMode.toUpperCase()} · ${pad.loop ? "LOOP" : "ONE SHOT"}</small>
+      <i></i>`;
+
+    button.onclick = () => {
+      state.selectedPadId = pad.id;
+      renderPads();
+      renderPadProps();
+      renderSequencer(false);
+    };
+
+    button.addEventListener("pointerdown", event => {
+      if (pad.playMode !== "gate") return;
+      event.preventDefault();
+      button.setPointerCapture?.(event.pointerId);
+      pressPad(pad.id);
+    });
+
+    button.addEventListener("pointerup", () => releasePad(pad.id));
+    button.addEventListener("pointercancel", () => releasePad(pad.id));
+    button.addEventListener("lostpointercapture", () => releasePad(pad.id));
+
+    dom.padsGrid.appendChild(button);
+    padRefs.set(pad.id, button);
+  });
+
+  renderPadProps();
+}
+
+function updatePadTile(pad) {
+  const element = padRefs.get(pad.id);
+  if (!element) return;
+
+  element.classList.toggle("playing", pad.playing);
+  element.classList.toggle("selected", pad.id === state.selectedPadId);
+  element.classList.toggle("empty", !pad.cueId);
+  dom.activePads.textContent = `${pads.filter(item => item.playing).length}/16`;
+}
+
+function renderPadProps() {
+  const pad = selectedPad();
+  if (!pad) return;
+
+  dom.padSelectedLabel.textContent = `PAD ${pad.id}`;
+  dom.padTitle.textContent = `PAD ${pad.id}`;
+  dom.padKey.textContent = pad.key.toUpperCase();
+
+  const cue = getCue(pad.cueId);
+  dom.padCue.textContent = cue ? cue.name : "SIN CUE";
+
+  dom.padMode.textContent = pad.playMode === "gate" ? "GATE" : "TRIGGER";
+  dom.padMode.classList.toggle("active", pad.playMode === "gate");
+  dom.padLoop.classList.toggle("active", pad.loop);
+  dom.padMute.classList.toggle("active", pad.muted);
+  dom.padSolo.classList.toggle("active", pad.solo);
+
+  dom.padVol.value = pad.volume;
+  dom.padVolOut.textContent = `${Math.round(pad.volume * 100)}%`;
+
+  dom.padHP.value = freqSlider(pad.highPass, 20, 8000);
+  dom.padHPOut.textContent = freq(pad.highPass);
+
+  dom.padLP.value = freqSlider(pad.lowPass, 20, 20000);
+  dom.padLPOut.textContent = freq(pad.lowPass);
+
+  dom.padRate.value = pad.playbackRate;
+  dom.padRateOut.textContent = `${pad.playbackRate.toFixed(2)}×`;
+  dom.padRateBpm.textContent = `≈ ${Math.round(pad.sync ? state.bpm : pad.bpm) * pad.playbackRate} BPM efectivos`;
+
+  dom.padBpm.value = pad.bpm;
+  dom.padSync.classList.toggle("active", pad.sync);
+  dom.padVisual.value = pad.visualMode;
+
+  renderPadSelectValue(pad);
+  renderMidiMapping();
+}
+
+function renderPadSelectValue(pad) {
+  dom.padCueSelect.innerHTML = "";
+
+  const none = document.createElement("option");
+  none.value = "";
+  none.textContent = "SIN CUE";
+  dom.padCueSelect.appendChild(none);
+
+  videos.forEach(video => {
+    if (!video.cues.length) return;
+
+    const group = document.createElement("optgroup");
+    group.label = video.name;
+
+    video.cues
+      .slice()
+      .sort((a, b) => a.startTime - b.startTime)
+      .forEach(cue => {
+        const option = document.createElement("option");
+        option.value = cue.id;
+        option.textContent = `${cue.name} · ${fmt(cue.startTime)}–${fmt(cue.endTime)}`;
+        group.appendChild(option);
+      });
+
+    dom.padCueSelect.appendChild(group);
+  });
+
+  dom.padCueSelect.value = pad?.cueId || "";
+}
+
+function renderPadSelect() {
+  renderPadSelectValue(selectedPad());
+}
+
+function assignCueToPad(pad, cueId) {
+  if (!pad) return;
+
+  stopPad(pad.id);
+  pad.cueId = cueId || null;
+
+  if (pad.cueId) {
+    const cue = getCue(pad.cueId);
+    const video = cueVideo(cue);
+
+    if (pad.engine && video && pad.engine.videoId !== video.id) {
+      destroyPadEngine(pad);
+    }
+  }
+
+  renderAll();
+  toast(
+    pad.cueId
+      ? `PAD ${pad.id} ← ${getCue(pad.cueId)?.name || "CUE"}`
+      : `PAD ${pad.id} sin asignación`
+  );
+}
+
+function setPadCue(pad, cueId) {
+  assignCueToPad(pad, cueId);
+}
+
+function freqSlider(value, min, max) {
+  return Math.log(value / min) / Math.log(max / min);
+}
+
+function sliderFreq(value, min, max) {
+  return min * Math.pow(max / min, Number(value));
+}
+
+function freq(value) {
+  return value >= 1000
+    ? `${(value / 1000).toFixed(value >= 10000 ? 0 : 1)}k`
+    : `${Math.round(value)}Hz`;
+}
+
+/* ==========================================================
+   MIDI MANAGER
+========================================================== */
+
+async function requestMIDI() {
+  if (!navigator.requestMIDIAccess) {
+    dom.midiStatus.textContent = "MIDI NO SOPORTADO EN ESTE NAVEGADOR";
+    return false;
+  }
+
+  if (!window.isSecureContext) {
+    dom.midiStatus.textContent = "REQUIERE HTTPS / LOCALHOST";
+    return false;
+  }
+
+  try {
+    state.midiAccess = state.midiAccess || await navigator.requestMIDIAccess({ sysex: false });
+    state.midiAccess.onstatechange = refreshMIDIInputs;
+    refreshMIDIInputs();
+    return true;
+  } catch (error) {
+    console.error(error);
+    dom.midiStatus.textContent = error.name === "SecurityError"
+      ? "PERMISO MIDI DENEGADO · REVISA EL NAVEGADOR"
+      : "ERROR AL CONECTAR MIDI";
+    return false;
+  }
+}
+
+async function openMIDIInput(input) {
+  if (!input) return;
+  try {
+    if (typeof input.open === "function" && input.state !== "open") {
+      await input.open();
+    }
+  } catch (error) {
+    console.warn("MIDI input open", error);
+  }
+
+  input.onmidimessage = onMIDI;
+  input.onstatechange = refreshMIDIInputs;
+}
+
+async function closeMIDIInput(input) {
+  if (!input) return;
+  input.onmidimessage = null;
+  try {
+    if (typeof input.close === "function" && input.state === "open") {
+      await input.close();
+    }
+  } catch {}
+}
+
+async function selectMIDI(inputId) {
+  if (!state.midiAccess) {
+    const ok = await requestMIDI();
+    if (!ok) return;
+  }
+
+  const inputs = [...state.midiAccess.inputs.values()];
+
+  for (const input of inputs) {
+    if (input.id !== inputId) await closeMIDIInput(input);
+  }
+
+  state.midiInputId = inputId || "";
+
+  const selected = inputs.find(input => input.id === inputId);
+  if (selected) {
+    await openMIDIInput(selected);
+    state.midiConnected = true;
+  } else {
+    state.midiConnected = false;
+  }
+
+  refreshMIDIInputs();
+}
+
+function refreshMIDIInputs() {
+  if (!state.midiAccess) return;
+
+  const inputs = [...state.midiAccess.inputs.values()];
+
+  dom.midiSelect.innerHTML = '<option value="">SELECCIONAR CONTROLADOR</option>';
+
+  inputs.forEach(input => {
+    const option = document.createElement("option");
+    option.value = input.id;
+    option.textContent = input.name || input.manufacturer || input.id;
+    dom.midiSelect.appendChild(option);
+  });
+
+  let selected = inputs.find(input => input.id === state.midiInputId);
+
+  if (!selected && inputs.length === 1) {
+    selected = inputs[0];
+    state.midiInputId = selected.id;
+  }
+
+  dom.midiSelect.value = state.midiInputId;
+
+  inputs.forEach(input => {
+    if (selected && input.id === selected.id) {
+      openMIDIInput(input);
+    } else {
+      input.onmidimessage = null;
+    }
+  });
+
+  state.midiConnected = !!selected;
+  dom.midiConnect.classList.toggle("active", state.midiConnected);
+
+  if (selected) {
+    dom.midiStatus.textContent = `CONECTADO · ${selected.name || selected.manufacturer || "CONTROLADOR"}`;
+  } else if (inputs.length) {
+    dom.midiStatus.textContent = "DISPOSITIVO DETECTADO · SELECCIONA UNO";
+  } else {
+    dom.midiStatus.textContent = "SIN DISPOSITIVOS DETECTADOS";
+  }
+
+  renderMidiMapping();
+}
+
+async function connectMIDI() {
+  dom.midiConnect.disabled = true;
+  dom.midiStatus.textContent = "CONECTANDO…";
+  await requestMIDI();
+
+  if (state.midiInputId) {
+    await selectMIDI(state.midiInputId);
+  }
+
+  dom.midiConnect.disabled = false;
+}
+
+async function detectMIDI() {
+  if (!state.midiAccess) {
+    const ok = await requestMIDI();
+    if (!ok) return;
+  }
+
+  state.midiDetecting = true;
+  dom.midiStatus.textContent = "ESPERANDO MENSAJE MIDI…";
+  toast("Pulsa un pad o control de tu controlador");
+
+  if (!state.midiInputId) {
+    const inputs = [...state.midiAccess.inputs.values()];
+    for (const input of inputs) {
+      try { if (typeof input.open === "function") await input.open(); } catch {}
+      input.onmidimessage = onMIDIDetect;
+    }
+  }
+}
+
+function onMIDIDetect(event) {
+  const [statusByte = 0, data1 = 0, data2 = 0] = event.data || [];
+  dom.midiLastMessage.textContent = describeMIDI(statusByte, data1, data2);
+  state.midiDetecting = false;
+  if (event.currentTarget?.id) {
+    state.midiInputId = event.currentTarget.id;
+  }
+  refreshMIDIInputs();
+  dom.midiStatus.textContent = `DETECTADO · ${event.currentTarget?.name || "CONTROLADOR MIDI"}`;
+  toast(`MIDI detectado · ${event.currentTarget?.name || "INPUT"}`);
+}
+
+function startMIDILearn() {
+  const pad = selectedPad();
+  if (!pad) return;
+
+  if (!state.midiAccess) {
+    requestMIDI();
+    toast("Primero conecta / selecciona el controlador MIDI");
+    return;
+  }
+
+  if (!state.midiInputId) {
+    toast("Selecciona un controlador MIDI");
+    return;
+  }
+
+  state.midiLearnPadId = pad.id;
+  dom.midiLearn.textContent = "ESPERANDO…";
+  dom.midiLearn.classList.add("active");
+  dom.midiStatus.textContent = `LEARN PAD ${pad.id} · PULSA EL CONTROL`;
+}
+
+function finishMIDILearn(note) {
+  const pad = getPad(state.midiLearnPadId);
+  if (!pad) return;
+
+  pad.midiNote = note;
+  pad.midiChannel = null;
+  state.midiLearnPadId = null;
+
+  dom.midiLearn.textContent = "LEARN PAD";
+  dom.midiLearn.classList.remove("active");
+  dom.midiStatus.textContent = `PAD ${pad.id} ASIGNADO · NOTE ${note}`;
+
+  renderAll();
+  toast(`PAD ${pad.id} ← MIDI Note ${note}`);
+}
+
+function renderMidiMapping() {
+  const pad = selectedPad();
+  if (!pad) return;
+
+  dom.midiPadMapping.textContent = `${pad.midiNote} · CH ${pad.midiChannel == null ? "ANY" : pad.midiChannel + 1}`;
+
+  dom.midiLearn.classList.toggle(
+    "active",
+    state.midiLearnPadId === pad.id
+  );
+}
+
+function describeMIDI(statusByte, data1, data2) {
+  const command = statusByte & 0xf0;
+  const channel = (statusByte & 0x0f) + 1;
+  const name = command === 0x90 && data2 > 0
+    ? "NOTE ON"
+    : command === 0x80 || (command === 0x90 && data2 === 0)
+      ? "NOTE OFF"
+      : command === 0xb0
+        ? "CC"
+        : command === 0xe0
+          ? "PITCH"
+          : command === 0xc0
+            ? "PROGRAM"
+            : `0x${command.toString(16).toUpperCase()}`;
+  return `${name} ${data1} · CH ${channel} · ${data2}`;
+}
+
+function onMIDI(event) {
+  const [statusByte = 0, data1 = 0, data2 = 0] = event.data || [];
+  const command = statusByte & 0xf0;
+  const channel = statusByte & 0x0f;
+
+  dom.midiLastMessage.textContent = describeMIDI(statusByte, data1, data2);
+
+  if (state.midiDetecting) {
+    const port = event.currentTarget;
+    state.midiDetecting = false;
+    if (port?.id) state.midiInputId = port.id;
+    refreshMIDIInputs();
+    dom.midiStatus.textContent = `DETECTADO · ${port?.name || "MIDI"}`;
+    return;
+  }
+
+  if (
+    state.midiLearnPadId &&
+    command === 0x90 &&
+    data2 > 0
+  ) {
+    finishMIDILearn(data1);
+    return;
+  }
+
+  if (command === 0x90 && data2 > 0 || command === 0x80 || (command === 0x90 && data2 === 0)) {
+    const isNoteOn = command === 0x90 && data2 > 0;
+    const pad = pads.find(item =>
+      item.midiNote === data1 &&
+      (item.midiChannel == null || item.midiChannel === channel)
+    );
+
+    if (pad) {
+      if (isNoteOn) pressPad(pad.id);
+      else releasePad(pad.id);
+    }
+  }
+
+  if (command === 0xb0) {
+    const pad = selectedPad();
+
+    if (!pad) return;
+
+    if (data1 === 112) {
+      pad.highPass = 20 + (data2 / 127) * 7980;
+      if (pad.hp) pad.hp.frequency.value = pad.highPass;
+    }
+
+    if (data1 === 113) {
+      pad.lowPass = 20 + (data2 / 127) * 19980;
+      if (pad.lp) pad.lp.frequency.value = pad.lowPass;
+    }
+
+    renderPadProps();
+  }
+}
+
+/* ==========================================================
+   BPM
+========================================================== */
+
+function tapBPM() {
+  const now = performance.now();
+
+  state.tapTimes = state.tapTimes.filter(time => now - time < 2200);
+  state.tapTimes.push(now);
+
+  if (state.tapTimes.length > 1) {
+    const intervals = state.tapTimes
+      .slice(1)
+      .map((time, index) => time - state.tapTimes[index]);
+
+    const average = intervals.reduce((sum, value) => sum + value, 0) / intervals.length;
+
+    state.bpm = clamp(60000 / average, 30, 300);
+    dom.bpm.value = state.bpm;
+    dom.bpmValue.textContent = `${Math.round(state.bpm)} BPM`;
+    renderSequencer(false);
+  }
+}
+
+/* ==========================================================
+   RECORDING
+========================================================== */
+
+async function toggleRecording() {
+  if (state.recording) {
+    stopRecording();
+    return;
+  }
+
+  try {
+    await ensureAudio();
+
+    if (!dom.canvas.captureStream || !window.MediaRecorder) {
+      throw new Error("Grabación no soportada");
+    }
+
+    state.recordDest = audioCtx.createMediaStreamDestination();
+    masterGain.connect(state.recordDest);
+
+    const videoStream = dom.canvas.captureStream(30);
+    state.recordStream = new MediaStream([
+      ...videoStream.getVideoTracks(),
+      ...state.recordDest.stream.getAudioTracks()
+    ]);
+
+    const mime = [
+      "video/webm;codecs=vp9,opus",
+      "video/webm;codecs=vp8,opus",
+      "video/webm"
+    ].find(type => MediaRecorder.isTypeSupported(type));
+
+    if (!mime) throw new Error("Formato no disponible");
+
+    state.chunks = [];
+    state.recorder = new MediaRecorder(state.recordStream, { mimeType: mime });
+
+    state.recorder.ondataavailable = event => {
+      if (event.data.size) state.chunks.push(event.data);
+    };
+
+    state.recorder.onstop = () => {
+      const blob = new Blob(state.chunks, { type: mime });
+      const anchor = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      anchor.href = url;
+      anchor.download = `av-chopper-${Date.now()}.webm`;
+      anchor.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    };
+
+    state.recorder.start();
+    state.recording = true;
+    state.recStart = Date.now();
+
+    dom.record.classList.add("recording");
+    dom.recordTimer.textContent = "00:00";
+
+    state.recTimer = setInterval(() => {
+      const seconds = Math.floor((Date.now() - state.recStart) / 1000);
+      dom.recordTimer.textContent = `${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
+    }, 500);
+
+    status("GRABANDO", true);
+  } catch (error) {
+    console.error(error);
+    toast("No se pudo iniciar la grabación");
+
+    if (state.recordDest && masterGain) {
+      try { masterGain.disconnect(state.recordDest); } catch {}
+    }
+    state.recordDest = null;
+    state.recordStream = null;
+  }
+}
+
+function stopRecording() {
+  try { state.recorder?.stop(); } catch {}
+
+  state.recording = false;
+  clearInterval(state.recTimer);
+  state.recTimer = null;
+
+  dom.record.classList.remove("recording");
+  dom.recordTimer.textContent = "00:00";
+
+  if (state.recordDest && masterGain) {
+    try { masterGain.disconnect(state.recordDest); } catch {}
+  }
+
+  state.recordDest = null;
+  state.recordStream = null;
+  state.recorder = null;
+
+  status("READY");
+}
+
+/* ==========================================================
+   SEQUENCER — 16 pasos × 16 pads
+========================================================== */
+
+function divisionBeats() {
+  return CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.25;
+}
+
+function seqBaseMs() {
+  return (60000 / Math.max(1, state.bpm)) * divisionBeats();
+}
+
+function seqStepDelayMs(index) {
+  const base = seqBaseMs();
+  const swing = clamp(state.sequencer.swing, 0, 50) / 100;
+  const amount = base * swing * 0.5;
+  return index % 2 === 1 ? base + amount : Math.max(1, base - amount);
+}
+
+function toggleSeqCell(stepIndex, padId) {
+  const step = state.sequencer.pattern[stepIndex];
+  if (!step) return;
+
+  const index = step.pads.indexOf(padId);
+  if (index >= 0) step.pads.splice(index, 1);
+  else step.pads.push(padId);
+
+  step.pads.sort((a, b) => a - b);
+  renderSequencer(false);
+}
+
+function clearSequencer() {
+  stopSequencer();
+  state.sequencer.pattern = Array.from(
+    { length: CONFIG.SEQ_STEPS },
+    () => makeSequenceStep()
+  );
+  renderSequencer(false);
+}
+
+function toggleSequencerLoop() {
+  state.sequencer.loop = !state.sequencer.loop;
+  renderSequencer(false);
+}
+
+function toggleSequencerFollow() {
+  state.sequencer.followPad = !state.sequencer.followPad;
+  dom.seqFollow.classList.toggle("active", state.sequencer.followPad);
+}
+
+function selectPadFromSequencer(padId) {
+  state.selectedPadId = padId;
+  renderPads();
+  renderPadProps();
+  renderSequencer(false);
+}
+
+function renderSequencer(scrollToSelected = true) {
+  if (!dom.seqGrid) return;
+
+  const grid = document.createDocumentFragment();
+  dom.seqGrid.innerHTML = "";
+
+  const corner = document.createElement("div");
+  corner.className = "seq-head";
+  corner.textContent = "PAD";
+  grid.appendChild(corner);
+
+  for (let step = 0; step < CONFIG.SEQ_STEPS; step += 1) {
+    const head = document.createElement("div");
+    head.className = "seq-head";
+    head.dataset.step = step;
+    head.textContent = String(step + 1).padStart(2, "0");
+    grid.appendChild(head);
+  }
+
+  pads.forEach(pad => {
+    const label = document.createElement("button");
+    label.type = "button";
+    label.className = "seq-label";
+    label.classList.toggle("selected", pad.id === state.selectedPadId);
+    label.dataset.padId = pad.id;
+    label.title = `Editar PAD ${pad.id}`;
+    label.innerHTML = `<strong>${String(pad.id).padStart(2, "0")} · ${pad.key.toUpperCase()}</strong><span>${escapeHTML(getCue(pad.cueId)?.name || "—")}</span>`;
+    label.onclick = () => selectPadFromSequencer(pad.id);
+    grid.appendChild(label);
+
+    for (let stepIndex = 0; stepIndex < CONFIG.SEQ_STEPS; stepIndex += 1) {
+      const cell = document.createElement("button");
+      cell.type = "button";
+      cell.className = "seq-cell";
+      cell.dataset.step = stepIndex;
+      cell.dataset.padId = pad.id;
+
+      const active = state.sequencer.pattern[stepIndex]?.pads.includes(pad.id);
+      cell.classList.toggle("active", active);
+      cell.classList.toggle("current", state.sequencer.index === stepIndex);
+
+      const dot = document.createElement("span");
+      dot.className = "seq-dot";
+      cell.appendChild(dot);
+
+      cell.title = `${pad.key.toUpperCase()} · PASO ${stepIndex + 1}`;
+      cell.onclick = () => toggleSeqCell(stepIndex, pad.id);
+      grid.appendChild(cell);
+    }
+  });
+
+  dom.seqGrid.appendChild(grid);
+
+  const activeCount = state.sequencer.pattern.reduce(
+    (sum, step) => sum + step.pads.length,
+    0
+  );
+
+  dom.seqStatus.textContent = `${CONFIG.SEQ_STEPS} PASOS · ${activeCount} ACTIVOS${state.sequencer.playing ? ` · PASO ${state.sequencer.index + 1}` : ""}`;
+  dom.seqPlay.textContent = state.sequencer.playing
+    ? "■ DETENER SECUENCIA"
+    : "▶ REPRODUCIR SECUENCIA";
+  dom.seqPlay.classList.toggle("active", state.sequencer.playing);
+  dom.seqLoop.classList.toggle("active", state.sequencer.loop);
+  dom.seqFollow.classList.toggle("active", state.sequencer.followPad);
+  dom.seqDivision.value = state.sequencer.division;
+  dom.seqSwing.value = state.sequencer.swing;
+  dom.seqSwingOutput.textContent = `${state.sequencer.swing}%`;
+  dom.seqPatternInfo.textContent = `${Math.round(state.bpm)} BPM · ${state.sequencer.division}`;
+
+  if (scrollToSelected && state.sequencer.followPad) {
+    const row = dom.seqGrid.querySelector(`.seq-label[data-pad-id="${state.selectedPadId}"]`);
+    row?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+}
+
+function updateSequencerVisual() {
+  dom.seqGrid.querySelectorAll(".seq-cell").forEach(cell => {
+    cell.classList.toggle(
+      "current",
+      Number(cell.dataset.step) === state.sequencer.index
+    );
+  });
+
+  dom.seqStatus.textContent = `${CONFIG.SEQ_STEPS} PASOS · ${state.sequencer.pattern.reduce((sum, step) => sum + step.pads.length, 0)} ACTIVOS${state.sequencer.playing ? ` · PASO ${state.sequencer.index + 1}` : ""}`;
+}
+
+async function fireSequencerStep(index, token) {
+  if (!state.sequencer.playing || token !== state.sequencer.scheduleToken) return;
+
+  state.sequencer.index = index;
+
+  for (const padId of state.sequencer.activePads) {
+    const pad = getPad(padId);
+    if (pad?.sequenceOwned) stopPad(padId);
+  }
+  state.sequencer.activePads.clear();
+
+  const padsToPlay = state.sequencer.pattern[index]?.pads || [];
+
+  for (const padId of padsToPlay) {
+    const ok = await startPad(padId, {
+      sequence: true,
+      silentStatus: true
+    });
+    if (ok) state.sequencer.activePads.add(padId);
+  }
+
+  updateSequencerVisual();
+
+  if (!state.sequencer.loop && index === CONFIG.SEQ_STEPS - 1) {
+    setTimeout(() => {
+      if (state.sequencer.playing && token === state.sequencer.scheduleToken) {
+        stopSequencer();
+      }
+    }, Math.max(0, seqStepDelayMs(index)));
+  }
+}
+
+function scheduleSequencer() {
+  if (!state.sequencer.playing) return;
+
+  const token = state.sequencer.scheduleToken;
+  const now = performance.now();
+  const horizon = now + CONFIG.SEQ_LOOKAHEAD * 1000;
+
+  while (state.sequencer.nextDue <= horizon) {
+    const nextIndex = state.sequencer.cursor + 1;
+
+    if (nextIndex >= CONFIG.SEQ_STEPS) {
+      if (state.sequencer.loop) {
+        state.sequencer.cursor = -1;
+      } else {
+        break;
+      }
+    }
+
+    const stepIndex = state.sequencer.cursor + 1;
+    const due = state.sequencer.nextDue;
+    const delay = Math.max(0, due - now);
+
+    setTimeout(
+      () => fireSequencerStep(stepIndex, token),
+      delay
+    );
+
+    state.sequencer.cursor = stepIndex;
+    state.sequencer.nextDue += seqStepDelayMs(stepIndex);
+  }
+
+  clearTimeout(state.sequencer.schedulerTimer);
+  state.sequencer.schedulerTimer = setTimeout(
+    scheduleSequencer,
+    CONFIG.SEQ_SCHEDULER_MS
+  );
+}
+
+async function playSequencer() {
+  if (state.sequencer.playing) {
+    stopSequencer();
+    return;
+  }
+
+  const activeCount = state.sequencer.pattern.reduce(
+    (sum, step) => sum + step.pads.length,
+    0
+  );
+
+  if (!activeCount) {
+    toast("Activa al menos una celda del patrón");
+    return;
+  }
+
+  try {
+    await ensureAudio();
+  } catch {
+    return;
+  }
+
+  state.sequencer.playing = true;
+  state.sequencer.index = -1;
+  state.sequencer.cursor = -1;
+  state.sequencer.scheduleToken += 1;
+  state.sequencer.nextDue = performance.now();
+
+  renderSequencer(false);
+  scheduleSequencer();
+}
+
+function stopSequencer() {
+  state.sequencer.scheduleToken += 1;
+  state.sequencer.playing = false;
+  clearTimeout(state.sequencer.schedulerTimer);
+  state.sequencer.schedulerTimer = null;
+  state.sequencer.index = -1;
+  state.sequencer.cursor = -1;
+  state.sequencer.nextDue = 0;
+
+  for (const padId of state.sequencer.activePads) {
+    const pad = getPad(padId);
+    if (pad?.sequenceOwned) stopPad(padId);
+  }
+
+  state.sequencer.activePads.clear();
+  renderSequencer(false);
+}
+
+/* ==========================================================
+   PROJECT
+========================================================== */
+
+function projectData() {
+  return {
+    version: 7,
+    globalBpm: state.bpm,
+    masterVolume: state.master,
+    visualizerMode: state.visualizerMode,
+
+    videos: videos.map(video => ({
+      id: video.id,
+      name: video.name,
+      sourceType: video.sourceType,
+      mediaKind: video.mediaKind,
+      fileName: video.fileName,
+      youtubeId: video.youtubeId,
+      duration: video.duration,
+      cues: video.cues.map(cue => ({
+        id: cue.id,
+        name: cue.name,
+        startTime: cue.startTime,
+        endTime: cue.endTime,
+        imageUrl: cue.imageUrl || null
+      }))
+    })),
+
+    pads: pads.map(pad => ({
+      id: pad.id,
+      key: pad.key,
+      midiNote: pad.midiNote,
+      midiChannel: pad.midiChannel,
+      cueId: pad.cueId,
+      playMode: pad.playMode,
+      loop: pad.loop,
+      volume: pad.volume,
+      muted: pad.muted,
+      solo: pad.solo,
+      highPass: pad.highPass,
+      lowPass: pad.lowPass,
+      playbackRate: pad.playbackRate,
+      visualMode: pad.visualMode,
+      bpm: pad.bpm,
+      sync: pad.sync
+    })),
+
+    sequence: {
+      division: state.sequencer.division,
+      swing: state.sequencer.swing,
+      loop: state.sequencer.loop,
+      followPad: state.sequencer.followPad,
+      pattern: state.sequencer.pattern.map(step => ({
+        pads: step.pads.slice()
+      }))
+    }
+  };
+}
+
+function saveProject() {
+  const blob = new Blob(
+    [JSON.stringify(projectData(), null, 2)],
+    { type: "application/json" }
+  );
+
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `av-chopper-v7-${new Date().toISOString().replace(/[:.]/g, "-")}.json`;
+  anchor.click();
+
+  setTimeout(() => URL.revokeObjectURL(url), 800);
+  toast("Proyecto guardado");
+}
+
+function loadProjectFile(event) {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      loadProject(JSON.parse(reader.result));
+    } catch (error) {
+      console.error(error);
+      toast("JSON de proyecto inválido");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function resetProjectState() {
+  stopPreview();
+  stopSequencer();
+  pads.forEach(pad => destroyPadEngine(pad));
+
+  videos.forEach(video => {
+    if (video.sourceUrl) URL.revokeObjectURL(video.sourceUrl);
+    if (video.editorEl) {
+      try { video.editorEl.remove(); } catch {}
+    }
+  });
+
+  videos.length = 0;
+  pads.length = 0;
+  for (let index = 0; index < CONFIG.PAD_COUNT; index += 1) {
+    pads.push(makePad(index));
+  }
+
+  state.selectedVideoId = null;
+  state.selectedCueId = null;
+  state.selectedPadId = 1;
+  state.playhead = 0;
+  state.midiLearnPadId = null;
+  state.midiDetecting = false;
+  state.visualSources = [];
+  state.zoom = 1;
+  state.sequencer.pattern = Array.from(
+    { length: CONFIG.SEQ_STEPS },
+    () => makeSequenceStep()
+  );
+  state.sequencer.index = -1;
+  state.sequencer.playing = false;
+  state.sequencer.activePads.clear();
+}
+
+function clearProject() {
+  resetProjectState();
+  renderAll();
+  status("READY");
+}
+
+function loadProject(data) {
+  if (!data || !Array.isArray(data.videos) || !Array.isArray(data.pads)) {
+    throw new Error("Formato inválido");
+  }
+
+  resetProjectState();
+
+  state.bpm = clamp(
+    Number(data.globalBpm) || CONFIG.DEFAULT_BPM,
+    30,
+    300
+  );
+
+  state.master = Number.isFinite(Number(data.masterVolume))
+    ? clamp(Number(data.masterVolume), 0, 1)
+    : CONFIG.DEFAULT_MASTER;
+
+  state.visualizerMode = CONFIG.VIS_LIMIT[data.visualizerMode]
+    ? data.visualizerMode
+    : "simple";
+
+  const validCueIds = new Set();
+
+  data.videos.forEach(raw => {
+    const video = makeVideo(raw);
+    video.sourceUrl = null;
+    video.linked = video.sourceType === "youtube";
+
+    video.cues = (raw.cues || []).map(cue => ({
+      id: cue.id || makeId("cue"),
+      videoId: video.id,
+      name: cue.name || "Cue",
+      startTime: Number(cue.startTime) || 0,
+      endTime: Number(cue.endTime) || 0,
+      imageUrl: cue.imageUrl || null
+    }));
+
+    video.cues.forEach(cue => validCueIds.add(cue.id));
+    videos.push(video);
+  });
+
+  for (let index = 0; index < CONFIG.PAD_COUNT; index += 1) {
+    const source = data.pads.find(pad => Number(pad.id) === index + 1);
+    if (!source) continue;
+
+    const pad = pads[index];
+    pad.midiNote = Number.isFinite(Number(source.midiNote))
+      ? clamp(Number(source.midiNote), 0, 127)
+      : CONFIG.MIDI_BASE + index;
+    pad.midiChannel = Number.isFinite(Number(source.midiChannel))
+      ? clamp(Number(source.midiChannel), 0, 15)
+      : null;
+    pad.playMode = source.playMode === "trigger" ? "trigger" : "gate";
+    pad.loop = source.loop !== false;
+    pad.volume = Number.isFinite(Number(source.volume))
+      ? clamp(Number(source.volume), 0, 1)
+      : 1;
+    pad.muted = !!source.muted;
+    pad.solo = !!source.solo;
+    pad.highPass = clamp(Number(source.highPass) || 20, 20, 8000);
+    pad.lowPass = clamp(Number(source.lowPass) || 20000, 20, 20000);
+    pad.playbackRate = clamp(Number(source.playbackRate) || 1, CONFIG.MIN_RATE, CONFIG.MAX_RATE);
+    pad.visualMode = ["auto", "visible", "hidden"].includes(source.visualMode)
+      ? source.visualMode
+      : "auto";
+    pad.bpm = clamp(Number(source.bpm) || CONFIG.DEFAULT_BPM, 20, 400);
+    pad.sync = !!source.sync;
+    pad.cueId = validCueIds.has(source.cueId) ? source.cueId : null;
+  }
+
+  const sequence = data.sequence || {};
+
+  if (Array.isArray(sequence.pattern)) {
+    state.sequencer.pattern = Array.from(
+      { length: CONFIG.SEQ_STEPS },
+      (_, index) => ({
+        pads: Array.isArray(sequence.pattern[index]?.pads)
+          ? sequence.pattern[index].pads
+              .map(Number)
+              .filter(id => id >= 1 && id <= CONFIG.PAD_COUNT)
+          : []
+      })
+    );
+  } else if (Array.isArray(sequence.steps)) {
+    /* Compatibilidad con la versión anterior: cada step antiguo ocupa una columna. */
+    state.sequencer.pattern = Array.from(
+      { length: CONFIG.SEQ_STEPS },
+      () => makeSequenceStep()
+    );
+    sequence.steps
+      .slice(0, CONFIG.SEQ_STEPS)
+      .forEach((step, index) => {
+        const padId = Number(step.padId);
+        if (padId >= 1 && padId <= CONFIG.PAD_COUNT) {
+          state.sequencer.pattern[index].pads = [padId];
+        }
+      });
+  }
+
+  state.sequencer.division = CONFIG.SEQ_DIVISIONS[sequence.division]
+    ? sequence.division
+    : "1/16";
+  state.sequencer.swing = clamp(Number(sequence.swing) || 0, 0, 50);
+  state.sequencer.loop = sequence.loop !== false;
+  state.sequencer.followPad = sequence.followPad !== false;
+
+  state.selectedVideoId = videos[0]?.id || null;
+  state.selectedCueId = null;
+  state.playhead = 0;
+
+  dom.master.value = state.master;
+  dom.bpm.value = state.bpm;
+
+  renderAll();
+  toast("Proyecto cargado · fuentes locales requieren vinculación");
+}
+
+/* ==========================================================
+   KEYBOARD
+========================================================== */
+
+function isTypingContext(element) {
+  if (!element) return false;
+  const tag = element.tagName;
+
+  if (tag === "TEXTAREA" || tag === "SELECT") return true;
+
+  if (tag === "INPUT") {
+    const type = (element.type || "text").toLowerCase();
+    return !["range", "checkbox", "radio", "button", "color"].includes(type);
+  }
+
+  return !!element.isContentEditable;
+}
+
+function bindKeyboard() {
+  window.addEventListener("keydown", event => {
+    if (isTypingContext(document.activeElement)) return;
+
+    const index = CONFIG.KEY_MAP.indexOf(event.key.toLowerCase());
+    if (index < 0 || event.repeat) return;
+
+    event.preventDefault();
+    pressPad(index + 1);
+  });
+
+  window.addEventListener("keyup", event => {
+    const index = CONFIG.KEY_MAP.indexOf(event.key.toLowerCase());
+    if (index >= 0) releasePad(index + 1);
+  });
+
+  window.addEventListener("blur", () => {
+    pads.forEach(pad => {
+      if (pad.playMode === "gate") stopPad(pad.id);
+    });
+  });
+}
+
+/* ==========================================================
+   RENDER + EVENTS
+========================================================== */
+
+function updatePadProgress() {
+  pads.forEach(pad => {
+    const element = padRefs.get(pad.id);
+    if (!element) return;
+
+    const bar = element.querySelector("i");
+    const cue = findPadCue(pad);
+    const video = cue ? cueVideo(cue) : null;
+
+    if (!bar || !pad.playing || !cue || !video || pad.engine?.kind !== "local") {
+      if (bar) bar.style.transform = pad.playing ? "scaleX(1)" : "scaleX(0)";
+      return;
+    }
+
+    const current = pad.engine.videoEl?.currentTime ?? cue.startTime;
+    const ratio = cueDuration(cue)
+      ? clamp((current - cue.startTime) / cueDuration(cue), 0, 1)
+      : 0;
+
+    bar.style.transform = `scaleX(${ratio})`;
+  });
+}
+
+function renderAll() {
+  renderPlaylist();
+  renderTimeline();
+  renderCueFields();
+  renderPads();
+  renderVisualButtons();
+  renderSequencer(false);
+
+  dom.bpm.value = state.bpm;
+  dom.bpmValue.textContent = `${Math.round(state.bpm)} BPM`;
+  dom.master.value = state.master;
+
+  updateTimelineUI();
+  updateMidiMappingUI();
+  renderCanvas();
+}
+
+function renderPlaylist() {
+  const selected = selectedVideo();
+
+  dom.selectedVideoActions.hidden = !selected;
+  dom.relinkVideo.hidden = !(selected && selected.sourceType === "local" && !selected.linked);
+
+  dom.playlistCount.textContent = `${videos.length} VIDEO${videos.length === 1 ? "" : "S"}`;
+  dom.playlist.innerHTML = "";
+
+  videos.forEach(video => {
+    const row = document.createElement("div");
+    row.className = "playlist-row";
+    if (video.id === state.selectedVideoId) row.classList.add("selected");
+
+    const main = document.createElement("button");
+    main.type = "button";
+    main.className = "playlist-main";
+    main.innerHTML = `
+      <span class="source-dot ${video.sourceType}"></span>
+      <span class="playlist-name">${escapeHTML(video.name)}</span>
+      <span class="playlist-meta">${video.sourceType === "youtube" ? "YT" : fmt(video.duration)}</span>`;
+    main.onclick = () => selectVideo(video.id);
+
+    const remove = document.createElement("button");
+    remove.type = "button";
+    remove.className = "playlist-delete";
+    remove.textContent = "×";
+    remove.title = "Eliminar";
+    remove.onclick = event => {
+      event.stopPropagation();
+      state.selectedVideoId = video.id;
+      removeVideo();
+    };
+
+    row.append(main, remove);
+    dom.playlist.appendChild(row);
+  });
+}
+
+function updateMidiMappingUI() {
+  renderMidiMapping();
+}
+
+function changeZoom(direction) {
+  const oldZoom = state.zoom;
+  const nextZoom = clamp(
+    oldZoom * (direction > 0 ? 2 : 0.5),
+    1,
+    CONFIG.ZOOM_MAX
+  );
+
+  if (nextZoom === oldZoom) return;
+
+  const video = selectedVideo();
+  const playheadRatio = video?.duration
+    ? state.playhead / video.duration
+    : 0.5;
+
+  state.zoom = nextZoom;
+  renderTimeline();
+
+  if (video) {
+    dom.timelineViewport.scrollLeft = Math.max(
+      0,
+      playheadRatio * dom.timelineContent.clientWidth - dom.timelineViewport.clientWidth / 2
+    );
+  }
+}
+
+function bind() {
+  dom.audioStart.onclick = () => {
+    ensureAudio()
+      .then(() => status("AUDIO READY", true))
+      .catch(() => {});
+  };
+
+  dom.master.oninput = event => {
+    state.master = clamp(Number(event.target.value), 0, 1);
+    if (masterGain && audioCtx) masterGain.gain.value = state.master;
+  };
+
+  dom.bpm.oninput = event => {
+    state.bpm = clamp(Number(event.target.value) || CONFIG.DEFAULT_BPM, 30, 300);
+    dom.bpm.value = state.bpm;
+    dom.bpmValue.textContent = `${Math.round(state.bpm)} BPM`;
+    pads.forEach(updatePadGain);
+    renderSequencer(false);
+  };
+
+  dom.tap.onclick = tapBPM;
+  dom.record.onclick = toggleRecording;
+
+  dom.addLocal.onclick = () => dom.mediaFile.click();
+  dom.mediaFile.onchange = handleLocal;
+  dom.addYT.onclick = addYouTube;
+  dom.ytUrl.addEventListener("keydown", event => {
+    if (event.key === "Enter") addYouTube();
+  });
+
+  ["dragenter", "dragover"].forEach(type => {
+    dom.drop.addEventListener(type, event => {
+      event.preventDefault();
+      dom.drop.classList.add("drag");
+    });
+  });
+
+  ["dragleave", "drop"].forEach(type => {
+    dom.drop.addEventListener(type, event => {
+      event.preventDefault();
+      dom.drop.classList.remove("drag");
+    });
+  });
+
+  dom.drop.addEventListener("drop", event => {
+    const file = event.dataTransfer.files?.[0];
+    if (file) addLocalFile(file);
+  });
+
+  dom.save.onclick = saveProject;
+  dom.load.onclick = () => dom.projectFileInput.click();
+  dom.projectFileInput.onchange = loadProjectFile;
+
+  dom.renameVideo.onclick = renameVideo;
+  dom.removeVideo.onclick = removeVideo;
+  dom.relinkVideo.onclick = () => dom.relinkFileInput.click();
+  dom.relinkFileInput.onchange = event => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (file) relinkSelected(file);
+  };
+
+  dom.clear.onclick = () => {
+    if (confirm("¿Reiniciar proyecto?")) clearProject();
+  };
+
+  dom.midiConnect.onclick = connectMIDI;
+  dom.midiDetect.onclick = async () => {
+    const ok = await requestMIDI();
+    if (ok) detectMIDI();
+  };
+  dom.midiLearn.onclick = startMIDILearn;
+  dom.midiSelect.onchange = event => selectMIDI(event.target.value);
+
+  dom.timelineViewport.addEventListener("pointerdown", event => {
+    if (!event.target.closest(".cue-block")) beginPlayheadDrag(event);
+  });
+
+  dom.timelineViewport.addEventListener("dblclick", event => {
+    if (!event.target.closest(".cue-block")) addCueAt(xToTime(event.clientX));
+  });
+
+  dom.timelinePlay.onclick = toggleTimelinePlayback;
+
+  dom.timelineStart.onclick = () => {
+    stopPreview();
+    state.playhead = 0;
+    const video = selectedVideo();
+    if (video?.editorEl) {
+      try { video.editorEl.currentTime = 0; } catch {}
+    }
+    updateTimelineUI();
+    renderCanvas();
+  };
+
+  dom.zoomIn.onclick = () => changeZoom(1);
+  dom.zoomOut.onclick = () => changeZoom(-1);
+
+  dom.visualBtns.addEventListener("click", event => {
+    const button = event.target.closest("button[data-mode]");
+    if (button) setVisualMode(button.dataset.mode);
+  });
+
+  dom.cueNew.onclick = addCue;
+  dom.cuePreview.onclick = () => {
+    const cue = selectedCue();
+    if (cue) previewCue(cue);
+  };
+
+  dom.cueStartBtn.onclick = () => {
+    const cue = selectedCue();
+    if (!cue) return;
+    state.playhead = cue.startTime;
+    updateTimelineUI();
+    renderCanvas();
+  };
+
+  dom.cueEndBtn.onclick = () => {
+    const cue = selectedCue();
+    if (!cue) return;
+    state.playhead = cue.endTime;
+    const video = cueVideo(cue);
+    if (video?.editorEl) {
+      try { video.editorEl.currentTime = state.playhead; } catch {}
+    }
+    updateTimelineUI();
+    renderCanvas();
+  };
+
+  dom.cueDup.onclick = duplicateCue;
+  dom.cueSplit.onclick = splitCue;
+  dom.cueMerge.onclick = mergeCue;
+  dom.cueDelete.onclick = deleteCue;
+  dom.cueDivide2.onclick = () => divide(2);
+  dom.cueDivide4.onclick = () => divide(4);
+  dom.cueDivide8.onclick = () => divide(8);
+
+  dom.cueName.addEventListener("change", event => {
+    const cue = selectedCue();
+    if (!cue) return;
+    cue.name = event.target.value.trim() || cue.name;
+    renderAll();
+  });
+
+  dom.cueStart.addEventListener("change", event => applyCueTime("start", event.target.value));
+  dom.cueEnd.addEventListener("change", event => applyCueTime("end", event.target.value));
+  dom.cueDur.addEventListener("change", event => applyCueTime("duration", event.target.value));
+
+  dom.cueImage.addEventListener("change", event => {
+    const cue = selectedCue();
+    if (!cue) return;
+    cue.imageUrl = event.target.value.trim() || null;
+    renderCanvas();
+  });
+
+  dom.padCueSelect.onchange = event => {
+    setPadCue(selectedPad(), event.target.value);
+  };
+
+  dom.padTrigger.onclick = () => pressPad(state.selectedPadId);
+
+  dom.padMode.onclick = () => {
+    const pad = selectedPad();
+    pad.playMode = pad.playMode === "gate" ? "trigger" : "gate";
+    renderAll();
+  };
+
+  dom.padLoop.onclick = () => {
+    const pad = selectedPad();
+    pad.loop = !pad.loop;
+    renderAll();
+  };
+
+  dom.padMute.onclick = () => {
+    const pad = selectedPad();
+    pad.muted = !pad.muted;
+    updateAllGains();
+    renderAll();
+  };
+
+  dom.padSolo.onclick = () => {
+    const pad = selectedPad();
+    pad.solo = !pad.solo;
+    updateAllGains();
+    renderAll();
+  };
+
+  dom.padSync.onclick = () => {
+    const pad = selectedPad();
+    pad.sync = !pad.sync;
+    renderAll();
+  };
+
+  dom.padVol.oninput = event => {
+    const pad = selectedPad();
+    pad.volume = Number(event.target.value);
+    updatePadGain(pad);
+    renderPadProps();
+  };
+
+  dom.padHP.oninput = event => {
+    const pad = selectedPad();
+    pad.highPass = sliderFreq(event.target.value, 20, 8000);
+    if (pad.hp) pad.hp.frequency.value = pad.highPass;
+    renderPadProps();
+  };
+
+  dom.padLP.oninput = event => {
+    const pad = selectedPad();
+    pad.lowPass = sliderFreq(event.target.value, 20, 20000);
+    if (pad.lp) pad.lp.frequency.value = pad.lowPass;
+    renderPadProps();
+  };
+
+  dom.padRate.oninput = event => {
+    const pad = selectedPad();
+    pad.playbackRate = clamp(Number(event.target.value) || 1, CONFIG.MIN_RATE, CONFIG.MAX_RATE);
+
+    if (pad.engine?.videoEl) pad.engine.videoEl.playbackRate = effectiveRate(pad);
+    if (pad.engine?.player) {
+      try { pad.engine.player.setPlaybackRate(clamp(effectiveRate(pad), CONFIG.MIN_RATE, CONFIG.MAX_RATE)); } catch {}
+    }
+
+    renderPadProps();
+  };
+
+  dom.padRateReset.onclick = () => {
+    const pad = selectedPad();
+    pad.playbackRate = 1;
+    if (pad.engine?.videoEl) pad.engine.videoEl.playbackRate = effectiveRate(pad);
+    if (pad.engine?.player) {
+      try { pad.engine.player.setPlaybackRate(clamp(effectiveRate(pad), CONFIG.MIN_RATE, CONFIG.MAX_RATE)); } catch {}
+    }
+    renderPadProps();
+  };
+
+  dom.padBpm.onchange = event => {
+    const pad = selectedPad();
+    pad.bpm = clamp(Number(event.target.value) || CONFIG.DEFAULT_BPM, 20, 400);
+    renderPadProps();
+  };
+
+  dom.padVisual.onchange = event => {
+    const pad = selectedPad();
+    pad.visualMode = event.target.value;
+
+    if (pad.visualMode === "hidden") removeVisual(pad.id);
+    else if (pad.playing) activateVisual(pad);
+
+    renderAll();
+  };
+
+  dom.padUnassign.onclick = () => {
+    const pad = selectedPad();
+    stopPad(pad.id);
+    pad.cueId = null;
+    renderAll();
+  };
+
+  dom.seqDivision.onchange = event => {
+    state.sequencer.division = CONFIG.SEQ_DIVISIONS[event.target.value]
+      ? event.target.value
+      : "1/16";
+    renderSequencer(false);
+  };
+
+  dom.seqSwing.oninput = event => {
+    state.sequencer.swing = clamp(Number(event.target.value) || 0, 0, 50);
+    dom.seqSwingOutput.textContent = `${state.sequencer.swing}%`;
+  };
+
+  dom.seqFollow.onclick = toggleSequencerFollow;
+  dom.seqPlay.onclick = playSequencer;
+  dom.seqLoop.onclick = toggleSequencerLoop;
+  dom.seqClear.onclick = () => {
+    if (confirm("¿Vaciar patrón?")) clearSequencer();
+  };
+}
+
+/* ==========================================================
+   ANIMATION LOOP
+========================================================== */
+
+function animationTick() {
+  const video = selectedVideo();
+
+  if (
+    !state.scrubbing &&
+    state.preview.playing &&
+    state.preview.type === "local" &&
+    video?.editorEl
+  ) {
+    state.playhead = video.editorEl.currentTime;
+
+    if (state.playhead >= state.preview.end - 0.02) {
+      stopPreview();
+    } else {
+      updateTimelineUI();
+    }
+  }
+
+  const now = performance.now();
+  const pollYouTube = now - state.lastYTPoll >= 80;
+  if (pollYouTube) state.lastYTPoll = now;
+
+  pads.forEach(pad => {
+    if (!pad.playing) return;
+
+    const cue = findPadCue(pad);
+    if (!cue) return;
+
+    if (pad.engine?.kind === "local") {
+      const el = pad.engine.videoEl;
+      if (!el) return;
+
+      if (el.currentTime >= cue.endTime - 0.02) {
+        if (pad.loop) {
+          try {
+            el.currentTime = cue.startTime;
+            el.play();
+          } catch {}
+        } else {
+          stopPad(pad.id);
+        }
+      }
+    } else if (
+      pollYouTube &&
+      pad.engine?.kind === "youtube" &&
+      pad.engine.ready &&
+      pad.engine.player
+    ) {
+      try {
+        const current = pad.engine.player.getCurrentTime();
+        if (typeof current === "number" && current >= cue.endTime - 0.15) {
+          if (pad.loop) {
+            pad.engine.player.seekTo(cue.startTime, true);
+            pad.engine.player.playVideo();
+          } else {
+            stopPad(pad.id);
+          }
+        }
+      } catch {}
+    }
+  });
+
+  updatePadProgress();
+  renderCanvas();
+  requestAnimationFrame(animationTick);
+}
+
+/* ==========================================================
+   YOUTUBE API
+========================================================== */
+
+function loadYouTubeAPI() {
+  if (window.YT && window.YT.Player) return Promise.resolve();
+  if (ytApiPromise) return ytApiPromise;
+
+  ytApiPromise = new Promise((resolve, reject) => {
+    const previous = window.onYouTubeIframeAPIReady;
+
+    window.onYouTubeIframeAPIReady = () => {
+      try { previous?.(); } catch {}
+      resolve();
+    };
+
+    const script = document.createElement("script");
+    script.src = "https://www.youtube.com/iframe_api";
+    script.async = true;
+    script.onerror = () => reject(new Error("YouTube API"));
+    document.head.appendChild(script);
+  });
+
+  return ytApiPromise;
+}
+
+/* ==========================================================
+   START
+========================================================== */
+
+document.addEventListener("DOMContentLoaded", () => {
+  bind();
+  bindKeyboard();
+  renderAll();
+  status("READY");
+  requestAnimationFrame(animationTick);
+});
 </script>
 </body>
 </html>
