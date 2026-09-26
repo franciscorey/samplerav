@@ -23,7 +23,7 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 .playlist{display:grid;gap:4px;max-height:390px;overflow:auto}.playlist-row{display:grid;grid-template-columns:1fr 26px;gap:4px}.playlist-main{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center;padding:8px;text-align:left;min-width:0}.playlist-row.selected .playlist-main{border-color:var(--cyan);background:var(--cyan-dim)}.source-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}.source-dot.youtube{background:var(--red)}.playlist-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:10px var(--mono)}.playlist-meta{font:8px var(--mono);color:var(--dim)}.playlist-delete{padding:0;color:var(--red)}.project-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.project-grid .wide{grid-column:1/-1}.midi-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-row select{min-width:0}.midi-status,.hint{font:8px var(--mono);line-height:1.45;color:var(--dim)}
 .midi-card{display:grid;gap:6px;padding:7px;border:1px solid var(--line);background:#0d0f13}.midi-monitor{display:grid;gap:3px;font:8px var(--mono);color:var(--dim);min-height:29px}.midi-monitor strong{color:var(--cyan);font-weight:500}.midi-learn-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-learn-row button{padding:6px 8px;font:9px var(--mono)}
 .seq-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.seq-controls select,.seq-controls input{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.seq-grid-wrap{overflow:auto;border:1px solid var(--line);background:#0a0b0e}.seq-grid{display:grid;grid-template-columns:116px repeat(16,30px);min-width:596px}.seq-cell,.seq-head,.seq-label{height:28px;border-right:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055)}.seq-head{display:grid;place-items:center;font:8px var(--mono);color:var(--faint);background:#111318;position:sticky;top:0;z-index:2}.seq-label{display:flex;align-items:center;gap:5px;padding:0 6px;font:8px var(--mono);background:#111318;position:sticky;left:0;z-index:3;overflow:hidden}.seq-label strong{font-size:9px;color:var(--text)}.seq-label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}.seq-cell{position:relative;padding:3px;background:#101216;cursor:pointer}.seq-cell:hover{background:#1b2027}.seq-cell.active{background:var(--cyan-dim);box-shadow:inset 0 0 0 1px var(--cyan)}.seq-cell.current{box-shadow:inset 0 0 0 1px var(--yellow)}.seq-cell.current.active{box-shadow:inset 0 0 0 1px var(--cyan),inset 0 -3px 0 var(--yellow)}.seq-dot{display:block;width:100%;height:100%;background:transparent}.seq-cell.active .seq-dot{background:var(--cyan)}.seq-summary{display:flex;justify-content:space-between;gap:8px;font:8px var(--mono);color:var(--dim)}
-.center{display:grid;gap:9px;min-width:0}.visor{position:relative;height:min(48vw,540px);min-height:320px;overflow:hidden;background:#050608;border:1px solid var(--line2);contain:paint}.visor canvas{display:block;width:100%;height:100%;background:#050608}.visor-overlay{position:absolute;inset:0;pointer-events:none}.visor-top,.visor-bottom{position:absolute;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.visor-top{top:8px}.visor-bottom{bottom:8px;align-items:end}.visor-chip{padding:5px 7px;background:rgba(0,0,0,.65);border:1px solid var(--line);font:9px var(--mono);color:var(--dim)}.visor-chip strong{color:var(--cyan)}.visor-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#454b55;font:10px var(--mono)}.visual-buttons{display:flex;gap:4px;pointer-events:auto}.visual-buttons button{padding:4px 7px;font:9px var(--mono)}.yt-preview{position:absolute;inset:0;display:none;background:#000;pointer-events:auto}.yt-preview.show{display:block}.yt-preview iframe{width:100%;height:100%;border:0}
+.center{display:grid;gap:9px;min-width:0}.visor{position:relative;height:min(48vw,540px);min-height:320px;overflow:hidden;background:#050608;border:1px solid var(--line2);contain:paint}.visor canvas{display:block;width:100%;height:100%;background:#050608}.visor-overlay{position:absolute;inset:0;pointer-events:none}.visor-top,.visor-bottom{position:absolute;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.visor-top{top:8px}.visor-bottom{bottom:8px;align-items:end}.visor-chip{padding:5px 7px;background:rgba(0,0,0,.65);border:1px solid var(--line);font:9px var(--mono);color:var(--dim)}.visor-chip strong{color:var(--cyan)}.visor-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#454b55;font:10px var(--mono)}.visual-buttons{display:flex;gap:4px;pointer-events:auto}.visual-buttons button{padding:4px 7px;font:9px var(--mono)}.yt-preview{position:absolute;inset:0;display:none;background:#000;pointer-events:auto}.yt-preview.show{display:block}.yt-preview iframe{width:100%;height:100%;border:0}.background-layer{position:absolute;inset:0;display:none;background:#000;z-index:1}.background-layer.show{display:block}.background-layer video{width:100%;height:100%;object-fit:cover;display:block}.background-layer iframe{width:100%;height:100%;border:0}.visor canvas{position:relative;z-index:2}.visor-overlay{z-index:3}.bg-controls{display:grid;grid-template-columns:1fr auto;gap:5px}.bg-controls select{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.bg-state{font:8px var(--mono);color:var(--dim);margin-top:4px}.transport-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
 .timeline-panel{min-width:0;overflow:hidden}.timeline-toolbar{display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--line);min-width:0}.timeline-toolbar .title{flex:1;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.timeline-toolbar .time{font:10px var(--mono);color:var(--dim);white-space:nowrap}.timeline-toolbar button{padding:5px 7px;font:9px var(--mono)}.timeline-toolbar .zoom-label{min-width:35px;text-align:center}.timeline-wrap{padding:8px;background:#0b0c0f;min-width:0}.timeline-viewport{height:168px;width:100%;overflow:auto;overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);background:#090a0d;min-width:0;contain:layout paint}.timeline-content{position:relative;width:100%;min-width:600px;height:136px}.ruler{position:absolute;left:0;top:0;height:28px;min-width:100%;border-bottom:1px solid var(--line)}.ruler span{position:absolute;top:8px;transform:translateX(-50%);font:8px var(--mono);color:var(--faint);white-space:nowrap}.track{position:absolute;left:0;right:0;top:28px;height:108px;background:repeating-linear-gradient(90deg,transparent 0,transparent 49px,rgba(255,255,255,.035) 50px)}.cue-layer{position:absolute;inset:16px 0 12px}.cue-block{position:absolute;top:10px;height:68px;min-width:8px;padding:7px 11px;background:var(--green);color:#07120b;border:1px solid #d6ffe0;border-radius:3px;overflow:hidden;cursor:grab;display:flex;flex-direction:column;justify-content:space-between;touch-action:none;user-select:none}.cue-block:active{cursor:grabbing}.cue-block.selected{background:var(--cyan);box-shadow:0 0 0 2px rgba(0,255,204,.2)}.cue-block strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cue-block small{font:8px var(--mono);white-space:nowrap}.cue-handle{position:absolute;top:0;bottom:0;width:8px;background:rgba(0,0,0,.12);opacity:0}.cue-block:hover .cue-handle,.cue-block.selected .cue-handle{opacity:.85}.cue-handle.start{left:0;cursor:ew-resize}.cue-handle.end{right:0;cursor:ew-resize}.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--red);box-shadow:0 0 8px rgba(255,104,118,.5);z-index:4;pointer-events:none}.playhead:before{content:"";position:absolute;left:-4px;top:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--red)}.timeline-status{display:flex;justify-content:space-between;gap:10px;padding:6px 2px 0;color:var(--dim);font:8px var(--mono)}
 .cue-panel .panel-body,.pad-panel .panel-body{display:grid;gap:8px}.cue-title{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.empty{padding:10px 0;color:var(--faint);font:10px var(--mono);line-height:1.45}.field{display:grid;gap:4px}.field label,.small-label{font:8px var(--mono);color:var(--dim);letter-spacing:.08em}.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.time-grid .full{grid-column:1/-1}.cue-tools{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cue-tools .wide{grid-column:1/-1}.assign-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.assign-pad{padding:6px 3px;font:9px var(--mono);text-align:left}.assign-pad span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.assign-pad small{display:block;margin-top:2px;color:var(--dim);font:7px var(--mono)}.assign-pad.active small{color:var(--cyan)}
 .performance{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;margin-top:10px}.performance>*{min-width:0}.pads-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--line)}.pads-head strong{font-size:13px}.pads-head span{font:8px var(--mono);color:var(--dim)}.pads-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:8px}.pad{position:relative;min-height:88px;padding:9px;text-align:left;background:#15181d;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:5px;overflow:hidden;touch-action:none}.pad:hover{border-color:var(--line2)}.pad.selected{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}.pad.playing{border-color:var(--cyan);background:var(--cyan-dim)}.pad.empty{opacity:.58}.pad-num{font:9px var(--mono);color:var(--dim)}.pad kbd{justify-self:end;padding:2px 5px;border:1px solid var(--line2);font:10px var(--mono);color:var(--cyan)}.pad strong{grid-column:1/-1;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.pad small{grid-column:1/-1;font:8px var(--mono);color:var(--dim)}.pad i{position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left}.pad.playing i{transform:scaleX(1)}
@@ -68,7 +68,8 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div id="midiStatus" class="midi-status">NO CONECTADO · PULSA CONECTAR</div>
       <div class="midi-card">
         <div class="midi-learn-row"><button id="midiDetectButton" class="btn">DETECTAR MIDI</button><button id="midiLearnButton" class="btn">LEARN PAD</button></div>
-        <div class="midi-monitor"><div>PAD MIDI: <strong id="midiPadMapping">36 · CH ANY</strong></div><div>ÚLTIMO: <span id="midiLastMessage">—</span></div></div>
+        <div class="midi-monitor"><div>PAD MIDI: <strong id="midiPadMapping">NOTE 36 · CH ANY</strong></div><div>ÚLTIMO: <span id="midiLastMessage">—</span></div></div>
+        <div class="hint">MiniLab 3: pads de usuario suelen enviar CC 102–109. LEARN acepta NOTE o CC.</div>
       </div>
       <div class="hint">Selecciona un pad y pulsa LEARN PAD; luego pulsa un pad o tecla de tu controlador. El mapeo queda guardado en el proyecto.</div>
     </div>
@@ -77,6 +78,7 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
   <section class="center">
     <div class="visor">
       <canvas id="outputCanvas" width="1280" height="720"></canvas>
+      <div id="backgroundLayer" class="background-layer"></div>
       <div class="visor-overlay">
         <div class="visor-top"><div class="visor-chip" id="visorContext">SIN REPRODUCCIÓN</div><div class="visor-chip"><strong id="visualizerModeLabel">SIMPLE</strong> · <span id="visualSourceCount">0/1</span></div></div>
         <div id="visualizerPlaceholder" class="visor-empty">CARGA UN VIDEO · CREA UN CUE · ASÍGNALO A UN PAD</div>
@@ -112,6 +114,8 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div id="cuePropsEmpty" class="empty">Selecciona un video y crea un cue. Puedes modificar inicio, fin y duración al milisegundo.</div>
       <div id="cuePropsForm" hidden>
         <div class="cue-title" id="cueEditorTitle">Cue</div>
+        <div class="bg-controls" style="margin-bottom:8px"><button id="cueBackgroundButton" class="btn">▶ BACKGROUND CUE</button><button id="cueBackgroundStop" class="btn danger">■</button></div>
+        <div id="cueBackgroundState" class="bg-state">SIN BACKGROUND · el cue se reproduce en loop, sin audio</div>
         <div class="field"><label>NOMBRE</label><input id="cueNameInput"></div>
         <div class="time-grid">
           <div class="field"><label>INICIO</label><input id="cueStartInput" class="mono" placeholder="00:00.000"></div>
@@ -158,14 +162,19 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
   <div class="panel-head"><span>05 · SECUENCIADOR</span><span id="seqStatus">16 PASOS · 0 ACTIVOS</span></div>
   <div class="panel-body stack">
     <div class="seq-controls">
-      <div><label class="small-label">RESOLUCIÓN</label><select id="seqDivision"><option value="1/16">1/16</option><option value="1/8">1/8</option><option value="1/4">1/4</option></select></div>
+      <div><label class="small-label">RESOLUCIÓN</label><select id="seqDivision"><option value="1/16">1/16</option><option value="1/8">1/8</option><option value="1/4">1/4</option><option value="1/2">1/2</option></select></div>
       <div><label class="small-label">SWING</label><input id="seqSwing" type="range" min="0" max="50" value="0" step="1"><div id="seqSwingOutput" class="hint">0%</div></div>
       <div style="display:grid;align-items:end"><button id="seqFollowButton" type="button" class="btn wide active">FOLLOW PAD</button></div>
     </div>
     <div id="seqGridWrap" class="seq-grid-wrap"><div id="seqGrid" class="seq-grid"></div></div>
+    <div class="transport-row">
+      <button id="seqPlayButton" type="button" class="btn active">▶ PLAY / RESUME</button>
+      <button id="seqPauseButton" type="button" class="btn">Ⅱ PAUSA</button>
+      <button id="seqStopButton" type="button" class="btn">■ STOP</button>
+    </div>
     <div class="cue-tools">
-      <button id="seqPlayButton" type="button" class="btn wide active">▶ REPRODUCIR SECUENCIA</button>
       <button id="seqLoopButton" type="button" class="btn active">LOOP</button>
+      <button id="seqRestartButton" type="button" class="btn">↺ REINICIAR</button>
       <button id="seqClearButton" type="button" class="btn danger wide">VACIAR PATRÓN</button>
     </div>
     <div class="seq-summary"><span id="seqPatternInfo">120 BPM · 1/16</span><span>CLICK CELDA = ACTIVAR · SELECTOR DE PAD = EDITA FILA</span></div>
@@ -207,7 +216,8 @@ const CONFIG = {
   SEQ_DIVISIONS: {
     "1/16": 0.25,
     "1/8": 0.5,
-    "1/4": 1
+    "1/4": 1,
+    "1/2": 2
   },
   SEQ_LOOKAHEAD: 0.10,
   SEQ_SCHEDULER_MS: 25
@@ -286,7 +296,9 @@ function makePad(index) {
   return {
     id: index + 1,
     key: CONFIG.KEY_MAP[index],
+    midiType: "note",
     midiNote: CONFIG.MIDI_BASE + index,
+    midiCC: index < 8 ? 102 + index : null,
     midiChannel: null,
     cueId: null,
     playMode: "gate",
@@ -327,6 +339,8 @@ const state = {
 
   visualizerMode: "simple",
   visualSources: [],
+  backgroundCueId: null,
+  backgroundEngine: null,
 
   master: CONFIG.DEFAULT_MASTER,
   bpm: CONFIG.DEFAULT_BPM,
@@ -363,6 +377,7 @@ const state = {
     division: "1/16",
     swing: 0,
     playing: false,
+    paused: false,
     index: -1,
     loop: true,
     followPad: true,
@@ -413,6 +428,11 @@ const dom = {
   midiStatus: $("midiStatus"),
   midiPadMapping: $("midiPadMapping"),
   midiLastMessage: $("midiLastMessage"),
+
+  backgroundLayer: $("backgroundLayer"),
+  cueBackground: $("cueBackgroundButton"),
+  cueBackgroundStop: $("cueBackgroundStop"),
+  cueBackgroundState: $("cueBackgroundState"),
 
   visorContext: $("visorContext"),
   canvas: $("outputCanvas"),
@@ -499,6 +519,9 @@ const dom = {
   seqSwingOutput: $("seqSwingOutput"),
   seqFollow: $("seqFollowButton"),
   seqPlay: $("seqPlayButton"),
+  seqPause: $("seqPauseButton"),
+  seqStop: $("seqStopButton"),
+  seqRestart: $("seqRestartButton"),
   seqLoop: $("seqLoopButton"),
   seqClear: $("seqClearButton"),
   seqPatternInfo: $("seqPatternInfo")
@@ -907,6 +930,97 @@ function updateYTVolume(pad) {
 }
 
 /* ==========================================================
+   BACKGROUND CUE
+========================================================== */
+
+function stopBackgroundCue() {
+  const engine = state.backgroundEngine;
+  if (engine?.videoEl) {
+    try { engine.videoEl.pause(); } catch {}
+    try { engine.videoEl.remove(); } catch {}
+  }
+  if (engine?.player) {
+    try { engine.player.destroy(); } catch {}
+  }
+  if (engine?.host) {
+    try { engine.host.remove(); } catch {}
+  }
+  state.backgroundEngine = null;
+  state.backgroundCueId = null;
+  dom.backgroundLayer.innerHTML = "";
+  dom.backgroundLayer.classList.remove("show");
+  dom.cueBackgroundState.textContent = "SIN BACKGROUND · el cue se reproduce en loop, sin audio";
+  renderCanvas();
+}
+
+async function startBackgroundCue(cue) {
+  if (!cue) return;
+  const video = cueVideo(cue);
+  if (!video) return;
+  stopBackgroundCue();
+  state.backgroundCueId = cue.id;
+
+  if (video.sourceType === "local") {
+    if (!video.sourceUrl) {
+      toast("Vincula primero el archivo local");
+      state.backgroundCueId = null;
+      return;
+    }
+    const el = document.createElement(video.mediaKind === "audio" ? "audio" : "video");
+    el.src = video.sourceUrl;
+    el.preload = "auto";
+    el.loop = true;
+    el.muted = true;
+    el.playsInline = true;
+    el.volume = 0;
+    el.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
+    dom.backgroundLayer.appendChild(el);
+    state.backgroundEngine = { kind: "local", videoEl: el, videoId: video.id };
+    dom.backgroundLayer.classList.add("show");
+    const play = () => {
+      try { el.currentTime = cue.startTime; } catch {}
+      el.play().catch(() => toast("El navegador bloqueó el background; pulsa el botón otra vez"));
+    };
+    if (el.readyState >= 1) play(); else el.addEventListener("loadedmetadata", play, { once: true });
+  } else {
+    try {
+      await loadYouTubeAPI();
+      const host = document.createElement("div");
+      host.style.cssText = "width:100%;height:100%";
+      dom.backgroundLayer.appendChild(host);
+      state.backgroundEngine = { kind: "youtube", host, player: null, videoId: video.id };
+      const player = new YT.Player(host, {
+        width: "100%", height: "100%", videoId: video.youtubeId,
+        playerVars: { autoplay: 0, controls: 0, playsinline: 1, rel: 0, loop: 1, playlist: video.youtubeId },
+        events: {
+          onReady: e => {
+            if (!state.backgroundEngine) return;
+            state.backgroundEngine.player = e.target;
+            e.target.mute();
+            e.target.seekTo(cue.startTime, true);
+            e.target.playVideo();
+            dom.backgroundLayer.classList.add("show");
+          }
+        }
+      });
+      state.backgroundEngine.player = player;
+    } catch {
+      state.backgroundCueId = null;
+      toast("No se pudo iniciar el background de YouTube");
+    }
+  }
+  dom.cueBackgroundState.textContent = `BACKGROUND · ${cue.name} · LOOP · AUDIO OFF`;
+  renderCanvas();
+}
+
+function toggleBackgroundCue() {
+  const cue = selectedCue();
+  if (!cue) return;
+  if (state.backgroundCueId === cue.id) stopBackgroundCue();
+  else startBackgroundCue(cue);
+}
+
+/* ==========================================================
    VISUAL
 ========================================================== */
 
@@ -1098,6 +1212,21 @@ function renderCanvas() {
     dom.visorContext.textContent = `PREVIEW · ${cue?.name || "CUE"}`;
     dom.placeholder.hidden = true;
     return;
+  }
+
+  if (!state.preview.playing && state.backgroundCueId) {
+    const bgCue = getCue(state.backgroundCueId);
+    const bgVideo = bgCue ? cueVideo(bgCue) : null;
+    if (bgCue?.imageUrl) {
+      const entry = getImageEntry(bgCue.imageUrl);
+      if (entry?.loaded) drawCoverImage(ctx, entry.img, { x: 0, y: 0, w: width, h: height });
+    } else if (bgVideo?.sourceType === "local" && bgVideo.mediaKind === "video" && state.backgroundEngine?.videoEl?.readyState >= 2) {
+      drawCover(ctx, state.backgroundEngine.videoEl, { x: 0, y: 0, w: width, h: height });
+    } else if (bgVideo?.sourceType === "youtube") {
+      // YouTube is rendered by the iframe layer, not canvas.
+    } else {
+      drawImageOrNotice(ctx, { x: 0, y: 0, w: width, h: height }, cueFallbackImageUrl(bgVideo), "BACKGROUND");
+    }
   }
 
   const active = state.visualSources
@@ -2337,50 +2466,43 @@ function onMIDIDetect(event) {
 function startMIDILearn() {
   const pad = selectedPad();
   if (!pad) return;
-
   if (!state.midiAccess) {
-    requestMIDI();
-    toast("Primero conecta / selecciona el controlador MIDI");
+    requestMIDI().then(ok => { if (ok) startMIDILearn(); });
     return;
   }
-
   if (!state.midiInputId) {
-    toast("Selecciona un controlador MIDI");
-    return;
+    const inputs = [...state.midiAccess.inputs.values()];
+    if (inputs.length === 1) selectMIDI(inputs[0].id);
+    else { toast("Selecciona un controlador MIDI"); return; }
   }
-
   state.midiLearnPadId = pad.id;
   dom.midiLearn.textContent = "ESPERANDO…";
   dom.midiLearn.classList.add("active");
-  dom.midiStatus.textContent = `LEARN PAD ${pad.id} · PULSA EL CONTROL`;
+  dom.midiStatus.textContent = `LEARN PAD ${pad.id} · PULSA NOTE O PAD`;
 }
 
-function finishMIDILearn(note) {
+function finishMIDILearn(type, number, channel) {
   const pad = getPad(state.midiLearnPadId);
   if (!pad) return;
-
-  pad.midiNote = note;
-  pad.midiChannel = null;
+  pad.midiType = type;
+  pad.midiNote = type === "note" ? number : null;
+  pad.midiCC = type === "cc" ? number : null;
+  pad.midiChannel = channel;
   state.midiLearnPadId = null;
-
   dom.midiLearn.textContent = "LEARN PAD";
   dom.midiLearn.classList.remove("active");
-  dom.midiStatus.textContent = `PAD ${pad.id} ASIGNADO · NOTE ${note}`;
-
+  dom.midiStatus.textContent = `PAD ${pad.id} ← ${type.toUpperCase()} ${number}`;
   renderAll();
-  toast(`PAD ${pad.id} ← MIDI Note ${note}`);
+  toast(`PAD ${pad.id} ← MIDI ${type.toUpperCase()} ${number}`);
 }
 
 function renderMidiMapping() {
   const pad = selectedPad();
   if (!pad) return;
-
-  dom.midiPadMapping.textContent = `${pad.midiNote} · CH ${pad.midiChannel == null ? "ANY" : pad.midiChannel + 1}`;
-
-  dom.midiLearn.classList.toggle(
-    "active",
-    state.midiLearnPadId === pad.id
-  );
+  const type = pad.midiType || "note";
+  const number = type === "cc" ? pad.midiCC : pad.midiNote;
+  dom.midiPadMapping.textContent = `${type.toUpperCase()} ${number ?? "—"} · CH ${pad.midiChannel == null ? "ANY" : pad.midiChannel + 1}`;
+  dom.midiLearn.classList.toggle("active", state.midiLearnPadId === pad.id);
 }
 
 function describeMIDI(statusByte, data1, data2) {
@@ -2404,7 +2526,6 @@ function onMIDI(event) {
   const [statusByte = 0, data1 = 0, data2 = 0] = event.data || [];
   const command = statusByte & 0xf0;
   const channel = statusByte & 0x0f;
-
   dom.midiLastMessage.textContent = describeMIDI(statusByte, data1, data2);
 
   if (state.midiDetecting) {
@@ -2416,43 +2537,46 @@ function onMIDI(event) {
     return;
   }
 
-  if (
-    state.midiLearnPadId &&
-    command === 0x90 &&
-    data2 > 0
-  ) {
-    finishMIDILearn(data1);
+  const isNoteOn = command === 0x90 && data2 > 0;
+  const isNoteOff = command === 0x80 || (command === 0x90 && data2 === 0);
+  const isCC = command === 0xb0;
+
+  if (state.midiLearnPadId && (isNoteOn || (isCC && data2 > 0))) {
+    finishMIDILearn(isCC ? "cc" : "note", data1, channel);
     return;
   }
 
-  if (command === 0x90 && data2 > 0 || command === 0x80 || (command === 0x90 && data2 === 0)) {
-    const isNoteOn = command === 0x90 && data2 > 0;
-    const pad = pads.find(item =>
-      item.midiNote === data1 &&
-      (item.midiChannel == null || item.midiChannel === channel)
-    );
+  const pad = pads.find(item => {
+    const type = item.midiType || "note";
+    const number = type === "cc" ? item.midiCC : item.midiNote;
+    const match = number === data1 && (item.midiChannel == null || item.midiChannel === channel);
+    if (type === "cc") return isCC && match;
+    return (isNoteOn || isNoteOff) && match;
+  });
 
-    if (pad) {
-      if (isNoteOn) pressPad(pad.id);
-      else releasePad(pad.id);
+  if (pad) {
+    const type = pad.midiType || "note";
+    if (type === "cc") {
+      if (data2 > 0) pressPad(pad.id);
+      else if (pad.playMode === "gate") releasePad(pad.id);
+    } else if (isNoteOn) {
+      pressPad(pad.id);
+    } else if (isNoteOff) {
+      releasePad(pad.id);
     }
   }
 
-  if (command === 0xb0) {
-    const pad = selectedPad();
-
-    if (!pad) return;
-
+  if (isCC) {
+    const selected = selectedPad();
+    if (!selected) return;
     if (data1 === 112) {
-      pad.highPass = 20 + (data2 / 127) * 7980;
-      if (pad.hp) pad.hp.frequency.value = pad.highPass;
+      selected.highPass = 20 + (data2 / 127) * 7980;
+      if (selected.hp) selected.hp.frequency.value = selected.highPass;
     }
-
     if (data1 === 113) {
-      pad.lowPass = 20 + (data2 / 127) * 19980;
-      if (pad.lp) pad.lp.frequency.value = pad.lowPass;
+      selected.lowPass = 20 + (data2 / 127) * 19980;
+      if (selected.lp) selected.lp.frequency.value = selected.lowPass;
     }
-
     renderPadProps();
   }
 }
@@ -2587,7 +2711,8 @@ function divisionBeats() {
 }
 
 function seqBaseMs() {
-  return (60000 / Math.max(1, state.bpm)) * divisionBeats();
+  const beats = CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.25;
+  return (60000 / Math.max(30, state.bpm)) * beats;
 }
 
 function seqStepDelayMs(index) {
@@ -2694,10 +2819,10 @@ function renderSequencer(scrollToSelected = true) {
   );
 
   dom.seqStatus.textContent = `${CONFIG.SEQ_STEPS} PASOS · ${activeCount} ACTIVOS${state.sequencer.playing ? ` · PASO ${state.sequencer.index + 1}` : ""}`;
-  dom.seqPlay.textContent = state.sequencer.playing
-    ? "■ DETENER SECUENCIA"
-    : "▶ REPRODUCIR SECUENCIA";
+  dom.seqPlay.textContent = state.sequencer.playing ? "▶ EN CURSO" : (state.sequencer.paused ? "▶ RESUME" : "▶ PLAY");
   dom.seqPlay.classList.toggle("active", state.sequencer.playing);
+  dom.seqPause.classList.toggle("active", state.sequencer.paused);
+  dom.seqStop.classList.toggle("active", !state.sequencer.playing && !state.sequencer.paused && state.sequencer.index < 0);
   dom.seqLoop.classList.toggle("active", state.sequencer.loop);
   dom.seqFollow.classList.toggle("active", state.sequencer.followPad);
   dom.seqDivision.value = state.sequencer.division;
@@ -2793,53 +2918,60 @@ function scheduleSequencer() {
 }
 
 async function playSequencer() {
-  if (state.sequencer.playing) {
-    stopSequencer();
-    return;
-  }
-
-  const activeCount = state.sequencer.pattern.reduce(
-    (sum, step) => sum + step.pads.length,
-    0
-  );
-
-  if (!activeCount) {
-    toast("Activa al menos una celda del patrón");
-    return;
-  }
-
-  try {
-    await ensureAudio();
-  } catch {
-    return;
-  }
+  if (state.sequencer.playing) return;
+  const activeCount = state.sequencer.pattern.reduce((sum, step) => sum + step.pads.length, 0);
+  if (!activeCount) { toast("Activa al menos una celda del patrón"); return; }
+  try { await ensureAudio(); } catch { return; }
 
   state.sequencer.playing = true;
-  state.sequencer.index = -1;
-  state.sequencer.cursor = -1;
+  state.sequencer.paused = false;
   state.sequencer.scheduleToken += 1;
+  if (state.sequencer.index < 0 || state.sequencer.index >= CONFIG.SEQ_STEPS - 1) {
+    state.sequencer.cursor = -1;
+    state.sequencer.index = -1;
+  } else {
+    state.sequencer.cursor = state.sequencer.index;
+  }
   state.sequencer.nextDue = performance.now();
-
   renderSequencer(false);
   scheduleSequencer();
+}
+
+function pauseSequencer() {
+  if (!state.sequencer.playing) return;
+  state.sequencer.scheduleToken += 1;
+  state.sequencer.playing = false;
+  state.sequencer.paused = true;
+  clearTimeout(state.sequencer.schedulerTimer);
+  state.sequencer.schedulerTimer = null;
+  for (const padId of state.sequencer.activePads) {
+    const pad = getPad(padId);
+    if (pad?.sequenceOwned) stopPad(padId);
+  }
+  state.sequencer.activePads.clear();
+  renderSequencer(false);
 }
 
 function stopSequencer() {
   state.sequencer.scheduleToken += 1;
   state.sequencer.playing = false;
+  state.sequencer.paused = false;
   clearTimeout(state.sequencer.schedulerTimer);
   state.sequencer.schedulerTimer = null;
   state.sequencer.index = -1;
   state.sequencer.cursor = -1;
   state.sequencer.nextDue = 0;
-
   for (const padId of state.sequencer.activePads) {
     const pad = getPad(padId);
     if (pad?.sequenceOwned) stopPad(padId);
   }
-
   state.sequencer.activePads.clear();
   renderSequencer(false);
+}
+
+function restartSequencer() {
+  stopSequencer();
+  playSequencer();
 }
 
 /* ==========================================================
@@ -2852,6 +2984,7 @@ function projectData() {
     globalBpm: state.bpm,
     masterVolume: state.master,
     visualizerMode: state.visualizerMode,
+    backgroundCueId: state.backgroundCueId,
 
     videos: videos.map(video => ({
       id: video.id,
@@ -2873,7 +3006,9 @@ function projectData() {
     pads: pads.map(pad => ({
       id: pad.id,
       key: pad.key,
+      midiType: pad.midiType || "note",
       midiNote: pad.midiNote,
+      midiCC: pad.midiCC,
       midiChannel: pad.midiChannel,
       cueId: pad.cueId,
       playMode: pad.playMode,
@@ -2958,7 +3093,9 @@ function resetProjectState() {
   state.playhead = 0;
   state.midiLearnPadId = null;
   state.midiDetecting = false;
+  stopBackgroundCue();
   state.visualSources = [];
+  state.backgroundCueId = null;
   state.zoom = 1;
   state.sequencer.pattern = Array.from(
     { length: CONFIG.SEQ_STEPS },
@@ -2966,6 +3103,7 @@ function resetProjectState() {
   );
   state.sequencer.index = -1;
   state.sequencer.playing = false;
+  state.sequencer.paused = false;
   state.sequencer.activePads.clear();
 }
 
@@ -2992,9 +3130,8 @@ function loadProject(data) {
     ? clamp(Number(data.masterVolume), 0, 1)
     : CONFIG.DEFAULT_MASTER;
 
-  state.visualizerMode = CONFIG.VIS_LIMIT[data.visualizerMode]
-    ? data.visualizerMode
-    : "simple";
+  state.visualizerMode = CONFIG.VIS_LIMIT[data.visualizerMode] ? data.visualizerMode : "simple";
+  state.backgroundCueId = null;
 
   const validCueIds = new Set();
 
@@ -3021,6 +3158,8 @@ function loadProject(data) {
     if (!source) continue;
 
     const pad = pads[index];
+    pad.midiType = source.midiType === "cc" ? "cc" : "note";
+    pad.midiCC = Number.isFinite(Number(source.midiCC)) ? clamp(Number(source.midiCC), 0, 127) : (index < 8 ? 102 + index : null);
     pad.midiNote = Number.isFinite(Number(source.midiNote))
       ? clamp(Number(source.midiNote), 0, 127)
       : CONFIG.MIDI_BASE + index;
@@ -3350,6 +3489,8 @@ function bind() {
   });
 
   dom.cueNew.onclick = addCue;
+  dom.cueBackground.onclick = toggleBackgroundCue;
+  dom.cueBackgroundStop.onclick = stopBackgroundCue;
   dom.cuePreview.onclick = () => {
     const cue = selectedCue();
     if (cue) previewCue(cue);
@@ -3519,6 +3660,9 @@ function bind() {
 
   dom.seqFollow.onclick = toggleSequencerFollow;
   dom.seqPlay.onclick = playSequencer;
+  dom.seqPause.onclick = pauseSequencer;
+  dom.seqStop.onclick = stopSequencer;
+  dom.seqRestart.onclick = restartSequencer;
   dom.seqLoop.onclick = toggleSequencerLoop;
   dom.seqClear.onclick = () => {
     if (confirm("¿Vaciar patrón?")) clearSequencer();
@@ -3590,6 +3734,14 @@ function animationTick() {
       } catch {}
     }
   });
+
+  if (state.backgroundCueId && state.backgroundEngine?.kind === "local") {
+    const cue = getCue(state.backgroundCueId);
+    const el = state.backgroundEngine.videoEl;
+    if (cue && el && Number.isFinite(el.currentTime) && el.currentTime >= cue.endTime - 0.03) {
+      try { el.currentTime = cue.startTime; el.play(); } catch {}
+    }
+  }
 
   updatePadProgress();
   renderCanvas();
