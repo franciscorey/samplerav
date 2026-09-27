@@ -22,17 +22,17 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 .source-input{display:grid;grid-template-columns:1fr auto;gap:5px}.source-input input,.field input,.field select,.cue-select{width:100%;min-width:0;background:var(--raised);border:1px solid var(--line);padding:7px 7px;border-radius:var(--r);font:10px var(--mono)}.drop{padding:9px;border:1px dashed var(--line2);text-align:center;color:var(--faint);font:9px var(--mono)}.drop.drag{border-color:var(--cyan);background:var(--cyan-dim);color:var(--cyan)}
 .playlist{display:grid;gap:4px;max-height:390px;overflow:auto}.playlist-row{display:grid;grid-template-columns:1fr 26px;gap:4px}.playlist-main{display:grid;grid-template-columns:8px 1fr auto;gap:7px;align-items:center;padding:8px;text-align:left;min-width:0}.playlist-row.selected .playlist-main{border-color:var(--cyan);background:var(--cyan-dim)}.source-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}.source-dot.youtube{background:var(--red)}.playlist-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:10px var(--mono)}.playlist-meta{font:8px var(--mono);color:var(--dim)}.playlist-delete{padding:0;color:var(--red)}.project-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.project-grid .wide{grid-column:1/-1}.midi-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-row select{min-width:0}.midi-status,.hint{font:8px var(--mono);line-height:1.45;color:var(--dim)}
 .midi-card{display:grid;gap:6px;padding:7px;border:1px solid var(--line);background:#0d0f13}.midi-monitor{display:grid;gap:3px;font:8px var(--mono);color:var(--dim);min-height:29px}.midi-monitor strong{color:var(--cyan);font-weight:500}.midi-learn-row{display:grid;grid-template-columns:1fr auto;gap:5px}.midi-learn-row button{padding:6px 8px;font:9px var(--mono)}
-.seq-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}.seq-controls select,.seq-controls input{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.seq-grid-wrap{overflow:auto;border:1px solid var(--line);background:#0a0b0e}.seq-grid{display:grid;grid-template-columns:116px repeat(16,30px);min-width:596px}.seq-cell,.seq-head,.seq-label{height:28px;border-right:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055)}.seq-head{display:grid;place-items:center;font:8px var(--mono);color:var(--faint);background:#111318;position:sticky;top:0;z-index:2}.seq-label{display:flex;align-items:center;gap:5px;padding:0 6px;font:8px var(--mono);background:#111318;position:sticky;left:0;z-index:3;overflow:hidden}.seq-label strong{font-size:9px;color:var(--text)}.seq-label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}.seq-cell{position:relative;padding:3px;background:#101216;cursor:pointer}.seq-cell:hover{background:#1b2027}.seq-cell.active{background:var(--cyan-dim);box-shadow:inset 0 0 0 1px var(--cyan)}.seq-cell.current{box-shadow:inset 0 0 0 1px var(--yellow)}.seq-cell.current.active{box-shadow:inset 0 0 0 1px var(--cyan),inset 0 -3px 0 var(--yellow)}.seq-dot{display:block;width:100%;height:100%;background:transparent}.seq-cell.active .seq-dot{background:var(--cyan)}.seq-summary{display:flex;justify-content:space-between;gap:8px;font:8px var(--mono);color:var(--dim)}
+.seq-toolbar{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(390px,1.35fr) minmax(300px,1fr);gap:7px;align-items:stretch}.seq-group{display:grid;grid-template-columns:auto 1fr;align-items:end;gap:7px;padding:7px 8px;background:#0d0f13;border:1px solid var(--line);border-radius:var(--r);min-width:0}.seq-group-title{grid-column:1/-1;font:8px var(--mono);letter-spacing:.12em;color:var(--dim)}.seq-field{display:grid;gap:3px;min-width:0}.seq-field>span{display:flex;justify-content:space-between;font:8px var(--mono);color:var(--dim)}.seq-field select,.seq-field input{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.seq-swing{min-width:110px}.seq-button-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;min-width:0}.seq-pattern-group .seq-button-row{grid-template-columns:repeat(3,minmax(0,1fr))}.seq-button-row .btn{min-width:0;padding:7px 6px;font:9px var(--mono);white-space:nowrap}.seq-primary{border-color:var(--cyan);color:var(--cyan)}.seq-grid-wrap{width:100%;overflow:auto;border:1px solid var(--line);background:#0a0b0e}.seq-grid{display:grid;grid-template-columns:132px repeat(16,minmax(32px,1fr));width:100%;min-width:644px}.seq-cell,.seq-head,.seq-label{height:28px;border-right:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055)}.seq-head{display:grid;place-items:center;font:8px var(--mono);color:var(--faint);background:#111318;position:sticky;top:0;z-index:2}.seq-label{display:flex;align-items:center;gap:5px;padding:0 6px;font:8px var(--mono);background:#111318;position:sticky;left:0;z-index:3;overflow:hidden}.seq-label strong{font-size:9px;color:var(--text)}.seq-label span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--dim)}.seq-cell{position:relative;padding:3px;background:#101216;cursor:pointer}.seq-cell:hover{background:#1b2027}.seq-cell.active{background:var(--cyan-dim);box-shadow:inset 0 0 0 1px var(--cyan)}.seq-cell.current{box-shadow:inset 0 0 0 1px var(--yellow)}.seq-cell.current.active{box-shadow:inset 0 0 0 1px var(--cyan),inset 0 -3px 0 var(--yellow)}.seq-dot{display:block;width:100%;height:100%;background:transparent}.seq-cell.active .seq-dot{background:var(--cyan)}.seq-summary{display:flex;justify-content:space-between;gap:8px;font:8px var(--mono);color:var(--dim)}
 .center{display:grid;gap:9px;min-width:0}.visor{position:relative;height:min(48vw,540px);min-height:320px;overflow:hidden;background:#050608;border:1px solid var(--line2);contain:paint}.visor canvas{display:block;width:100%;height:100%;background:#050608}.visor-overlay{position:absolute;inset:0;pointer-events:none}.visor-top,.visor-bottom{position:absolute;left:8px;right:8px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.visor-top{top:8px}.visor-bottom{bottom:8px;align-items:end}.visor-chip{padding:5px 7px;background:rgba(0,0,0,.65);border:1px solid var(--line);font:9px var(--mono);color:var(--dim)}.visor-chip strong{color:var(--cyan)}.visor-empty{position:absolute;inset:0;display:grid;place-items:center;text-align:center;color:#454b55;font:10px var(--mono)}.visual-buttons{display:flex;gap:4px;pointer-events:auto}.visual-buttons button{padding:4px 7px;font:9px var(--mono)}.yt-preview{position:absolute;inset:0;display:none;background:#000;pointer-events:auto}.yt-preview.show{display:block}.yt-preview iframe{width:100%;height:100%;border:0}.background-layer{position:absolute;inset:0;display:none;background:#000;z-index:1}.background-layer.show{display:block}.background-layer video{width:100%;height:100%;object-fit:cover;display:block}.background-layer iframe{width:100%;height:100%;border:0}.visor canvas{position:relative;z-index:2}.visor-overlay{z-index:3}.bg-controls{display:grid;grid-template-columns:1fr auto;gap:5px}.bg-controls select{width:100%;background:var(--raised);border:1px solid var(--line);padding:6px;border-radius:var(--r);font:9px var(--mono)}.bg-state{font:8px var(--mono);color:var(--dim);margin-top:4px}.transport-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
-.timeline-panel{min-width:0;overflow:hidden}.timeline-toolbar{display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--line);min-width:0}.timeline-toolbar .title{flex:1;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.timeline-toolbar .time{font:10px var(--mono);color:var(--dim);white-space:nowrap}.timeline-toolbar button{padding:5px 7px;font:9px var(--mono)}.timeline-toolbar .zoom-label{min-width:35px;text-align:center}.timeline-wrap{padding:8px;background:#0b0c0f;min-width:0}.timeline-viewport{height:168px;width:100%;overflow:auto;overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);background:#090a0d;min-width:0;contain:layout paint}.timeline-content{position:relative;width:100%;min-width:600px;height:136px}.ruler{position:absolute;left:0;top:0;height:28px;min-width:100%;border-bottom:1px solid var(--line)}.ruler span{position:absolute;top:8px;transform:translateX(-50%);font:8px var(--mono);color:var(--faint);white-space:nowrap}.track{position:absolute;left:0;right:0;top:28px;height:108px;background:repeating-linear-gradient(90deg,transparent 0,transparent 49px,rgba(255,255,255,.035) 50px)}.cue-layer{position:absolute;inset:16px 0 12px}.cue-block{position:absolute;top:10px;height:68px;min-width:8px;padding:7px 11px;background:var(--green);color:#07120b;border:1px solid #d6ffe0;border-radius:3px;overflow:hidden;cursor:grab;display:flex;flex-direction:column;justify-content:space-between;touch-action:none;user-select:none}.cue-block:active{cursor:grabbing}.cue-block.selected{background:var(--cyan);box-shadow:0 0 0 2px rgba(0,255,204,.2)}.cue-block strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cue-block small{font:8px var(--mono);white-space:nowrap}.cue-handle{position:absolute;top:0;bottom:0;width:8px;background:rgba(0,0,0,.12);opacity:0}.cue-block:hover .cue-handle,.cue-block.selected .cue-handle{opacity:.85}.cue-handle.start{left:0;cursor:ew-resize}.cue-handle.end{right:0;cursor:ew-resize}.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--red);box-shadow:0 0 8px rgba(255,104,118,.5);z-index:4;pointer-events:none}.playhead:before{content:"";position:absolute;left:-4px;top:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--red)}.timeline-status{display:flex;justify-content:space-between;gap:10px;padding:6px 2px 0;color:var(--dim);font:8px var(--mono)}
+.timeline-panel{min-width:0;overflow:hidden}.timeline-toolbar{display:flex;align-items:center;gap:5px;padding:7px 8px;border-bottom:1px solid var(--line);min-width:0}.timeline-toolbar .title{flex:1;min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px}.timeline-toolbar .time{font:10px var(--mono);color:var(--dim);white-space:nowrap}.timeline-toolbar button{padding:5px 7px;font:9px var(--mono)}.timeline-toolbar .zoom-label{min-width:35px;text-align:center}.timeline-wrap{padding:8px;background:#0b0c0f;min-width:0}.timeline-viewport{height:168px;width:100%;overflow:auto;overflow-x:auto;overflow-y:hidden;border:1px solid var(--line);background:#090a0d;min-width:0;contain:layout paint}.timeline-content{position:relative;width:100%;min-width:600px;height:136px}.ruler{position:absolute;left:0;top:0;height:28px;min-width:100%;border-bottom:1px solid var(--line);overflow:hidden}.ruler span{position:absolute;top:7px;transform:translateX(-50%);font:8px var(--mono);color:var(--faint);white-space:nowrap;pointer-events:none}.ruler i{position:absolute;top:20px;width:1px;height:8px;background:rgba(255,255,255,.12);transform:translateX(-50%);pointer-events:none}.track{position:absolute;left:0;right:0;top:28px;height:108px;background:#0a0b0e}.timeline-grid-line{position:absolute;top:28px;bottom:0;width:1px;background:rgba(255,255,255,.035);transform:translateX(-50%);pointer-events:none}.cue-layer{position:absolute;inset:16px 0 12px}.cue-block{position:absolute;top:10px;height:68px;min-width:8px;padding:7px 11px;background:var(--green);color:#07120b;border:1px solid #d6ffe0;border-radius:3px;overflow:hidden;cursor:grab;display:flex;flex-direction:column;justify-content:space-between;touch-action:none;user-select:none}.cue-block:active{cursor:grabbing}.cue-block.selected{background:var(--cyan);box-shadow:0 0 0 2px rgba(0,255,204,.2)}.cue-block strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cue-block small{font:8px var(--mono);white-space:nowrap}.cue-handle{position:absolute;top:0;bottom:0;width:8px;background:rgba(0,0,0,.12);opacity:0}.cue-block:hover .cue-handle,.cue-block.selected .cue-handle{opacity:.85}.cue-handle.start{left:0;cursor:ew-resize}.cue-handle.end{right:0;cursor:ew-resize}.playhead{position:absolute;top:0;bottom:0;width:2px;background:var(--red);box-shadow:0 0 8px rgba(255,104,118,.5);z-index:4;pointer-events:none}.playhead:before{content:"";position:absolute;left:-4px;top:0;border-left:5px solid transparent;border-right:5px solid transparent;border-top:6px solid var(--red)}.timeline-status{display:flex;justify-content:space-between;gap:10px;padding:6px 2px 0;color:var(--dim);font:8px var(--mono)}
 .cue-panel .panel-body,.pad-panel .panel-body{display:grid;gap:8px}.cue-title{font-size:15px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.empty{padding:10px 0;color:var(--faint);font:10px var(--mono);line-height:1.45}.field{display:grid;gap:4px}.field label,.small-label{font:8px var(--mono);color:var(--dim);letter-spacing:.08em}.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.time-grid .full{grid-column:1/-1}.cue-tools{display:grid;grid-template-columns:1fr 1fr;gap:5px}.cue-tools .wide{grid-column:1/-1}.assign-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}.assign-pad{padding:6px 3px;font:9px var(--mono);text-align:left}.assign-pad span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.assign-pad small{display:block;margin-top:2px;color:var(--dim);font:7px var(--mono)}.assign-pad.active small{color:var(--cyan)}
 .performance{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:10px;margin-top:10px}.performance>*{min-width:0}.pads-head{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;border-bottom:1px solid var(--line)}.pads-head strong{font-size:13px}.pads-head span{font:8px var(--mono);color:var(--dim)}.pads-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;padding:8px}.pad{position:relative;min-height:88px;padding:9px;text-align:left;background:#15181d;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:5px;overflow:hidden;touch-action:none}.pad:hover{border-color:var(--line2)}.pad.selected{border-color:var(--cyan);box-shadow:inset 0 0 0 1px var(--cyan)}.pad.playing{border-color:var(--cyan);background:var(--cyan-dim)}.pad.empty{opacity:.58}.pad-num{font:9px var(--mono);color:var(--dim)}.pad kbd{justify-self:end;padding:2px 5px;border:1px solid var(--line2);font:10px var(--mono);color:var(--cyan)}.pad strong{grid-column:1/-1;align-self:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.pad small{grid-column:1/-1;font:8px var(--mono);color:var(--dim)}.pad i{position:absolute;left:0;bottom:0;width:100%;height:3px;background:var(--cyan);transform:scaleX(0);transform-origin:left}.pad.playing i{transform:scaleX(1)}
 .pad-title-row{display:flex;align-items:center;justify-content:space-between}.pad-title{font-size:16px;font-weight:600}.key-badge{padding:3px 6px;border:1px solid var(--cyan);background:var(--cyan-dim);color:var(--cyan);font:10px var(--mono)}.seg{display:grid;grid-template-columns:1fr 1fr;gap:5px}.seg button{padding:7px;font:9px var(--mono)}.control{display:grid;gap:4px}.control-line{display:flex;justify-content:space-between;font:8px var(--mono);color:var(--dim)}.control input[type=range]{width:100%}.pad-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}.pad-actions .wide{grid-column:1/-1}.bottom{display:flex;justify-content:space-between;gap:12px;margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font:8px var(--mono);color:var(--faint)}
 .toast{position:fixed;right:18px;bottom:18px;z-index:20;padding:10px 13px;background:#16191f;border:1px solid var(--line2);font:9px var(--mono);opacity:0;transform:translateY(8px);pointer-events:none;transition:.15s}.toast.show{opacity:1;transform:none}[hidden]{display:none!important}
 .rate-row{display:grid;grid-template-columns:1fr auto;gap:5px;align-items:center}.rate-row button{padding:5px 8px;font:9px var(--mono);white-space:nowrap}
 .seq-row{display:grid;grid-template-columns:18px 1fr 56px auto auto auto;gap:5px;align-items:center;padding:6px 7px;background:var(--raised);border:1px solid var(--line)}.seq-row.active{border-color:var(--cyan);background:var(--cyan-dim)}.seq-row input{width:100%;min-width:0;background:var(--raised2);border:1px solid var(--line);padding:4px;border-radius:var(--r);font:9px var(--mono)}.seq-row button{padding:3px 6px;font:9px var(--mono)}.seq-index{font:8px var(--mono);color:var(--dim)}.seq-pad{font:10px var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-@media(max-width:1250px){.workspace{grid-template-columns:220px minmax(0,1fr)}.cue-panel{grid-column:1/-1}.performance{grid-template-columns:1fr}.pad-panel{grid-column:1/-1}}
-@media(max-width:900px){.workspace{grid-template-columns:1fr}.topbar{display:flex;flex-wrap:wrap}.transport{width:100%;order:3}.top-tools{margin-left:auto}.visor{height:56vw;min-height:270px}.pads-grid{grid-template-columns:repeat(2,1fr)}.assign-grid{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1250px){.seq-toolbar{grid-template-columns:1fr 1fr}.seq-pattern-group{grid-column:1/-1}.workspace{grid-template-columns:220px minmax(0,1fr)}.cue-panel{grid-column:1/-1}.performance{grid-template-columns:1fr}.pad-panel{grid-column:1/-1}}
+@media(max-width:900px){.seq-toolbar{grid-template-columns:1fr}.seq-pattern-group{grid-column:auto}.seq-group{grid-template-columns:1fr}.workspace{grid-template-columns:1fr}.topbar{display:flex;flex-wrap:wrap}.transport{width:100%;order:3}.top-tools{margin-left:auto}.visor{height:56vw;min-height:270px}.pads-grid{grid-template-columns:repeat(2,1fr)}.assign-grid{grid-template-columns:repeat(4,1fr)}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -65,11 +65,13 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div class="project-grid"><button id="loadProjectButton" class="btn">CARGAR</button><button id="saveProjectButton" class="btn">GUARDAR</button><button id="clearProjectButton" class="btn wide danger">REINICIAR</button></div>
       <div class="section-title" style="margin-top:4px">MIDI</div>
       <div class="midi-row"><select id="midiInputSelect"><option value="">SELECCIONAR CONTROLADOR</option></select><button id="midiConnectButton" class="btn">CONECTAR</button></div>
+      <div class="midi-row"><button id="midiRefreshButton" class="btn">REFRESCAR PUERTOS</button><button id="midiReleaseButton" class="btn">LIBERAR</button></div>
       <div id="midiStatus" class="midi-status">NO CONECTADO · PULSA CONECTAR</div>
       <div class="midi-card">
         <div class="midi-learn-row"><button id="midiDetectButton" class="btn">DETECTAR MIDI</button><button id="midiLearnButton" class="btn">LEARN PAD</button></div>
         <div class="midi-monitor"><div>PAD MIDI: <strong id="midiPadMapping">NOTE 36 · CH ANY</strong></div><div>ÚLTIMO: <span id="midiLastMessage">—</span></div></div>
-        <div class="hint">MiniLab 3: pads de usuario suelen enviar CC 102–109. LEARN acepta NOTE o CC.</div>
+        <div class="midi-monitor"><div>PUERTOS: <strong id="midiPortInfo">—</strong></div><div>PERMISO: <strong id="midiPermissionInfo">—</strong></div></div>
+        <div class="hint">MiniLab 3: usa <b>MiniLab 3 MIDI</b>. Evita MCU/HUI, DIN THRU y ALV. Si Chrome y Firefox están abiertos a la vez, cierra uno antes de probar.</div>
       </div>
       <div class="hint">Selecciona un pad y pulsa LEARN PAD; luego pulsa un pad o tecla de tu controlador. El mapeo queda guardado en el proyecto.</div>
     </div>
@@ -81,7 +83,7 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div id="backgroundLayer" class="background-layer"></div>
       <div class="visor-overlay">
         <div class="visor-top"><div class="visor-chip" id="visorContext">SIN REPRODUCCIÓN</div><div class="visor-chip"><strong id="visualizerModeLabel">SIMPLE</strong> · <span id="visualSourceCount">0/1</span></div></div>
-        <div id="visualizerPlaceholder" class="visor-empty"> </div>
+        <div id="visualizerPlaceholder" class="visor-empty">CARGA UN VIDEO · CREA UN CUE · ASÍGNALO A UN PAD</div>
         <div id="ytPreview" class="yt-preview"></div>
         <div class="visor-bottom"><div id="visualizerModeButtons" class="visual-buttons"><button data-mode="simple" class="active">SIMPLE</button><button data-mode="split2">2</button><button data-mode="split4">4</button></div><div class="visor-chip">VISUAL</div></div>
       </div>
@@ -152,6 +154,20 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
       <div class="control"><div class="control-line"><span>LPF</span><span id="padLPOutput">20k</span></div><input id="padLPInput" type="range" min="0" max="1" step=".001" value="1"></div>
       <div class="time-grid"><div class="field"><label>BPM PAD</label><input id="padBpmInput" type="number" min="20" max="400" value="120"></div><div class="field" style="align-self:end"><button id="padSyncButton" class="btn wide">SYNC</button></div></div>
       <div class="field"><label>VISUAL</label><select id="padVisualSelect"><option value="auto">AUTO · VISOR</option><option value="visible">VISIBLE · PRIORIDAD</option><option value="hidden">HIDDEN · SOLO AUDIO</option></select></div>
+      <div class="midi-card">
+        <div class="section-title" style="margin:0">MIDI LEARN · KNOBS / FADERS</div>
+        <div class="midi-row"><select id="midiControlTarget">
+          <option value="padVolume">PAD · VOL</option>
+          <option value="padHP">PAD · HPF</option>
+          <option value="padLP">PAD · LPF</option>
+          <option value="padRate">PAD · RATE</option>
+          <option value="padBpm">PAD · BPM</option>
+          <option value="master">MASTER</option>
+          <option value="globalBpm">GLOBAL · BPM</option>
+        </select><button id="midiLearnControlButton" class="btn">LEARN</button></div>
+        <div id="midiControlMapping" class="midi-monitor">SIN ASIGNAR</div>
+        <div class="hint">Selecciona un parámetro, pulsa LEARN y mueve un knob o fader. Los controles PAD actúan sobre el pad seleccionado.</div>
+      </div>
       <div class="pad-actions"><button id="padTriggerButton" class="btn wide">DISPARAR</button><button id="padUnassignButton" class="btn danger wide">QUITAR CUE</button></div>
       <div class="hint">GATE reproduce mientras mantienes presionado. TRIGGER alterna reproducción. Un cue puede asignarse a varios pads.</div>
     </div>
@@ -161,24 +177,32 @@ button,input,select{font:inherit;color:inherit}button{border:1px solid var(--lin
 <section class="panel sequencer-panel" style="margin-top:10px">
   <div class="panel-head"><span>05 · SECUENCIADOR</span><span id="seqStatus">16 PASOS · 0 ACTIVOS</span></div>
   <div class="panel-body stack">
-    <div class="seq-controls">
-      <div><label class="small-label">RESOLUCIÓN</label><select id="seqDivision"><option value="1/16">1/16</option><option value="1/8">1/8</option><option value="1/4">1/4</option><option value="1/2">1/2</option></select></div>
-      <div><label class="small-label">SWING</label><input id="seqSwing" type="range" min="0" max="50" value="0" step="1"><div id="seqSwingOutput" class="hint">0%</div></div>
-      <div style="display:grid;align-items:end"><button id="seqFollowButton" type="button" class="btn wide active">FOLLOW PAD</button></div>
+    <div class="seq-toolbar">
+      <div class="seq-group seq-clock">
+        <div class="seq-group-title">RELOJ</div>
+        <label class="seq-field"><span>RESOLUCIÓN</span><select id="seqDivision"><option value="1/8">1/8</option><option value="1/4">1/4</option><option value="1/2">1/2</option><option value="1/1">1/1</option></select></label>
+        <label class="seq-field seq-swing"><span>SWING <b id="seqSwingOutput">0%</b></span><input id="seqSwing" type="range" min="0" max="50" value="0" step="1"></label>
+      </div>
+      <div class="seq-group seq-transport-group">
+        <div class="seq-group-title">TRANSPORTE</div>
+        <div class="seq-button-row">
+          <button id="seqPlayButton" type="button" class="btn seq-primary">▶ PLAY</button>
+          <button id="seqPauseButton" type="button" class="btn">Ⅱ PAUSA</button>
+          <button id="seqStopButton" type="button" class="btn">■ STOP</button>
+          <button id="seqRestartButton" type="button" class="btn">↺</button>
+        </div>
+      </div>
+      <div class="seq-group seq-pattern-group">
+        <div class="seq-group-title">PATRÓN</div>
+        <div class="seq-button-row">
+          <button id="seqLoopButton" type="button" class="btn active">LOOP</button>
+          <button id="seqFollowButton" type="button" class="btn active">FOLLOW PAD</button>
+          <button id="seqClearButton" type="button" class="btn danger">VACIAR</button>
+        </div>
+      </div>
     </div>
     <div id="seqGridWrap" class="seq-grid-wrap"><div id="seqGrid" class="seq-grid"></div></div>
-    <div class="transport-row">
-      <button id="seqPlayButton" type="button" class="btn active">▶ PLAY / RESUME</button>
-      <button id="seqPauseButton" type="button" class="btn">Ⅱ PAUSA</button>
-      <button id="seqStopButton" type="button" class="btn">■ STOP</button>
-    </div>
-    <div class="cue-tools">
-      <button id="seqLoopButton" type="button" class="btn active">LOOP</button>
-      <button id="seqRestartButton" type="button" class="btn">↺ REINICIAR</button>
-      <button id="seqClearButton" type="button" class="btn danger wide">VACIAR PATRÓN</button>
-    </div>
-    <div class="seq-summary"><span id="seqPatternInfo">120 BPM · 1/16</span><span>CLICK CELDA = ACTIVAR · SELECTOR DE PAD = EDITA FILA</span></div>
-  </div>
+    <div class="seq-summary"><span id="seqPatternInfo">120 BPM · 1/8</span><span>CELDA = ACTIVAR · PAD = EDITAR FILA</span></div>  </div>
 </section>
 
 <div class="bottom"><span>AV CHOPPER V3 · UN SOLO VISOR · CUES REUTILIZABLES · MIDI 36–51</span><span>LOCAL = AUDIO + CANVAS · YOUTUBE = REPRODUCCIÓN DIRECTA</span></div>
@@ -214,10 +238,10 @@ const CONFIG = {
   VIS_LIMIT: { simple: 1, split2: 2, split4: 4 },
   ZOOM_MAX: 16,
   SEQ_DIVISIONS: {
-    "1/16": 0.25,
     "1/8": 0.5,
     "1/4": 1,
-    "1/2": 2
+    "1/2": 2,
+    "1/1": 4
   },
   SEQ_LOOKAHEAD: 0.10,
   SEQ_SCHEDULER_MS: 25
@@ -349,7 +373,17 @@ const state = {
   midiInputId: "",
   midiConnected: false,
   midiLearnPadId: null,
+  midiLearnControl: null,
   midiDetecting: false,
+  midiControlMappings: {
+    padVolume: null,
+    padHP: null,
+    padLP: null,
+    padRate: null,
+    padBpm: null,
+    master: null,
+    globalBpm: null
+  },
 
   preview: {
     videoId: null,
@@ -374,7 +408,7 @@ const state = {
 
   sequencer: {
     pattern: Array.from({ length: CONFIG.SEQ_STEPS }, () => makeSequenceStep()),
-    division: "1/16",
+    division: "1/8",
     swing: 0,
     playing: false,
     paused: false,
@@ -422,12 +456,19 @@ const dom = {
   relinkFile: $("relinkFileInput"),
 
   midiConnect: $("midiConnectButton"),
+  midiRefresh: $("midiRefreshButton"),
+  midiRelease: $("midiReleaseButton"),
   midiDetect: $("midiDetectButton"),
   midiLearn: $("midiLearnButton"),
   midiSelect: $("midiInputSelect"),
   midiStatus: $("midiStatus"),
+  midiPortInfo: $("midiPortInfo"),
+  midiPermissionInfo: $("midiPermissionInfo"),
   midiPadMapping: $("midiPadMapping"),
   midiLastMessage: $("midiLastMessage"),
+  midiControlTarget: $("midiControlTarget"),
+  midiLearnControl: $("midiLearnControlButton"),
+  midiControlMapping: $("midiControlMapping"),
 
   backgroundLayer: $("backgroundLayer"),
   cueBackground: $("cueBackgroundButton"),
@@ -1688,21 +1729,31 @@ function renderTimeline() {
   dom.timelineTime.textContent = fmt(state.playhead);
   dom.timelineRuler.innerHTML = "";
   dom.cues.innerHTML = "";
+  dom.timelineContent.querySelectorAll(".timeline-grid-line").forEach(el => el.remove());
 
   if (video.duration > 0) {
-    const tickStep = state.zoom >= 8
-      ? 1
-      : state.zoom >= 4
-        ? 2
-        : state.zoom >= 2
-          ? 5
-          : Math.max(5, Math.ceil(video.duration / 10));
+    const pxPerSecond = timelineContentWidth() / Math.max(video.duration, 0.001);
+    const candidates = [0.5, 1, 2, 5, 10, 15, 30, 60, 120];
+    let tickStep = candidates[candidates.length - 1];
+    for (const candidate of candidates) {
+      if (candidate * pxPerSecond >= 64) { tickStep = candidate; break; }
+    }
 
     for (let t = 0; t <= video.duration + 0.0001; t += tickStep) {
+      const ratio = t / video.duration;
       const marker = document.createElement("span");
-      marker.style.left = `${(t / video.duration) * 100}%`;
+      marker.style.left = `${ratio * 100}%`;
       marker.textContent = fmt(t).slice(0, 5);
       dom.timelineRuler.appendChild(marker);
+
+      const tick = document.createElement("i");
+      tick.style.left = `${ratio * 100}%`;
+      dom.timelineRuler.appendChild(tick);
+
+      const line = document.createElement("i");
+      line.className = "timeline-grid-line";
+      line.style.left = `${ratio * 100}%`;
+      dom.timelineContent.appendChild(line);
     }
   }
 
@@ -2301,120 +2352,159 @@ function freq(value) {
    MIDI MANAGER
 ========================================================== */
 
+async function midiPermissionState() {
+  try {
+    if (!navigator.permissions?.query) return "NO DISPONIBLE";
+    const result = await navigator.permissions.query({ name: "midi" });
+    return result.state.toUpperCase();
+  } catch {
+    return "NO DISPONIBLE";
+  }
+}
+
+function midiBrowserLabel() {
+  const ua = navigator.userAgent;
+  if (/Firefox/i.test(ua)) return "Firefox";
+  if (/Chrome/i.test(ua)) return "Chrome/Chromium";
+  if (/Safari/i.test(ua)) return "Safari";
+  return "NAVEGADOR";
+}
+
+function midiPortLabel(input) {
+  return [input.manufacturer, input.name].filter(Boolean).join(" · ") || input.id || "MIDI";
+}
+
 async function requestMIDI() {
+  dom.midiPermissionInfo.textContent = "CONSULTANDO…";
+
   if (!navigator.requestMIDIAccess) {
-    dom.midiStatus.textContent = "MIDI NO SOPORTADO EN ESTE NAVEGADOR";
+    dom.midiStatus.textContent = `${midiBrowserLabel()} · WEB MIDI NO DISPONIBLE`;
+    dom.midiPermissionInfo.textContent = "NO SOPORTADO";
     return false;
   }
 
   if (!window.isSecureContext) {
-    dom.midiStatus.textContent = "REQUIERE HTTPS / LOCALHOST";
+    dom.midiStatus.textContent = "MIDI REQUIERE HTTPS / LOCALHOST";
+    dom.midiPermissionInfo.textContent = "BLOQUEADO · CONTEXTO INSEGURO";
     return false;
   }
 
   try {
     state.midiAccess = state.midiAccess || await navigator.requestMIDIAccess({ sysex: false });
     state.midiAccess.onstatechange = refreshMIDIInputs;
+    dom.midiPermissionInfo.textContent = await midiPermissionState();
     refreshMIDIInputs();
     return true;
   } catch (error) {
-    console.error(error);
-    dom.midiStatus.textContent = error.name === "SecurityError"
-      ? "PERMISO MIDI DENEGADO · REVISA EL NAVEGADOR"
-      : "ERROR AL CONECTAR MIDI";
+    console.error("requestMIDIAccess", error);
+    dom.midiPermissionInfo.textContent = error.name || "ERROR";
+    dom.midiStatus.textContent = error.name === "NotAllowedError"
+      ? "MIDI DENEGADO · REVISAR PERMISOS DEL SITIO"
+      : error.name === "SecurityError"
+        ? "MIDI BLOQUEADO POR SEGURIDAD / PERMISOS"
+        : `ERROR MIDI · ${error.name || "DESCONOCIDO"}`;
     return false;
   }
 }
 
 async function openMIDIInput(input) {
-  if (!input) return;
+  if (!input) return false;
   try {
-    if (typeof input.open === "function" && input.state !== "open") {
-      await input.open();
-    }
+    if (typeof input.open === "function") await input.open();
   } catch (error) {
     console.warn("MIDI input open", error);
+    dom.midiStatus.textContent = `NO SE PUDO ABRIR · ${midiPortLabel(input)}`;
+    return false;
   }
 
   input.onmidimessage = onMIDI;
   input.onstatechange = refreshMIDIInputs;
+
+  const open = input.connection === "open" || input.state === "connected";
+  if (!open) {
+    dom.midiStatus.textContent = `PUERTO NO ABIERTO · ${midiPortLabel(input)} · ESTADO ${input.connection || input.state || "?"}`;
+  }
+  return open;
 }
 
 async function closeMIDIInput(input) {
   if (!input) return;
   input.onmidimessage = null;
+  input.onstatechange = null;
   try {
-    if (typeof input.close === "function" && input.state === "open") {
-      await input.close();
-    }
-  } catch {}
+    if (typeof input.close === "function") await input.close();
+  } catch (error) {
+    console.warn("MIDI input close", error);
+  }
 }
 
 async function selectMIDI(inputId) {
   if (!state.midiAccess) {
     const ok = await requestMIDI();
-    if (!ok) return;
+    if (!ok) return false;
   }
 
   const inputs = [...state.midiAccess.inputs.values()];
-
   for (const input of inputs) {
     if (input.id !== inputId) await closeMIDIInput(input);
   }
 
   state.midiInputId = inputId || "";
-
   const selected = inputs.find(input => input.id === inputId);
-  if (selected) {
-    await openMIDIInput(selected);
-    state.midiConnected = true;
-  } else {
+  if (!selected) {
     state.midiConnected = false;
+    refreshMIDIInputs();
+    return false;
   }
 
+  const opened = await openMIDIInput(selected);
+  state.midiConnected = opened;
   refreshMIDIInputs();
+  return opened;
 }
 
 function refreshMIDIInputs() {
   if (!state.midiAccess) return;
 
   const inputs = [...state.midiAccess.inputs.values()];
-
   dom.midiSelect.innerHTML = '<option value="">SELECCIONAR CONTROLADOR</option>';
 
   inputs.forEach(input => {
     const option = document.createElement("option");
     option.value = input.id;
-    option.textContent = input.name || input.manufacturer || input.id;
+    option.textContent = midiPortLabel(input);
     dom.midiSelect.appendChild(option);
   });
 
+  // Preferimos explícitamente el puerto estándar del MiniLab 3.
   let selected = inputs.find(input => input.id === state.midiInputId);
+  if (!selected) selected = inputs.find(input => /MiniLab\s*3\s*MIDI/i.test(input.name || ""));
+  if (!selected && inputs.length === 1) selected = inputs[0];
 
-  if (!selected && inputs.length === 1) {
-    selected = inputs[0];
-    state.midiInputId = selected.id;
-  }
-
+  if (selected) state.midiInputId = selected.id;
   dom.midiSelect.value = state.midiInputId;
 
-  inputs.forEach(input => {
-    if (selected && input.id === selected.id) {
-      openMIDIInput(input);
-    } else {
-      input.onmidimessage = null;
-    }
-  });
-
-  state.midiConnected = !!selected;
+  state.midiConnected = !!selected && (selected.connection === "open" || selected.state === "connected");
   dom.midiConnect.classList.toggle("active", state.midiConnected);
 
-  if (selected) {
-    dom.midiStatus.textContent = `CONECTADO · ${selected.name || selected.manufacturer || "CONTROLADOR"}`;
-  } else if (inputs.length) {
-    dom.midiStatus.textContent = "DISPOSITIVO DETECTADO · SELECCIONA UNO";
+  dom.midiPortInfo.textContent = inputs.length
+    ? inputs.map(input => `${input.name || "MIDI"}:${input.state || "?"}/${input.connection || "?"}`).join(" · ")
+    : "SIN INPUTS";
+
+  if (selected && !state.midiConnected) {
+    openMIDIInput(selected).then(ok => {
+      state.midiConnected = ok;
+      dom.midiConnect.classList.toggle("active", ok);
+      dom.midiStatus.textContent = ok
+        ? `CONECTADO · ${midiPortLabel(selected)}`
+        : `NO SE PUDO ABRIR · ${midiPortLabel(selected)}`;
+    });
+  } else if (selected) {
+    dom.midiStatus.textContent = `CONECTADO · ${midiPortLabel(selected)}`;
   } else {
-    dom.midiStatus.textContent = "SIN DISPOSITIVOS DETECTADOS";
+    dom.midiStatus.textContent = inputs.length
+      ? "DISPOSITIVO MIDI DETECTADO · SELECCIONA UN INPUT"
+      : "SIN INPUTS MIDI · CONECTA EL MINILAB Y REFRESCA";
   }
 
   renderMidiMapping();
@@ -2422,45 +2512,46 @@ function refreshMIDIInputs() {
 
 async function connectMIDI() {
   dom.midiConnect.disabled = true;
-  dom.midiStatus.textContent = "CONECTANDO…";
-  await requestMIDI();
-
-  if (state.midiInputId) {
-    await selectMIDI(state.midiInputId);
+  dom.midiStatus.textContent = "SOLICITANDO ACCESO MIDI…";
+  const ok = await requestMIDI();
+  if (ok) {
+    const inputs = [...state.midiAccess.inputs.values()];
+    const preferred = inputs.find(input => /MiniLab\s*3\s*MIDI/i.test(input.name || ""));
+    const target = inputs.find(input => input.id === state.midiInputId) || preferred || inputs[0];
+    if (target) await selectMIDI(target.id);
   }
-
   dom.midiConnect.disabled = false;
 }
 
-async function detectMIDI() {
-  if (!state.midiAccess) {
-    const ok = await requestMIDI();
-    if (!ok) return;
+async function releaseMIDI() {
+  state.midiLearnPadId = null;
+  state.midiLearnControl = null;
+  if (state.midiAccess) {
+    for (const input of state.midiAccess.inputs.values()) await closeMIDIInput(input);
   }
-
-  state.midiDetecting = true;
-  dom.midiStatus.textContent = "ESPERANDO MENSAJE MIDI…";
-  toast("Pulsa un pad o control de tu controlador");
-
-  if (!state.midiInputId) {
-    const inputs = [...state.midiAccess.inputs.values()];
-    for (const input of inputs) {
-      try { if (typeof input.open === "function") await input.open(); } catch {}
-      input.onmidimessage = onMIDIDetect;
-    }
-  }
+  state.midiConnected = false;
+  dom.midiConnect.classList.remove("active");
+  dom.midiStatus.textContent = "MIDI LIBERADO · CIERRA EL OTRO NAVEGADOR SI SIGUE BLOQUEADO";
+  dom.midiLearn.textContent = "LEARN PAD";
+  dom.midiLearn.classList.remove("active");
+  dom.midiLearnControl.textContent = "LEARN";
+  dom.midiLearnControl.classList.remove("active");
+  renderMidiMapping();
 }
 
-function onMIDIDetect(event) {
-  const [statusByte = 0, data1 = 0, data2 = 0] = event.data || [];
-  dom.midiLastMessage.textContent = describeMIDI(statusByte, data1, data2);
-  state.midiDetecting = false;
-  if (event.currentTarget?.id) {
-    state.midiInputId = event.currentTarget.id;
+async function detectMIDI() {
+  const ok = await requestMIDI();
+  if (!ok) return;
+
+  state.midiDetecting = true;
+  dom.midiStatus.textContent = "ESPERANDO MENSAJE MIDI… MUEVE UN KNOB / FADER O PULSA UN PAD";
+  toast("Mueve cualquier control del MiniLab 3");
+
+  const inputs = [...state.midiAccess.inputs.values()];
+  for (const input of inputs) {
+    try { await input.open?.(); } catch {}
+    input.onmidimessage = onMIDI;
   }
-  refreshMIDIInputs();
-  dom.midiStatus.textContent = `DETECTADO · ${event.currentTarget?.name || "CONTROLADOR MIDI"}`;
-  toast(`MIDI detectado · ${event.currentTarget?.name || "INPUT"}`);
 }
 
 function startMIDILearn() {
@@ -2472,13 +2563,39 @@ function startMIDILearn() {
   }
   if (!state.midiInputId) {
     const inputs = [...state.midiAccess.inputs.values()];
-    if (inputs.length === 1) selectMIDI(inputs[0].id);
+    const preferred = inputs.find(input => /MiniLab\s*3\s*MIDI/i.test(input.name || ""));
+    if (preferred) selectMIDI(preferred.id);
+    else if (inputs.length === 1) selectMIDI(inputs[0].id);
     else { toast("Selecciona un controlador MIDI"); return; }
   }
+  state.midiLearnControl = null;
   state.midiLearnPadId = pad.id;
   dom.midiLearn.textContent = "ESPERANDO…";
   dom.midiLearn.classList.add("active");
   dom.midiStatus.textContent = `LEARN PAD ${pad.id} · PULSA NOTE O PAD`;
+}
+
+function startMIDIControlLearn() {
+  const target = dom.midiControlTarget.value;
+  if (!target) return;
+  if (!state.midiAccess) {
+    requestMIDI().then(ok => { if (ok) startMIDIControlLearn(); });
+    return;
+  }
+  if (!state.midiInputId) {
+    const inputs = [...state.midiAccess.inputs.values()];
+    const preferred = inputs.find(input => /MiniLab\s*3\s*MIDI/i.test(input.name || ""));
+    if (preferred) selectMIDI(preferred.id);
+    else if (inputs.length === 1) selectMIDI(inputs[0].id);
+    else { toast("Selecciona un controlador MIDI"); return; }
+  }
+  state.midiLearnPadId = null;
+  state.midiLearnControl = target;
+  dom.midiLearnControl.textContent = "MUEVE…";
+  dom.midiLearnControl.classList.add("active");
+  dom.midiLearn.textContent = "LEARN PAD";
+  dom.midiLearn.classList.remove("active");
+  dom.midiStatus.textContent = `LEARN CONTROL · ${target.toUpperCase()} · MUEVE KNOB/FADER`;
 }
 
 function finishMIDILearn(type, number, channel) {
@@ -2491,18 +2608,42 @@ function finishMIDILearn(type, number, channel) {
   state.midiLearnPadId = null;
   dom.midiLearn.textContent = "LEARN PAD";
   dom.midiLearn.classList.remove("active");
-  dom.midiStatus.textContent = `PAD ${pad.id} ← ${type.toUpperCase()} ${number}`;
+  dom.midiStatus.textContent = `PAD ${pad.id} ← ${type.toUpperCase()} ${number} · CH ${channel + 1}`;
   renderAll();
   toast(`PAD ${pad.id} ← MIDI ${type.toUpperCase()} ${number}`);
 }
 
+function finishMIDIControlLearn(number, channel) {
+  const target = state.midiLearnControl;
+  if (!target) return;
+  state.midiControlMappings[target] = { cc: number, channel };
+  state.midiLearnControl = null;
+  dom.midiLearnControl.textContent = "LEARN";
+  dom.midiLearnControl.classList.remove("active");
+  dom.midiStatus.textContent = `CONTROL ${target.toUpperCase()} ← CC ${number} · CH ${channel + 1}`;
+  renderMidiMapping();
+  renderPadProps();
+  toast(`${target.toUpperCase()} ← CC ${number}`);
+}
+
+function renderMidiControlMapping() {
+  const target = dom.midiControlTarget.value;
+  const mapping = state.midiControlMappings[target];
+  dom.midiControlMapping.textContent = mapping
+    ? `${target.toUpperCase()} ← CC ${mapping.cc} · CH ${mapping.channel == null ? "ANY" : mapping.channel + 1}`
+    : `${target.toUpperCase()} · SIN ASIGNAR`;
+  dom.midiLearnControl.classList.toggle("active", state.midiLearnControl === target);
+}
+
 function renderMidiMapping() {
   const pad = selectedPad();
-  if (!pad) return;
-  const type = pad.midiType || "note";
-  const number = type === "cc" ? pad.midiCC : pad.midiNote;
-  dom.midiPadMapping.textContent = `${type.toUpperCase()} ${number ?? "—"} · CH ${pad.midiChannel == null ? "ANY" : pad.midiChannel + 1}`;
-  dom.midiLearn.classList.toggle("active", state.midiLearnPadId === pad.id);
+  if (pad) {
+    const type = pad.midiType || "note";
+    const number = type === "cc" ? pad.midiCC : pad.midiNote;
+    dom.midiPadMapping.textContent = `${type.toUpperCase()} ${number ?? "—"} · CH ${pad.midiChannel == null ? "ANY" : pad.midiChannel + 1}`;
+    dom.midiLearn.classList.toggle("active", state.midiLearnPadId === pad.id);
+  }
+  renderMidiControlMapping();
 }
 
 function describeMIDI(statusByte, data1, data2) {
@@ -2522,6 +2663,42 @@ function describeMIDI(statusByte, data1, data2) {
   return `${name} ${data1} · CH ${channel} · ${data2}`;
 }
 
+function applyMIDIControl(cc, value, channel) {
+  const selected = selectedPad();
+  for (const [target, mapping] of Object.entries(state.midiControlMappings)) {
+    if (!mapping || mapping.cc !== cc || (mapping.channel != null && mapping.channel !== channel)) continue;
+
+    const n = value / 127;
+    if (target === "padVolume" && selected) {
+      selected.volume = n;
+      updatePadGain(selected);
+    } else if (target === "padHP" && selected) {
+      selected.highPass = 20 + n * 7980;
+      if (selected.hp) selected.hp.frequency.value = selected.highPass;
+    } else if (target === "padLP" && selected) {
+      selected.lowPass = 20 + n * 19980;
+      if (selected.lp) selected.lp.frequency.value = selected.lowPass;
+    } else if (target === "padRate" && selected) {
+      selected.playbackRate = CONFIG.MIN_RATE + n * (CONFIG.MAX_RATE - CONFIG.MIN_RATE);
+      if (selected.engine?.videoEl) selected.engine.videoEl.playbackRate = effectiveRate(selected);
+      if (selected.engine?.player) {
+        try { selected.engine.player.setPlaybackRate(clamp(effectiveRate(selected), CONFIG.MIN_RATE, CONFIG.MAX_RATE)); } catch {}
+      }
+    } else if (target === "padBpm" && selected) {
+      selected.bpm = 20 + n * 380;
+    } else if (target === "master") {
+      state.master = n;
+      dom.master.value = state.master;
+      updateAllGains();
+    } else if (target === "globalBpm") {
+      state.bpm = Math.round(30 + n * 270);
+      dom.bpm.value = state.bpm;
+      dom.bpmValue.textContent = `${Math.round(state.bpm)} BPM`;
+    }
+  }
+  renderPadProps();
+}
+
 function onMIDI(event) {
   const [statusByte = 0, data1 = 0, data2 = 0] = event.data || [];
   const command = statusByte & 0xf0;
@@ -2533,13 +2710,17 @@ function onMIDI(event) {
     state.midiDetecting = false;
     if (port?.id) state.midiInputId = port.id;
     refreshMIDIInputs();
-    dom.midiStatus.textContent = `DETECTADO · ${port?.name || "MIDI"}`;
-    return;
+    dom.midiStatus.textContent = `DETECTADO · ${midiPortLabel(port)}`;
   }
 
   const isNoteOn = command === 0x90 && data2 > 0;
   const isNoteOff = command === 0x80 || (command === 0x90 && data2 === 0);
   const isCC = command === 0xb0;
+
+  if (state.midiLearnControl && isCC) {
+    finishMIDIControlLearn(data1, channel);
+    return;
+  }
 
   if (state.midiLearnPadId && (isNoteOn || (isCC && data2 > 0))) {
     finishMIDILearn(isCC ? "cc" : "note", data1, channel);
@@ -2567,17 +2748,18 @@ function onMIDI(event) {
   }
 
   if (isCC) {
+    applyMIDIControl(data1, data2, channel);
+
+    // Compatibilidad con los CC históricos del proyecto.
     const selected = selectedPad();
-    if (!selected) return;
-    if (data1 === 112) {
+    if (selected && data1 === 112) {
       selected.highPass = 20 + (data2 / 127) * 7980;
       if (selected.hp) selected.hp.frequency.value = selected.highPass;
     }
-    if (data1 === 113) {
+    if (selected && data1 === 113) {
       selected.lowPass = 20 + (data2 / 127) * 19980;
       if (selected.lp) selected.lp.frequency.value = selected.lowPass;
     }
-    renderPadProps();
   }
 }
 
@@ -2707,11 +2889,11 @@ function stopRecording() {
 ========================================================== */
 
 function divisionBeats() {
-  return CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.25;
+  return CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.5;
 }
 
 function seqBaseMs() {
-  const beats = CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.25;
+  const beats = CONFIG.SEQ_DIVISIONS[state.sequencer.division] || 0.5;
   return (60000 / Math.max(30, state.bpm)) * beats;
 }
 
@@ -2985,6 +3167,7 @@ function projectData() {
     masterVolume: state.master,
     visualizerMode: state.visualizerMode,
     backgroundCueId: state.backgroundCueId,
+    midiControlMappings: state.midiControlMappings,
 
     videos: videos.map(video => ({
       id: video.id,
@@ -3092,7 +3275,12 @@ function resetProjectState() {
   state.selectedPadId = 1;
   state.playhead = 0;
   state.midiLearnPadId = null;
+  state.midiLearnControl = null;
   state.midiDetecting = false;
+  state.midiControlMappings = {
+    padVolume: null, padHP: null, padLP: null, padRate: null,
+    padBpm: null, master: null, globalBpm: null
+  };
   stopBackgroundCue();
   state.visualSources = [];
   state.backgroundCueId = null;
@@ -3132,6 +3320,11 @@ function loadProject(data) {
 
   state.visualizerMode = CONFIG.VIS_LIMIT[data.visualizerMode] ? data.visualizerMode : "simple";
   state.backgroundCueId = null;
+  state.midiControlMappings = {
+    padVolume: null, padHP: null, padLP: null, padRate: null,
+    padBpm: null, master: null, globalBpm: null,
+    ...(data.midiControlMappings || {})
+  };
 
   const validCueIds = new Set();
 
@@ -3215,7 +3408,7 @@ function loadProject(data) {
 
   state.sequencer.division = CONFIG.SEQ_DIVISIONS[sequence.division]
     ? sequence.division
-    : "1/16";
+    : "1/8";
   state.sequencer.swing = clamp(Number(sequence.swing) || 0, 0, 50);
   state.sequencer.loop = sequence.loop !== false;
   state.sequencer.followPad = sequence.followPad !== false;
@@ -3452,12 +3645,16 @@ function bind() {
   };
 
   dom.midiConnect.onclick = connectMIDI;
-  dom.midiDetect.onclick = async () => {
+  dom.midiRefresh.onclick = async () => {
     const ok = await requestMIDI();
-    if (ok) detectMIDI();
+    if (ok) { refreshMIDIInputs(); toast("Puertos MIDI actualizados"); }
   };
+  dom.midiRelease.onclick = releaseMIDI;
+  dom.midiDetect.onclick = detectMIDI;
   dom.midiLearn.onclick = startMIDILearn;
   dom.midiSelect.onchange = event => selectMIDI(event.target.value);
+  dom.midiLearnControl.onclick = startMIDIControlLearn;
+  dom.midiControlTarget.onchange = renderMidiMapping;
 
   dom.timelineViewport.addEventListener("pointerdown", event => {
     if (!event.target.closest(".cue-block")) beginPlayheadDrag(event);
@@ -3649,7 +3846,7 @@ function bind() {
   dom.seqDivision.onchange = event => {
     state.sequencer.division = CONFIG.SEQ_DIVISIONS[event.target.value]
       ? event.target.value
-      : "1/16";
+      : "1/8";
     renderSequencer(false);
   };
 
